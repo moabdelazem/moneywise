@@ -1,36 +1,167 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Moneywise
+
+Moneywise is a Next.js application designed to manage and track expenses, providing an intuitive user experience for financial management. This app is built with Next.js, Prisma ORM, and PostgreSQL, with Docker Compose to manage the database.
+
+## Features
+
+- **Expense Tracking**: Add and categorize expenses.
+- **Expense Summary**: View total expenses over specified periods.
+- **Authentication**: Secure user login and registration system.
+
+## Technologies
+
+- **Next.js** for the frontend and backend routes.
+- **Prisma ORM** for database management.
+- **PostgreSQL** database, managed via Docker Compose.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Docker** and **Docker Compose**: Make sure Docker is installed on your machine.
+  - [Get Docker here](https://docs.docker.com/get-docker/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone the repository**:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   git clone https://github.com/moabdelazem/moneywise.git
+   cd moneywise
+   ```
 
-## Learn More
+2. **Install dependencies**:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Set up environment variables**:  
+   Create a `.env` file in the root directory and add the following variables:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```plaintext
+   DATABASE_URL="postgresql://user:password@localhost:5432/moneywise"
+   NEXTAUTH_SECRET="your_secret_key"
+   ```
 
-## Deploy on Vercel
+   Replace `user`, `password`, and `database_name` with your PostgreSQL credentials.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Start the PostgreSQL Database**:
+   Run the database using Docker Compose.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   docker-compose up -d
+   ```
+
+5. **Run database migrations**:
+   Initialize the database with Prisma migrations.
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+6. **Run the development server**:
+
+   ```bash
+   npm run dev
+   ```
+
+7. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see the app.
+
+## Available Scripts
+
+- `npm run dev`: Starts the development server.
+- `docker-compose up -d`: Starts the database in detached mode.
+- `npx prisma migrate dev`: Runs migrations on the database.
+
+## Contributing
+
+Feel free to fork this repository and submit pull requests.
+
+---
+
+Let me know if you'd like to customize this further!Here's a `README.md` template for your Moneywise app:
+
+---
+
+# Moneywise
+
+Moneywise is a Next.js application designed to manage and track expenses, providing an intuitive user experience for financial management. This app is built with Next.js, Prisma ORM, and PostgreSQL, with Docker Compose to manage the database.
+
+## Features
+
+- **Expense Tracking**: Add and categorize expenses.
+- **Expense Summary**: View total expenses over specified periods.
+- **Authentication**: Secure user login and registration system.
+
+## Technologies
+
+- **Next.js** for the frontend and backend routes.
+- **Prisma ORM** for database management.
+- **PostgreSQL** database, managed via Docker Compose.
+
+## Getting Started
+
+### Prerequisites
+
+- **Docker** and **Docker Compose**: Make sure Docker is installed on your machine.
+  - [Get Docker here](https://docs.docker.com/get-docker/)
+
+### Installation
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/yourusername/moneywise.git
+   cd moneywise
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**:  
+   Create a `.env` file in the root directory and add the following variables:
+
+   ```plaintext
+   DATABASE_URL="postgresql://user:password@localhost:5432/moneywise"
+   JWT_SECRET="your_secret_key"
+   ```
+
+   Replace `user`, `password`, and `database_name` with your PostgreSQL credentials.
+
+4. **Start the PostgreSQL Database**:
+   Run the database using Docker Compose.
+
+   ```bash
+   docker-compose up -d
+   ```
+
+5. **Run database migrations**:
+   Initialize the database with Prisma migrations.
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+6. **Run the development server**:
+
+   ```bash
+   npm run dev
+   ```
+
+7. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see the app.
+
+## Available Scripts
+
+- `npm run dev`: Starts the development server.
+- `docker-compose up -d`: Starts the database in detached mode.
+- `npx prisma migrate dev`: Runs migrations on the database.
+
+## Contributing
+
+Feel free to fork this repository and submit pull requests.
+
+---

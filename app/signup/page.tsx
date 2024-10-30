@@ -73,13 +73,11 @@ export default function SignUpPage() {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token);
-        // document.cookie = `token=${data.token}; path=/; max-age=86400; secure; samesite=strict`;
         toast({
           title: "Success",
-          description: "Your account has been created.",
+          description: "Your account has been created."
         });
-        router.push("/dashboard");
+        router.push("/login");
       } else {
         setSignupError(data.error || "An error occurred. Please try again.");
       }
