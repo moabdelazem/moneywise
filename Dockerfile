@@ -5,10 +5,10 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
 # Install all dependencies, including dev dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the Prisma schema
 COPY prisma ./prisma
@@ -28,15 +28,16 @@ FROM node:18-alpine AS runner
 # Set working directory
 WORKDIR /app
 
-# Copy .env file
-COPY .env .env
+# Copy .env file if it exists
+COPY --chown=node:node .env* ./
 
 # Copy package.json and install only production dependencies
 COPY package.json ./
-RUN npm install --only=production
+RUN npm ci --only=production
 
 # Copy the build output and Prisma client files from the builder stage
 COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
 COPY --from=builder /app/prisma ./prisma
 
