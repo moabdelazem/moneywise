@@ -33,7 +33,7 @@ COPY --chown=node:node .env* ./
 
 # Copy package.json and install only production dependencies
 COPY package.json ./
-RUN npm ci --only=production
+RUN npm install 
 
 # Copy the build output and Prisma client files from the builder stage
 COPY --from=builder /app/.next ./.next
