@@ -7,9 +7,9 @@ services:
       - POSTGRES_PASSWORD=moneywise_password
       - POSTGRES_DB=moneywise_db
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - moneywise_vol:/var/lib/postgresql/data
     ports:
       - '5432:5432'
 
 volumes:
-  postgres:
+  moneywise_vol:
