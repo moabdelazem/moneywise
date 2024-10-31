@@ -3,10 +3,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { DollarSign, Plus, LogOut } from "lucide-react";
+import {
+  DollarSign,
+  Plus,
+  LogOut,
+  PieChart as PieChartIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpenseForm } from "@/components/ExpenseForm";
+import { BudgetForm } from "@/components/BudgetForm";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,6 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
+import { toast } from "@/hooks/use-toast";
 import {
   PieChart,
   Pie,
@@ -33,6 +41,14 @@ interface Expense {
   category: string;
 }
 
+interface Budget {
+  id: string;
+  category: string;
+  amount: number;
+  month: number;
+  year: number;
+}
+
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 const MotionCard = motion(Card);
@@ -40,8 +56,10 @@ const MotionCard = motion(Card);
 export default function Dashboard() {
   const [userName, setUserName] = useState<string>("");
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [showBudgetForm, setShowBudgetForm] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -56,24 +74,37 @@ export default function Dashboard() {
       }
 
       try {
-        const [userResponse, expensesResponse] = await Promise.all([
-          fetch("/api/user", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }),
-          fetch("/api/expenses", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }),
-        ]);
+        const [userResponse, expensesResponse, budgetsResponse] =
+          await Promise.all([
+            fetch("/api/user", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }),
+            fetch("/api/expenses", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }),
+            fetch(
+              `/api/budgets?month=${
+                new Date().getMonth() + 1
+              }&year=${new Date().getFullYear()}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            ),
+          ]);
 
-        if (userResponse.ok && expensesResponse.ok) {
+        if (userResponse.ok && expensesResponse.ok && budgetsResponse.ok) {
           const userData = await userResponse.json();
           const expensesData = await expensesResponse.json();
+          const budgetsData = await budgetsResponse.json();
           setUserName(userData.name);
           setExpenses(expensesData);
+          setBudgets(budgetsData);
         } else {
           throw new Error("Failed to fetch data");
         }
@@ -114,11 +145,76 @@ export default function Dashboard() {
         const addedExpense = await response.json();
         setExpenses([addedExpense, ...expenses]);
         setShowExpenseForm(false);
+        checkBudgetLimits(addedExpense);
       } else {
         throw new Error("Failed to add expense");
       }
     } catch (error) {
       console.error("Error adding expense:", error);
+      toast({
+        title: "Error adding expense",
+        description:
+          "There was an error adding your expense. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddBudget = async (newBudget: Omit<Budget, "id">) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/budgets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newBudget),
+      });
+
+      if (response.ok) {
+        const addedBudget = await response.json();
+        setBudgets([
+          ...budgets.filter((b) => b.category !== addedBudget.category),
+          addedBudget,
+        ]);
+        setShowBudgetForm(false);
+      } else {
+        throw new Error("Failed to add budget");
+      }
+    } catch (error) {
+      console.error("Error adding budget:", error);
+      toast({
+        title: "Error setting budget",
+        description:
+          "There was an error setting your budget. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const checkBudgetLimits = (newExpense: Expense) => {
+    const relevantBudget = budgets.find(
+      (b) => b.category === newExpense.category
+    );
+    if (relevantBudget) {
+      const totalExpenses =
+        expenses
+          .filter((e) => e.category === newExpense.category)
+          .reduce((sum, e) => sum + e.amount, 0) + newExpense.amount;
+
+      if (totalExpenses > relevantBudget.amount * 0.9) {
+        toast({
+          title: "Budget Alert",
+          description: `You've spent over 90% of your ${newExpense.category} budget for this month.`,
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -209,9 +305,14 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </MotionCard>
-            <Button onClick={() => setShowExpenseForm(!showExpenseForm)}>
-              <Plus className="mr-2 h-4 w-4" /> Add Expense
-            </Button>
+            <div className="space-x-2">
+              <Button onClick={() => setShowExpenseForm(!showExpenseForm)}>
+                <Plus className="mr-2 h-4 w-4" /> Add Expense
+              </Button>
+              <Button onClick={() => setShowBudgetForm(!showBudgetForm)}>
+                <PieChartIcon className="mr-2 h-4 w-4" /> Set Budget
+              </Button>
+            </div>
           </motion.div>
 
           <AnimatePresence>
@@ -223,18 +324,36 @@ export default function Dashboard() {
                 transition={{ duration: 0.3 }}
               >
                 <ExpenseForm
-                  onSubmit={(data: {
-                    date: string;
-                    amount: string;
-                    description: string;
-                    category: string;
-                  }) =>
+                  onSubmit={(data) =>
                     handleAddExpense({
                       ...data,
                       amount: parseFloat(data.amount),
                     })
                   }
                   onCancel={() => setShowExpenseForm(false)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {showBudgetForm && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <BudgetForm
+                  onSubmit={(data) =>
+                    handleAddBudget({
+                      ...data,
+                      amount: parseFloat(data.amount),
+                      month: parseInt(data.month, 10),
+                      year: parseInt(data.year, 10),
+                    })
+                  }
+                  onCancel={() => setShowBudgetForm(false)}
                 />
               </motion.div>
             )}
@@ -265,7 +384,7 @@ export default function Dashboard() {
                           fill="#8884d8"
                           dataKey="value"
                         >
-                          {chartData.map((_, index) => (
+                          {chartData.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
                               fill={COLORS[index % COLORS.length]}
@@ -287,7 +406,7 @@ export default function Dashboard() {
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <CardHeader>
-                <CardTitle>Recent Expenses</CardTitle>
+                <CardTitle>Budget Overview</CardTitle>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
@@ -298,25 +417,27 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {expenses.slice(0, 5).map((expense) => (
-                      <motion.div
-                        key={expense.id}
-                        className="flex justify-between items-center"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.1 }}
-                      >
-                        <div>
-                          <p className="font-medium">{expense.description}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {expense.category}
-                          </p>
+                    {budgets.map((budget) => {
+                      const totalExpensesForCategory = expenses
+                        .filter((e) => e.category === budget.category)
+                        .reduce((sum, e) => sum + e.amount, 0);
+                      const percentage =
+                        (totalExpensesForCategory / budget.amount) * 100;
+                      return (
+                        <div key={budget.id} className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="font-medium">
+                              {budget.category}
+                            </span>
+                            <span>
+                              ${totalExpensesForCategory.toFixed(2)} / $
+                              {budget.amount.toFixed(2)}
+                            </span>
+                          </div>
+                          <Progress value={percentage} className="h-2" />
                         </div>
-                        <p className="font-medium">
-                          ${expense.amount.toFixed(2)}
-                        </p>
-                      </motion.div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
