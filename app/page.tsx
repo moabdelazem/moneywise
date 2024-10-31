@@ -91,12 +91,13 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <footer className="py-6 text-center text-sm text-muted-foreground">
+      <footer className="flex flex-col gap-4 py-6 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} MoneyWise. All rights reserved.
-        <a href="" className="text-blue-400">
+        <a href="https://github.com/moabdelazem/moneywise" className="text-blue-400">
           The Project is Free and Open Source, Visit Github to see The Source
           Code
         </a>
+        Created With ❤️ by Mohamed Abdelazem - Monica Nader - Malak Ayman - Rawan Medhat
       </footer>
     </>
   );
