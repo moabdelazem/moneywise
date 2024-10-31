@@ -21,10 +21,14 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+// Signup schema
 const signupSchema = z
   .object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-    email: z.string().email({ message: "Invalid email address" }),
+    email: z
+      .string()
+      .email({ message: "Invalid email address" })
+      .transform((value) => value.toLowerCase()),
     password: z
       .string()
       .min(8, { message: "Password must be at least 8 characters" })
@@ -50,6 +54,7 @@ export default function SignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
 
+  // Form hook with zod resolver
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -75,7 +80,7 @@ export default function SignUpPage() {
       if (response.ok) {
         toast({
           title: "Success",
-          description: "Your account has been created."
+          description: "Your account has been created.",
         });
         router.push("/login");
       } else {
@@ -90,7 +95,7 @@ export default function SignUpPage() {
 
   return (
     <div className="container flex items-center justify-center min-h-screen mx-auto">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Create your MoneyWise account</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -111,7 +116,7 @@ export default function SignUpPage() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder="Ex: John Doe" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

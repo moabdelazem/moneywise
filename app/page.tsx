@@ -93,14 +93,10 @@ export default function Home() {
       </main>
       <footer className="py-6 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} MoneyWise. All rights reserved.
-        <div className="space-y-4">
-          <ul className="flex gap-8 justify-center items-center">
-            <li>Mohamed Abdelazem</li>
-            <li>Monica Nader</li>
-            <li>Malak Ayman</li>
-            <li>Rawan Medhat</li>
-          </ul>
-        </div>
+        <a href="" className="text-blue-400">
+          The Project is Free and Open Source, Visit Github to see The Source
+          Code
+        </a>
       </footer>
     </>
   );

@@ -27,14 +27,3 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/moneywise:latest
-
-      - name: Deploy to server
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            docker pull ${{ secrets.DOCKER_USERNAME }}/moneywise:latest
-            docker stop moneywise || true
-            docker rm moneywise || true
-            docker run -d --name moneywise -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/moneywise:latest
-          EOF
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}

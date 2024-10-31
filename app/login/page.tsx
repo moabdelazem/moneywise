@@ -22,7 +22,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  email: z
+    .string()
+    .email({ message: "Invalid email address" })
+    .transform((value) => value.toLowerCase()),
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters" }),
@@ -82,7 +85,7 @@ export default function LoginPage() {
 
   return (
     <div className="container flex items-center justify-center min-h-screen mx-auto">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Welcome back to MoneyWise</h1>
           <p className="mt-2 text-sm text-muted-foreground">
