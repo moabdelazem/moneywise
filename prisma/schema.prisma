@@ -21,6 +21,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Expense   Expense[]
+  Budget    Budget[]
 }
 
 model Expense {
@@ -33,4 +34,18 @@ model Expense {
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Budget {
+  id         String   @id @default(cuid())
+  userId     String
+  category   String
+  amount     Float
+  month      Int
+  year       Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, category, month, year])
 }
