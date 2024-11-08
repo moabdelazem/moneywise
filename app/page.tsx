@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import { ArrowRight, PiggyBank, BarChart2, Target } from "lucide-react";
+import {
+  ArrowRight,
+  PiggyBank,
+  BarChart2,
+  Target,
+  CheckCircle,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,14 +55,14 @@ export default function Home() {
                   Money<span className="text-primary">Wise</span>
                 </h1>
                 <p className="text-xl text-muted-foreground">
-                  A simple and easy to use budgeting app that helps you track
-                  your expenses and income.
+                  A simple and powerful budgeting app that helps you take
+                  control of your finances.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                  <Button asChild size="lg" className="w-full sm:w-auto">
+                  <Button asChild size="lg" className="w-full sm:w-auto group">
                     <Link href="/signup" className="flex items-center">
                       Get Started
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </Button>
                   <Button
@@ -91,13 +97,21 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <footer className="flex flex-col gap-4 py-6 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} MoneyWise. All rights reserved.
-        <a href="https://github.com/moabdelazem/moneywise" className="text-blue-400">
-          The Project is Free and Open Source, Visit Github to see The Source
-          Code
+      <footer className="flex flex-col gap-4 py-6 text-center text-sm text-muted-foreground bg-stone-100 dark:bg-stone-900">
+        <div>© {new Date().getFullYear()} MoneyWise. All rights reserved.</div>
+        <a
+          href="https://github.com/moabdelazem/moneywise"
+          className="text-primary hover:underline"
+        >
+          The Project is Free and Open Source - View on GitHub
         </a>
-        Created With ❤️ by Mohamed Abdelazem - Monica Nader - Malak Ayman - Rawan Medhat
+        <div className="flex items-center justify-center gap-2">
+          <CheckCircle className="h-4 w-4 text-green-500" />
+          <span>
+            Created with ❤️ by Mohamed Abdelazem, Monica Nader, Malak Ayman, and
+            Rawan Medhat
+          </span>
+        </div>
       </footer>
     </>
   );

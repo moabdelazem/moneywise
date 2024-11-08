@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/dashboard/Header";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { OverviewCards } from "@/components/dashboard/OverviewCards";
-import { ExpensesChart } from "@/components/dashboard/ExpensesChart";
 import { BudgetOverview } from "@/components/dashboard/BudgetOverview";
 import { ExpensesTable } from "@/components/dashboard/ExpensesTable";
 import { Reports } from "@/components/dashboard/Reports";
@@ -22,6 +21,10 @@ import { ExpenseForm } from "@/components/ExpenseForm";
 import { BudgetForm } from "@/components/BudgetForm";
 import { Button } from "@/components/ui/button";
 import { Plus, PieChart as PieChartIcon } from "lucide-react";
+import { LatestExpenses } from "@/components/dashboard/LatestExpense";
+// import { MonthlySpendingTrend } from "@/components/dashboard/MonthlySpendingTrend";
+import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
+import { FinancialHealthScore } from "@/components/dashboard/FinancialHealthScore";
 
 interface Expense {
   id: string;
@@ -38,6 +41,9 @@ interface Budget {
   month: number;
   year: number;
 }
+
+// !Place Holder
+const financialHealthScore = 99;
 
 export default function Dashboard() {
   const [userName, setUserName] = useState<string>("");
@@ -223,10 +229,21 @@ export default function Dashboard() {
               isLoading={isLoading}
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <ExpensesChart expenses={expenses} isLoading={isLoading} />
+              <LatestExpenses expenses={expenses} isLoading={isLoading} />
               <BudgetOverview
                 expenses={expenses}
                 budgets={budgets}
+                isLoading={isLoading}
+              />
+              {/* <MonthlySpendingTrend expenses={expenses} isLoading={isLoading} /> */}
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <FinancialHealthScore
+                score={financialHealthScore}
+                isLoading={isLoading}
+              />
+              <TopSpendingCategories
+                expenses={expenses}
                 isLoading={isLoading}
               />
             </div>

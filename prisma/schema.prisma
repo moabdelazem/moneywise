@@ -13,15 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model User {
+//   id        String    @id @default(cuid())
+//   name      String
+//   email     String    @unique
+//   password  String
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   Expense   Expense[]
+//   Budget    Budget[]
+// }
+
 model User {
-  id        String    @id @default(cuid())
-  name      String
-  email     String    @unique
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Expense   Expense[]
-  Budget    Budget[]
+  id                 String    @id @default(uuid())
+  name               String
+  email              String    @unique
+  password           String
+  currency           String    @default("USD")
+  emailNotifications Boolean   @default(true)
+  pushNotifications  Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  budgets            Budget[]
+  Expense            Expense[]
 }
 
 model Expense {
@@ -37,15 +51,15 @@ model Expense {
 }
 
 model Budget {
-  id         String   @id @default(cuid())
-  userId     String
-  category   String
-  amount     Float
-  month      Int
-  year       Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  user       User     @relation(fields: [userId], references: [id])
+  id        String   @id @default(cuid())
+  userId    String
+  category  String
+  amount    Float
+  month     Int
+  year      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, category, month, year])
 }

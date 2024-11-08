@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Loader2, Eye, EyeOff } from "lucide-react"
-import { motion } from "framer-motion"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Loader2, Eye, EyeOff } from "lucide-react";
+import { motion } from "framer-motion";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -17,11 +17,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useToast } from "@/hooks/use-toast"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 const loginSchema = z.object({
   email: z
@@ -31,14 +38,14 @@ const loginSchema = z.object({
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters" }),
-})
+});
 
 export default function Component() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [loginError, setLoginError] = useState<string | null>(null)
-  const router = useRouter()
-  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -46,45 +53,45 @@ export default function Component() {
       email: "",
       password: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
-    setIsLoading(true)
-    setLoginError(null)
+    setIsLoading(true);
+    setLoginError(null);
 
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token)
-        document.cookie = `token=${data.token}; path=/; max-age=86400; secure; samesite=strict`
+        localStorage.setItem("token", data.token);
+        document.cookie = `token=${data.token}; path=/; max-age=86400; secure; samesite=strict`;
 
         toast({
           title: "Success",
           description: "You have successfully logged in.",
-        })
+        });
 
-        router.push("/dashboard")
+        router.push("/dashboard");
       } else {
         setLoginError(
           data.error || "Invalid email or password. Please try again."
-        )
+        );
       }
     } catch (error) {
-      setLoginError("An unexpected error occurred. Please try again.")
-      console.error("Login error:", error)
+      setLoginError("An unexpected error occurred. Please try again.");
+      console.error("Login error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   return (
-    <div className="container flex items-center justify-center min-h-screen mx-auto bg-gradient-to-b from-primary/20 to-background">
+    <div className="flex items-center justify-center min-h-screen mx-auto bg-gradient-to-b from-primary/20 to-background">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -93,7 +100,9 @@ export default function Component() {
       >
         <Card className="shadow-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-center">Welcome back to MoneyWise</CardTitle>
+            <CardTitle className="text-3xl font-bold text-center">
+              Welcome back to MoneyWise
+            </CardTitle>
             <CardDescription className="text-center">
               Enter your credentials to access your account
             </CardDescription>
@@ -111,7 +120,10 @@ export default function Component() {
               </motion.div>
             )}
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="email"
@@ -190,5 +202,5 @@ export default function Component() {
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }

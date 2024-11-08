@@ -109,6 +109,14 @@ export function Sidebar({
           </Button>
           <Button
             variant="ghost"
+            className="w-full justify-start"
+            onClick={() => router.push("/settings")}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </Button>
+          <Button
+            variant="ghost"
             className="w-full justify-start text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
             onClick={handleLogout}
           >
