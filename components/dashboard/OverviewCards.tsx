@@ -1,12 +1,22 @@
+"use client";
+
 import { motion } from "framer-motion";
-import { DollarSign, TrendingUp, CreditCard, Calendar } from "lucide-react";
+import {
+  DollarSign,
+  TrendingUp,
+  CreditCard,
+  Calendar,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 
 const MotionCard = motion(Card);
 
 interface OverviewCardsProps {
-  expenses: { amount: number; category: string }[];
+  expenses: { amount: number; category: string; date: string }[];
   budgets: { id: string; amount: number; category: string }[];
   isLoading: boolean;
 }
@@ -21,6 +31,11 @@ export function OverviewCards({
     0
   );
 
+  const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+
+  const budgetStatus =
+    totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
+
   const chartData = expenses.reduce((acc, expense) => {
     const category = expense.category;
     const existingCategory = acc.find((item) => item.category === category);
@@ -32,6 +47,33 @@ export function OverviewCards({
     return acc;
   }, [] as { category: string; amount: number }[]);
 
+  const topCategory =
+    chartData.length > 0
+      ? chartData.reduce((a, b) => (a.amount > b.amount ? a : b))
+      : null;
+
+  const currentMonth = new Date().getMonth();
+  const currentMonthExpenses = expenses.filter(
+    (expense) => new Date(expense.date).getMonth() === currentMonth
+  );
+  const currentMonthTotal = currentMonthExpenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
+
+  const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const previousMonthExpenses = expenses.filter(
+    (expense) => new Date(expense.date).getMonth() === previousMonth
+  );
+  const previousMonthTotal = previousMonthExpenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
+
+  const monthlyChange = currentMonthTotal - previousMonthTotal;
+  const monthlyChangePercentage =
+    previousMonthTotal !== 0 ? (monthlyChange / previousMonthTotal) * 100 : 0;
+
   return (
     <motion.div
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
@@ -40,20 +82,22 @@ export function OverviewCards({
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <MotionCard
-        className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border border-gray-200 dark:border-gray-700 backdrop-blur-sm shadow-lg"
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium">Total Expenses</CardTitle>
-          <DollarSign className="h-5 w-5 opacity-70" />
+          <CardTitle className="text-lg font-medium text-gray-700 dark:text-gray-200">
+            Total Expenses
+          </CardTitle>
+          <DollarSign className="h-5 w-5 text-blue-500" />
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-24 bg-blue-300" />
+            <Skeleton className="h-8 w-24" />
           ) : (
             <motion.div
-              className="text-3xl font-bold"
+              className="text-3xl font-bold text-gray-900 dark:text-gray-100"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
@@ -61,80 +105,118 @@ export function OverviewCards({
               ${totalExpenses.toFixed(2)}
             </motion.div>
           )}
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Total spent this period
+          </p>
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-gradient-to-br from-green-500 to-green-600 text-white border border-gray-200 dark:border-gray-700 backdrop-blur-sm shadow-lg"
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium">Budget Status</CardTitle>
-          <TrendingUp className="h-5 w-5 opacity-70" />
+          <CardTitle className="text-lg font-medium text-gray-700 dark:text-gray-200">
+            Budget Status
+          </CardTitle>
+          <TrendingUp className="h-5 w-5 text-green-500" />
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-24 bg-green-300" />
+            <Skeleton className="h-8 w-24" />
           ) : (
-            <motion.div
-              className="text-3xl font-bold"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              {budgets.length > 0 ? "On Track" : "Not Set"}
-            </motion.div>
+            <>
+              <motion.div
+                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                {budgetStatus.toFixed(0)}%
+              </motion.div>
+              <Progress value={budgetStatus} className="mt-2" />
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                {budgetStatus > 100 ? "Over budget" : "Within budget"}
+              </p>
+            </>
           )}
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border border-gray-200 dark:border-gray-700 backdrop-blur-sm shadow-lg"
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium">Top Category</CardTitle>
-          <CreditCard className="h-5 w-5 opacity-70" />
+          <CardTitle className="text-lg font-medium text-gray-700 dark:text-gray-200">
+            Top Category
+          </CardTitle>
+          <CreditCard className="h-5 w-5 text-purple-500" />
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-24 bg-purple-300" />
+            <Skeleton className="h-8 w-24" />
           ) : (
-            <motion.div
-              className="text-3xl font-bold"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              {chartData.length > 0
-                ? chartData.reduce((a, b) => (a.amount > b.amount ? a : b))
-                    .category
-                : "N/A"}
-            </motion.div>
+            <>
+              <motion.div
+                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                {topCategory ? topCategory.category : "N/A"}
+              </motion.div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                {topCategory
+                  ? `$${topCategory.amount.toFixed(2)} spent`
+                  : "No expenses recorded"}
+              </p>
+            </>
           )}
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border border-gray-200 dark:border-gray-700 backdrop-blur-sm shadow-lg"
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium">This Month</CardTitle>
-          <Calendar className="h-5 w-5 opacity-70" />
+          <CardTitle className="text-lg font-medium text-gray-700 dark:text-gray-200">
+            Monthly Trend
+          </CardTitle>
+          <Calendar className="h-5 w-5 text-orange-500" />
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-24 bg-orange-300" />
+            <Skeleton className="h-8 w-24" />
           ) : (
-            <motion.div
-              className="text-3xl font-bold"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              {new Date().toLocaleString("default", { month: "long" })}
-            </motion.div>
+            <>
+              <motion.div
+                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                ${currentMonthTotal.toFixed(2)}
+              </motion.div>
+              <div
+                className={`flex items-center mt-2 ${
+                  monthlyChange >= 0 ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {monthlyChange >= 0 ? (
+                  <ArrowUp className="h-4 w-4 mr-1" />
+                ) : (
+                  <ArrowDown className="h-4 w-4 mr-1" />
+                )}
+                <span className="text-sm font-medium">
+                  {Math.abs(monthlyChangePercentage).toFixed(1)}%
+                </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">
+                  vs last month
+                </span>
+              </div>
+            </>
           )}
         </CardContent>
       </MotionCard>

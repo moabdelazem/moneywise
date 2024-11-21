@@ -1,8 +1,18 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import { CSSProperties } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  AlertCircle,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 
 const MotionCard = motion(Card);
 
@@ -19,6 +29,34 @@ export function BudgetOverview({
   isLoading,
   fullWidth = false,
 }: BudgetOverviewProps) {
+  const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+  const totalExpenses = expenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
+  const remainingBudget = totalBudget - totalExpenses;
+  const budgetUtilization = (totalExpenses / totalBudget) * 100;
+
+  const pieChartData = budgets.map((budget) => {
+    const expensesForCategory = expenses
+      .filter((e) => e.category === budget.category)
+      .reduce((sum, e) => sum + e.amount, 0);
+    return {
+      name: budget.category,
+      value: expensesForCategory,
+      budget: budget.amount,
+    };
+  });
+
+  const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#8884D8",
+    "#82CA9D",
+  ];
+
   return (
     <MotionCard
       className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-gray-700 ${
@@ -28,8 +66,12 @@ export function BudgetOverview({
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.6 }}
     >
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-xl font-semibold">Budget Overview</CardTitle>
+        <Button variant="outline" size="sm">
+          <DollarSign className="mr-2 h-4 w-4" />
+          Adjust Budget
+        </Button>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -40,28 +82,100 @@ export function BudgetOverview({
           </div>
         ) : (
           <div className="space-y-6">
-            {budgets.map((budget) => {
-              // total expenses for the category
-              const totalExpensesForCategory = expenses
-                .filter((e) => e.category === budget.category)
-                .reduce((sum, e) => sum + e.amount, 0);
-              const percentage =
-                (totalExpensesForCategory / budget.amount) * 100;
-              return (
-                <div key={budget.id} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
-                      {budget.category}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      ${totalExpensesForCategory.toFixed(2)} / $
-                      {budget.amount.toFixed(2)}
-                    </span>
-                  </div>
-                  <Progress
-                    value={percentage}
-                    style={
-                      {
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Overall Budget</h3>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Total Budget:
+                  </span>
+                  <span className="font-medium">${totalBudget.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Total Expenses:
+                  </span>
+                  <span className="font-medium">
+                    ${totalExpenses.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Remaining:
+                  </span>
+                  <span
+                    className={`font-medium ${
+                      remainingBudget >= 0 ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    ${Math.abs(remainingBudget).toFixed(2)}
+                    {remainingBudget >= 0 ? (
+                      <TrendingUp className="inline ml-1 h-4 w-4" />
+                    ) : (
+                      <TrendingDown className="inline ml-1 h-4 w-4" />
+                    )}
+                  </span>
+                </div>
+                <Progress
+                  value={budgetUtilization}
+                  className="mt-2"
+                  style={{
+                    background: budgetUtilization > 100 ? "#FCA5A5" : "#E5E7EB",
+                  }}
+                />
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  {budgetUtilization.toFixed(1)}% of budget used
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-2">
+                  Expense Distribution
+                </h3>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Category Breakdown</h3>
+              {budgets.map((budget) => {
+                const totalExpensesForCategory = expenses
+                  .filter((e) => e.category === budget.category)
+                  .reduce((sum, e) => sum + e.amount, 0);
+                const percentage =
+                  (totalExpensesForCategory / budget.amount) * 100;
+                return (
+                  <div key={budget.id} className="space-y-2 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {budget.category}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        ${totalExpensesForCategory.toFixed(2)} / $
+                        {budget.amount.toFixed(2)}
+                      </span>
+                    </div>
+                    <Progress
+                      value={percentage}
+                      style={{
                         background: percentage > 100 ? "#FCA5A5" : "#E5E7EB",
                         backgroundColor:
                           percentage > 100
@@ -69,12 +183,26 @@ export function BudgetOverview({
                             : percentage > 75
                             ? "#FBBF24"
                             : "#10B981",
-                      } as CSSProperties
-                    }
-                  />
-                </div>
-              );
-            })}
+                      }}
+                    />
+                    {percentage > 100 && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Over Budget</AlertTitle>
+                        <AlertDescription>
+                          You&apos;ve exceeded your budget for {budget.category}{" "}
+                          by $
+                          {(totalExpensesForCategory - budget.amount).toFixed(
+                            2
+                          )}
+                          .
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </CardContent>
