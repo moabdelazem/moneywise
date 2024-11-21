@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { CSSProperties } from "react";
 
 const MotionCard = motion(Card);
 
@@ -40,6 +41,7 @@ export function BudgetOverview({
         ) : (
           <div className="space-y-6">
             {budgets.map((budget) => {
+              // total expenses for the category
               const totalExpensesForCategory = expenses
                 .filter((e) => e.category === budget.category)
                 .reduce((sum, e) => sum + e.amount, 0);
@@ -58,17 +60,16 @@ export function BudgetOverview({
                   </div>
                   <Progress
                     value={percentage}
-                    className="h-2"
                     style={
                       {
                         background: percentage > 100 ? "#FCA5A5" : "#E5E7EB",
-                        "--tw-progress-fill":
+                        backgroundColor:
                           percentage > 100
                             ? "#EF4444"
                             : percentage > 75
                             ? "#FBBF24"
                             : "#10B981",
-                      } as React.CSSProperties
+                      } as CSSProperties
                     }
                   />
                 </div>

@@ -67,7 +67,10 @@ export function FinancialHealthScore({
           <p className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300">
             {getScoreText(score)}
           </p>
-          <Progress value={score} className="w-full mt-4" />
+          <Progress
+            value={score}
+            className={`w-full mt-4 ${getScoreColor(score)}`}
+          />
         </CardContent>
       </Card>
     </motion.div>

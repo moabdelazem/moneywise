@@ -268,7 +268,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
       <Sidebar
         userName={userName}
         activeView={activeView}

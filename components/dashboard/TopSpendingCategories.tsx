@@ -81,6 +81,7 @@ export function TopSpendingCategories({
               <Progress
                 value={(category.amount / totalSpending) * 100}
                 className="h-2"
+                style={{ backgroundColor: "#4B0082" }}
               />
             </div>
           ))}
