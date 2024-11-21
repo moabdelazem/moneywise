@@ -55,7 +55,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
   if (isLoading) {
     return (
       <MotionCard
-        className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-gray-700"
+        className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
@@ -77,7 +77,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
   if (expenses.length === 0) {
     return (
       <MotionCard
-        className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-gray-700"
+        className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
@@ -104,7 +104,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
 
   return (
     <MotionCard
-      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-gray-700"
+      className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
@@ -121,7 +121,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
             {latestExpenses.map((expense) => (
               <motion.li
                 key={expense.id}
-                className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                className="flex justify-between items-center p-3 bg-gray-50 dark:bg-neutral-700 rounded-lg"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
@@ -131,7 +131,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
                     {getExpenseIcon(expense.amount)}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-gray-100">
+                    <p className="font-medium text-gray-900 dark:text-neutral-100">
                       {expense.description}
                     </p>
                     <div className="flex items-center space-x-2 mt-1">
@@ -143,7 +143,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
                       >
                         {expense.category}
                       </Badge>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                      <span className="text-xs text-gray-500 dark:text-neutral-400 flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
                         {new Date(expense.date).toLocaleDateString()}
                       </span>
@@ -151,7 +151,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                  <p className="font-medium text-gray-900 dark:text-neutral-100 flex items-center">
                     <DollarSign className="h-4 w-4 mr-1" />
                     {expense.amount.toFixed(2)}
                   </p>

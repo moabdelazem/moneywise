@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/dashboard/Header";
 import { Sidebar } from "@/components/dashboard/Sidebar";
@@ -20,9 +20,8 @@ import {
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { BudgetForm } from "@/components/BudgetForm";
 import { Button } from "@/components/ui/button";
-import { Plus, PieChart as PieChartIcon } from "lucide-react";
+import { Plus, PieChartIcon } from "lucide-react";
 import { LatestExpenses } from "@/components/dashboard/LatestExpense";
-// import { MonthlySpendingTrend } from "@/components/dashboard/MonthlySpendingTrend";
 import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
 import { FinancialHealthScore } from "@/components/dashboard/FinancialHealthScore";
 
@@ -42,9 +41,6 @@ interface Budget {
   year: number;
 }
 
-// !Place Holder
-const financialHealthScore = 99;
-
 export default function Dashboard() {
   const [userName, setUserName] = useState<string>("");
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -57,8 +53,74 @@ export default function Dashboard() {
   >("dashboard");
   const router = useRouter();
 
+  const fetchData = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const [userResponse, expensesResponse, budgetsResponse] =
+        await Promise.all([
+          fetch("/api/user", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          fetch("/api/expenses", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          fetch(
+            `/api/budgets?month=${
+              new Date().getMonth() + 1
+            }&year=${new Date().getFullYear()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          ),
+        ]);
+
+      if (userResponse.ok && expensesResponse.ok && budgetsResponse.ok) {
+        const [userData, expensesData, budgetsData] = await Promise.all([
+          userResponse.json(),
+          expensesResponse.json(),
+          budgetsResponse.json(),
+        ]);
+        setUserName(userData.name);
+        setExpenses(expensesData);
+        setBudgets(budgetsData);
+      } else {
+        throw new Error("Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch data. Please try again.",
+        variant: "destructive",
+      });
+      router.push("/login");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [router]);
+
   useEffect(() => {
-    const fetchUserDataAndExpenses = async () => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("token");
+    router.push("/login");
+  }, [router]);
+
+  const handleAddExpense = useCallback(
+    async (newExpense: Omit<Expense, "id">) => {
       const token = localStorage.getItem("token");
       if (!token) {
         router.push("/login");
@@ -66,159 +128,133 @@ export default function Dashboard() {
       }
 
       try {
-        const [userResponse, expensesResponse, budgetsResponse] =
-          await Promise.all([
-            fetch("/api/user", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }),
-            fetch("/api/expenses", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }),
-            fetch(
-              `/api/budgets?month=${
-                new Date().getMonth() + 1
-              }&year=${new Date().getFullYear()}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            ),
-          ]);
+        const response = await fetch("/api/expenses", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newExpense),
+        });
 
-        if (userResponse.ok && expensesResponse.ok && budgetsResponse.ok) {
-          const userData = await userResponse.json();
-          const expensesData = await expensesResponse.json();
-          const budgetsData = await budgetsResponse.json();
-          setUserName(userData.name);
-          setExpenses(expensesData);
-          setBudgets(budgetsData);
+        if (response.ok) {
+          const addedExpense = await response.json();
+          setExpenses((prevExpenses) => [addedExpense, ...prevExpenses]);
+          setShowExpenseModal(false);
+          checkBudgetLimits(addedExpense);
+          toast({
+            title: "Expense added",
+            description: "Your expense has been successfully added.",
+          });
         } else {
-          throw new Error("Failed to fetch data");
+          throw new Error("Failed to add expense");
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
-        router.push("/login");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserDataAndExpenses();
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
-  };
-
-  const handleAddExpense = async (newExpense: Omit<Expense, "id">) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/expenses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newExpense),
-      });
-
-      if (response.ok) {
-        const addedExpense = await response.json();
-        setExpenses([addedExpense, ...expenses]);
-        setShowExpenseModal(false);
-        checkBudgetLimits(addedExpense);
+        console.error("Error adding expense:", error);
         toast({
-          title: "Expense added",
-          description: "Your expense has been successfully added.",
-        });
-      } else {
-        throw new Error("Failed to add expense");
-      }
-    } catch (error) {
-      console.error("Error adding expense:", error);
-      toast({
-        title: "Error adding expense",
-        description:
-          "There was an error adding your expense. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleAddBudget = async (newBudget: Omit<Budget, "id">) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/budgets", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newBudget),
-      });
-
-      if (response.ok) {
-        const addedBudget = await response.json();
-        setBudgets([
-          ...budgets.filter((b) => b.category !== addedBudget.category),
-          addedBudget,
-        ]);
-        setShowBudgetModal(false);
-        toast({
-          title: "Budget set",
-          description: "Your budget has been successfully set.",
-        });
-      } else {
-        throw new Error("Failed to add budget");
-      }
-    } catch (error) {
-      console.error("Error adding budget:", error);
-      toast({
-        title: "Error setting budget",
-        description:
-          "There was an error setting your budget. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const checkBudgetLimits = (newExpense: Expense) => {
-    const relevantBudget = budgets.find(
-      (b) => b.category === newExpense.category
-    );
-    if (relevantBudget) {
-      const totalExpenses =
-        expenses
-          .filter((e) => e.category === newExpense.category)
-          .reduce((sum, e) => sum + e.amount, 0) + newExpense.amount;
-
-      if (totalExpenses > relevantBudget.amount * 0.9) {
-        toast({
-          title: "Budget Alert",
-          description: `You've spent over 90% of your ${newExpense.category} budget for this month.`,
+          title: "Error adding expense",
+          description:
+            "There was an error adding your expense. Please try again.",
           variant: "destructive",
         });
       }
-    }
-  };
+    },
+    [router]
+  );
 
-  const renderContent = () => {
+  const handleAddBudget = useCallback(
+    async (newBudget: Omit<Budget, "id">) => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/budgets", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newBudget),
+        });
+
+        if (response.ok) {
+          const addedBudget = await response.json();
+          setBudgets((prevBudgets) => [
+            ...prevBudgets.filter((b) => b.category !== addedBudget.category),
+            addedBudget,
+          ]);
+          setShowBudgetModal(false);
+          toast({
+            title: "Budget set",
+            description: "Your budget has been successfully set.",
+          });
+        } else {
+          throw new Error("Failed to add budget");
+        }
+      } catch (error) {
+        console.error("Error adding budget:", error);
+        toast({
+          title: "Error setting budget",
+          description:
+            "There was an error setting your budget. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [router]
+  );
+
+  const checkBudgetLimits = useCallback(
+    (newExpense: Expense) => {
+      const relevantBudget = budgets.find(
+        (b) => b.category === newExpense.category
+      );
+      if (relevantBudget) {
+        const totalExpenses =
+          expenses
+            .filter((e) => e.category === newExpense.category)
+            .reduce((sum, e) => sum + e.amount, 0) + newExpense.amount;
+
+        if (totalExpenses > relevantBudget.amount * 0.9) {
+          toast({
+            title: "Budget Alert",
+            description: `You've spent over 90% of your ${newExpense.category} budget for this month.`,
+            variant: "destructive",
+          });
+        }
+      }
+    },
+    [budgets, expenses]
+  );
+
+  const calculateFinancialHealthScore = useCallback(() => {
+    // Implement a more sophisticated calculation based on various financial factors
+    const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+    const totalExpenses = expenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
+    const savingsRatio = (totalBudget - totalExpenses) / totalBudget;
+    const budgetAdherence = expenses.every((expense) => {
+      const relevantBudget = budgets.find(
+        (b) => b.category === expense.category
+      );
+      return relevantBudget ? expense.amount <= relevantBudget.amount : true;
+    });
+
+    let score = 50; // Base score
+    score += savingsRatio * 30; // Up to 30 points for savings
+    score += budgetAdherence ? 20 : 0; // 20 points for sticking to budget
+
+    return Math.min(Math.max(Math.round(score), 0), 100); // Ensure score is between 0 and 100
+  }, [budgets, expenses]);
+
+  const renderContent = useCallback(() => {
+    const financialHealthScore = calculateFinancialHealthScore();
+
     switch (activeView) {
       case "dashboard":
         return (
@@ -230,16 +266,13 @@ export default function Dashboard() {
             />
             <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8">
               <LatestExpenses expenses={expenses} isLoading={isLoading} />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8">
               <BudgetOverview
                 expenses={expenses}
                 budgets={budgets}
                 isLoading={isLoading}
               />
-              {/* <MonthlySpendingTrend expenses={expenses} isLoading={isLoading} /> */}
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <FinancialHealthScore
                 score={financialHealthScore}
                 isLoading={isLoading}
@@ -267,10 +300,10 @@ export default function Dashboard() {
       default:
         return null;
     }
-  };
+  }, [activeView, expenses, budgets, isLoading, calculateFinancialHealthScore]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 dark:from-neutral-900 dark:to-neutral-800 transition-colors duration-300">
       <Sidebar
         userName={userName}
         activeView={activeView}

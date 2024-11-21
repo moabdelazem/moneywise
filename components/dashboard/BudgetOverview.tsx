@@ -59,7 +59,7 @@ export function BudgetOverview({
 
   return (
     <MotionCard
-      className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-gray-700 ${
+      className={`bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700 ${
         fullWidth ? "w-full" : ""
       }`}
       initial={{ opacity: 0, x: 20 }}
@@ -186,7 +186,7 @@ export function BudgetOverview({
                       }}
                     />
                     {percentage > 100 && (
-                      <Alert variant="destructive">
+                      <Alert variant="destructive" className="bg-white/80">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Over Budget</AlertTitle>
                         <AlertDescription>

@@ -82,12 +82,12 @@ export function OverviewCards({
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <MotionCard
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+        className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium text-gray-700 dark:text-gray-200">
+          <CardTitle className="text-lg font-medium text-gray-700 dark:text-neutral-200">
             Total Expenses
           </CardTitle>
           <DollarSign className="h-5 w-5 text-blue-500" />
@@ -97,7 +97,7 @@ export function OverviewCards({
             <Skeleton className="h-8 w-24" />
           ) : (
             <motion.div
-              className="text-3xl font-bold text-gray-900 dark:text-gray-100"
+              className="text-3xl font-bold text-gray-900 dark:text-neutral-100"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
@@ -105,18 +105,18 @@ export function OverviewCards({
               ${totalExpenses.toFixed(2)}
             </motion.div>
           )}
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-sm text-gray-500 dark:text-neutral-400 mt-2">
             Total spent this period
           </p>
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+        className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium text-gray-700 dark:text-gray-200">
+          <CardTitle className="text-lg font-medium text-gray-700 dark:text-neutral-200">
             Budget Status
           </CardTitle>
           <TrendingUp className="h-5 w-5 text-green-500" />
@@ -127,7 +127,7 @@ export function OverviewCards({
           ) : (
             <>
               <motion.div
-                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
+                className="text-3xl font-bold text-gray-900 dark:text-neutral-100"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -135,7 +135,7 @@ export function OverviewCards({
                 {budgetStatus.toFixed(0)}%
               </motion.div>
               <Progress value={budgetStatus} className="mt-2" />
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-sm text-gray-500 dark:text-neutral-400 mt-2">
                 {budgetStatus > 100 ? "Over budget" : "Within budget"}
               </p>
             </>
@@ -143,12 +143,12 @@ export function OverviewCards({
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+        className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium text-gray-700 dark:text-gray-200">
+          <CardTitle className="text-lg font-medium text-gray-700 dark:text-neutral-200">
             Top Category
           </CardTitle>
           <CreditCard className="h-5 w-5 text-purple-500" />
@@ -159,14 +159,14 @@ export function OverviewCards({
           ) : (
             <>
               <motion.div
-                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
+                className="text-3xl font-bold text-gray-900 dark:text-neutral-100"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
               >
                 {topCategory ? topCategory.category : "N/A"}
               </motion.div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-sm text-gray-500 dark:text-neutral-400 mt-2">
                 {topCategory
                   ? `$${topCategory.amount.toFixed(2)} spent`
                   : "No expenses recorded"}
@@ -176,12 +176,12 @@ export function OverviewCards({
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+        className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium text-gray-700 dark:text-gray-200">
+          <CardTitle className="text-lg font-medium text-gray-700 dark:text-neutral-200">
             Monthly Trend
           </CardTitle>
           <Calendar className="h-5 w-5 text-orange-500" />
@@ -192,7 +192,7 @@ export function OverviewCards({
           ) : (
             <>
               <motion.div
-                className="text-3xl font-bold text-gray-900 dark:text-gray-100"
+                className="text-3xl font-bold text-gray-900 dark:text-neutral-100"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -212,7 +212,7 @@ export function OverviewCards({
                 <span className="text-sm font-medium">
                   {Math.abs(monthlyChangePercentage).toFixed(1)}%
                 </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">
+                <span className="text-sm text-gray-500 dark:text-neutral-400 ml-1">
                   vs last month
                 </span>
               </div>
