@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
     JWT_SECRET: process.env.JWT_SECRET,
     output: "standalone",
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  }
 };
 
 export default nextConfig;

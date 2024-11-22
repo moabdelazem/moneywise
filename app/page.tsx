@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link";
-import { Metadata } from "next";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -15,19 +14,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const metadata: Metadata = {
-  title: "MoneyWise - Simple Budgeting App",
-  description:
-    "Track your expenses, set budgets, and achieve your financial goals with MoneyWise.",
-  openGraph: {
-    title: "MoneyWise - Simple Budgeting App",
-    description:
-      "Track your expenses, set budgets, and achieve your financial goals with MoneyWise.",
-    images: [
-      { url: "/og-image.jpg", width: 1200, height: 630, alt: "MoneyWise App" },
-    ],
-  },
-};
+// const metadata: Metadata = {
+//   title: "MoneyWise - Simple Budgeting App",
+//   description:
+//     "Track your expenses, set budgets, and achieve your financial goals with MoneyWise.",
+//   openGraph: {
+//     title: "MoneyWise - Simple Budgeting App",
+//     description:
+//       "Track your expenses, set budgets, and achieve your financial goals with MoneyWise.",
+//     images: [
+//       { url: "/og-image.jpg", width: 1200, height: 630, alt: "MoneyWise App" },
+//     ],
+//   },
+// };
 
 const features = [
   {

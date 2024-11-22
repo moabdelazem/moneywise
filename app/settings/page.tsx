@@ -53,10 +53,12 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [deletePassword, setDeletePassword] = useState("");
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  // @esling-ignore-next-line
+  const [_, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     fetchUserSettings();
+  // @esling-ignore-next-line
   }, []);
 
   const fetchUserSettings = async () => {

@@ -69,7 +69,7 @@ export function BudgetOverview({
           <AlertCircle className="w-12 h-12 text-yellow-500 mb-4" />
           <h3 className="text-xl font-semibold mb-2">No Budgets Set</h3>
           <p className="text-center text-gray-500 dark:text-gray-400 mb-4">
-            You haven't set any budgets yet. Start by adding your first budget to track your expenses effectively.
+            You haven&apos;t set any budgets yet. Start by adding your first budget to track your expenses effectively.
           </p>
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" />

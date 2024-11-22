@@ -126,7 +126,7 @@ export function FinancialHealthScore({
             />
           ) : (
             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-              We don't have enough data to calculate your score yet. Keep using MoneyWise to get your financial health score.
+              We don&apos;t have enough data to calculate your score yet. Keep using MoneyWise to get your financial health score.
             </p>
           )}
           <Button
