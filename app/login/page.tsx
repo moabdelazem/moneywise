@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { motion } from "framer-motion";
+import { Loader2, Eye, EyeOff, LogIn } from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +40,7 @@ const loginSchema = z.object({
     .min(8, { message: "Password must be at least 8 characters" }),
 });
 
-export default function Component() {
+export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -91,34 +91,38 @@ export default function Component() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen mx-auto bg-gradient-to-b from-primary/20 to-background">
+    <div className="flex items-center justify-center min-h-screen mx-auto bg-gradient-to-b from-primary/20 via-background to-background">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md px-4 sm:px-0"
       >
-        <Card className="shadow-lg">
+        <Card className="shadow-lg border-primary/10">
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold text-center">
-              Welcome back to MoneyWise
+              Welcome back
             </CardTitle>
-            <CardDescription className="text-center">
-              Enter your credentials to access your account
+            <CardDescription className="text-center text-base">
+              Enter your credentials to access your MoneyWise account
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {loginError && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Alert variant="destructive">
-                  <AlertDescription>{loginError}</AlertDescription>
-                </Alert>
-              </motion.div>
-            )}
+            <AnimatePresence mode="wait">
+              {loginError && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Alert variant="destructive">
+                    <AlertDescription>{loginError}</AlertDescription>
+                  </Alert>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -131,7 +135,11 @@ export default function Component() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="you@example.com" {...field} />
+                        <Input 
+                          placeholder="you@example.com" 
+                          {...field} 
+                          className="bg-background"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -149,6 +157,7 @@ export default function Component() {
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             {...field}
+                            className="bg-background pr-10"
                           />
                           <Button
                             type="button"
@@ -162,6 +171,9 @@ export default function Component() {
                             ) : (
                               <Eye className="h-4 w-4" />
                             )}
+                            <span className="sr-only">
+                              {showPassword ? "Hide password" : "Show password"}
+                            </span>
                           </Button>
                         </div>
                       </FormControl>
@@ -169,14 +181,33 @@ export default function Component() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading}
+                >
                   {isLoading ? (
-                    <>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center justify-center"
+                    >
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Logging in...
-                    </>
+                    </motion.div>
                   ) : (
-                    "Log in"
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center justify-center"
+                    >
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Log in
+                    </motion.div>
                   )}
                 </Button>
               </form>

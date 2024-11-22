@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
+import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,7 @@ const signupSchema = z
     path: ["confirmPassword"],
   });
 
-export default function Component() {
+export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -111,35 +111,41 @@ export default function Component() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen mx-auto bg-gradient-to-b from-primary/20 to-background">
+    <div className="flex items-center justify-center min-h-screen mx-auto bg-gradient-to-b from-primary/20 via-background to-background px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="shadow-lg">
+        <Card className="shadow-lg border-primary/10">
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold text-center">
-              Create your MoneyWise account
+              Join MoneyWise
             </CardTitle>
-            <CardDescription className="text-center">
-              Start your journey to financial wisdom
+            <CardDescription className="text-center text-base">
+              Start your journey to financial wisdom today
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Progress value={(step / 3) * 100} className="w-full" />
-            {signupError && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Alert variant="destructive">
-                  <AlertDescription>{signupError}</AlertDescription>
-                </Alert>
-              </motion.div>
-            )}
+            <Progress 
+              value={(step / 3) * 100} 
+              className="w-full h-2" 
+            />
+            <AnimatePresence mode="wait">
+              {signupError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Alert variant="destructive">
+                    <AlertDescription>{signupError}</AlertDescription>
+                  </Alert>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -161,7 +167,7 @@ export default function Component() {
                           <FormItem>
                             <FormLabel>Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="Ex: John Doe" {...field} />
+                              <Input placeholder="Ex: John Doe" {...field} className="bg-background" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -184,7 +190,7 @@ export default function Component() {
                           <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                              <Input placeholder="you@example.com" {...field} />
+                              <Input placeholder="you@example.com" {...field} className="bg-background" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -199,6 +205,7 @@ export default function Component() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20 }}
                       transition={{ duration: 0.3 }}
+                      className="space-y-4"
                     >
                       <FormField
                         control={form.control}
@@ -212,6 +219,7 @@ export default function Component() {
                                   type={showPassword ? "text" : "password"}
                                   placeholder="••••••••"
                                   {...field}
+                                  className="bg-background pr-10"
                                 />
                                 <Button
                                   type="button"
@@ -225,6 +233,9 @@ export default function Component() {
                                   ) : (
                                     <Eye className="h-4 w-4" />
                                   )}
+                                  <span className="sr-only">
+                                    {showPassword ? "Hide password" : "Show password"}
+                                  </span>
                                 </Button>
                               </div>
                             </FormControl>
@@ -241,26 +252,26 @@ export default function Component() {
                             <FormControl>
                               <div className="relative">
                                 <Input
-                                  type={
-                                    showConfirmPassword ? "text" : "password"
-                                  }
+                                  type={showConfirmPassword ? "text" : "password"}
                                   placeholder="••••••••"
                                   {...field}
+                                  className="bg-background pr-10"
                                 />
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
                                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                  onClick={() =>
-                                    setShowConfirmPassword(!showConfirmPassword)
-                                  }
+                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                 >
                                   {showConfirmPassword ? (
                                     <EyeOff className="h-4 w-4" />
                                   ) : (
                                     <Eye className="h-4 w-4" />
                                   )}
+                                  <span className="sr-only">
+                                    {showConfirmPassword ? "Hide password" : "Show password"}
+                                  </span>
                                 </Button>
                               </div>
                             </FormControl>
@@ -271,7 +282,7 @@ export default function Component() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <div className="flex justify-between">
+                <div className="flex justify-between pt-4">
                   {step > 1 && (
                     <Button type="button" variant="outline" onClick={prevStep}>
                       <ArrowLeft className="w-4 h-4 mr-2" />
@@ -294,12 +305,27 @@ export default function Component() {
                       disabled={isLoading}
                     >
                       {isLoading ? (
-                        <>
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex items-center"
+                        >
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                           Creating account...
-                        </>
+                        </motion.div>
                       ) : (
-                        "Sign up"
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex items-center"
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Sign up
+                        </motion.div>
                       )}
                     </Button>
                   )}

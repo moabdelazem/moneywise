@@ -3,7 +3,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Settings, User, Bell, Trash, RefreshCw, Save, ArrowLeft, Lock } from 'lucide-react';
+import {
+  Settings,
+  User,
+  Bell,
+  Trash,
+  RefreshCw,
+  Save,
+  ArrowLeft,
+  Lock,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +31,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface UserSettings {
   id: string;
@@ -140,7 +155,8 @@ export default function SettingsPage() {
     } catch {
       toast({
         title: "Error",
-        description: "Failed to delete account. Please check your password and try again.",
+        description:
+          "Failed to delete account. Please check your password and try again.",
         variant: "destructive",
       });
     } finally {
@@ -199,7 +215,9 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>User Preferences</CardTitle>
-          <CardDescription>Manage your account settings and preferences.</CardDescription>
+          <CardDescription>
+            Manage your account settings and preferences.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="account" className="space-y-4">
@@ -236,7 +254,9 @@ export default function SettingsPage() {
             <TabsContent value="notifications" className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="email-notifications">Email Notifications</Label>
+                  <Label htmlFor="email-notifications">
+                    Email Notifications
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Receive email updates about your account activity.
                   </p>
@@ -282,13 +302,18 @@ export default function SettingsPage() {
       <Card className="mt-8">
         <CardHeader>
           <CardTitle className="text-red-600">Danger Zone</CardTitle>
-          <CardDescription>Irreversible and destructive actions</CardDescription>
+          <CardDescription>
+            Irreversible and destructive actions
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>
+                <Button
+                  variant="destructive"
+                  onClick={() => setShowDeleteConfirm(true)}
+                >
                   <Trash className="mr-2 h-4 w-4" />
                   Delete Account
                 </Button>
@@ -302,7 +327,9 @@ export default function SettingsPage() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="space-y-2 mb-4">
-                  <Label htmlFor="delete-password">Enter your password to confirm</Label>
+                  <Label htmlFor="delete-password">
+                    Enter your password to confirm
+                  </Label>
                   <Input
                     id="delete-password"
                     type="password"
@@ -312,10 +339,12 @@ export default function SettingsPage() {
                   />
                 </div>
                 <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => {
-                    setShowDeleteConfirm(false);
-                    setDeletePassword("");
-                  }}>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setShowDeleteConfirm(false);
+                      setDeletePassword("");
+                    }}
+                  >
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
