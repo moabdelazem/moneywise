@@ -231,7 +231,8 @@ export default function Dashboard() {
   );
 
   const calculateFinancialHealthScore = useCallback(() => {
-    // Implement a more sophisticated calculation based on various financial factors
+    // ? we can implement a more sophisticated calculation based on various financial factors
+    // ? such as savings, adherence to budget, etc.
     const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
     const totalExpenses = expenses.reduce(
       (sum, expense) => sum + expense.amount,
