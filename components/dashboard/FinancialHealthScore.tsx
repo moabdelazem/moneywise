@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,16 +12,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  TrendingUp,
-  DollarSign,
-  PiggyBank,
-  CreditCard,
-  Info,
-} from "lucide-react";
+import { TrendingUp, DollarSign, PiggyBank, CreditCard, Info, AlertCircle } from 'lucide-react';
 
 interface FinancialHealthScoreProps {
-  score: number;
+  score: number | null;
   isLoading: boolean;
 }
 
@@ -31,45 +25,47 @@ export function FinancialHealthScore({
 }: FinancialHealthScoreProps) {
   const [showDetails, setShowDetails] = useState(false);
 
-  const getScoreColor = (score: number) => {
+  const getScoreColor = (score: number | null) => {
+    if (score === null) return "bg-gray-400";
     if (score >= 80) return "bg-green-500";
     if (score >= 60) return "bg-yellow-500";
     return "bg-red-500";
   };
 
-  const getScoreText = (score: number) => {
+  const getScoreText = (score: number | null) => {
+    if (score === null) return "Not Available";
     if (score >= 80) return "Excellent";
     if (score >= 60) return "Good";
     if (score >= 40) return "Fair";
     return "Needs Improvement";
   };
 
-  const getScoreDetails = (score: number) => [
+  const getScoreDetails = (score: number | null) => [
     {
       label: "Savings",
-      value: score >= 60 ? "On Track" : "Needs Attention",
+      value: score === null ? "N/A" : (score >= 60 ? "On Track" : "Needs Attention"),
       icon: PiggyBank,
     },
     {
       label: "Debt",
-      value: score >= 70 ? "Manageable" : "High",
+      value: score === null ? "N/A" : (score >= 70 ? "Manageable" : "High"),
       icon: CreditCard,
     },
     {
       label: "Spending",
-      value: score >= 50 ? "Controlled" : "Excessive",
+      value: score === null ? "N/A" : (score >= 50 ? "Controlled" : "Excessive"),
       icon: DollarSign,
     },
     {
       label: "Investments",
-      value: score >= 80 ? "Diversified" : "Limited",
+      value: score === null ? "N/A" : (score >= 80 ? "Diversified" : "Limited"),
       icon: TrendingUp,
     },
   ];
 
   if (isLoading) {
     return (
-      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-gray-700">
+      <Card className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">
             Financial Health Score
@@ -111,16 +107,28 @@ export function FinancialHealthScore({
         </CardHeader>
         <CardContent className="flex flex-col items-center">
           <div
-            className={`w-32 h-32 rounded-full flex items-center justify-center text-3xl font-bold text-white ${getScoreColor(
-              score
-            )}`}
+            className={`w-32 h-32 rounded-full flex items-center justify-center text-3xl font-bold text-white ${getScoreColor(score)}`}
           >
-            {score}
+            {score === null ? (
+              <AlertCircle className="w-12 h-12" />
+            ) : (
+              score
+            )}
           </div>
           <p className="mt-4 text-lg font-medium text-gray-700 dark:text-neutral-300">
             {getScoreText(score)}
           </p>
-          <Progress value={score} className="w-full mt-4" />
+          {score !== null ? (
+            <Progress 
+              value={score} 
+              className="w-full mt-4" 
+              aria-label={`Financial health score: ${score} out of 100`}
+            />
+          ) : (
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+              We don't have enough data to calculate your score yet. Keep using MoneyWise to get your financial health score.
+            </p>
+          )}
           <Button
             variant="outline"
             className="mt-4"
@@ -128,29 +136,31 @@ export function FinancialHealthScore({
           >
             {showDetails ? "Hide Details" : "Show Details"}
           </Button>
-          {showDetails && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="w-full mt-4 space-y-2"
-            >
-              {getScoreDetails(score).map((detail, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <detail.icon className="h-5 w-5 mr-2 text-gray-500" />
-                    <span className="text-sm text-gray-600 dark:text-neutral-400">
-                      {detail.label}
+          <AnimatePresence>
+            {showDetails && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full mt-4 space-y-2"
+              >
+                {getScoreDetails(score).map((detail, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <detail.icon className="h-5 w-5 mr-2 text-gray-500" />
+                      <span className="text-sm text-gray-600 dark:text-neutral-400">
+                        {detail.label}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
+                      {detail.value}
                     </span>
                   </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
-                    {detail.value}
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-          )}
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
     </motion.div>
