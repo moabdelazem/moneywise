@@ -82,7 +82,7 @@ export function OverviewCards({
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <MotionCard
-        className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-lg"
+        className="bg-card border border-gray-200 dark:border-neutral-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -111,7 +111,7 @@ export function OverviewCards({
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-lg"
+        className="bg-card border border-gray-200 dark:border-neutral-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -143,7 +143,7 @@ export function OverviewCards({
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-lg"
+        className="bg-card border border-gray-200 dark:border-neutral-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -176,7 +176,7 @@ export function OverviewCards({
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-lg"
+        className="bg-card border border-gray-200 dark:border-neutral-700 shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >

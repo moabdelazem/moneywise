@@ -8,7 +8,7 @@ import { OverviewCards } from "@/components/dashboard/OverviewCards";
 import { BudgetOverview } from "@/components/dashboard/BudgetOverview";
 import { ExpensesTable } from "@/components/dashboard/ExpensesTable";
 import { Reports } from "@/components/dashboard/Reports";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -20,10 +20,14 @@ import {
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { BudgetForm } from "@/components/BudgetForm";
 import { Button } from "@/components/ui/button";
-import { Plus, PieChartIcon } from "lucide-react";
+import { Plus, PieChart, ArrowLeft } from "lucide-react";
 import { LatestExpenses } from "@/components/dashboard/LatestExpense";
 import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
 import { FinancialHealthScore } from "@/components/dashboard/FinancialHealthScore";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MonthlySpendingTrend } from "@/components/dashboard/MonthlySpendingTrend";
 
 interface Expense {
   id: string;
@@ -51,7 +55,9 @@ export default function Dashboard() {
   const [activeView, setActiveView] = useState<
     "dashboard" | "expenses" | "budgets" | "reports"
   >("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const router = useRouter();
+  const { toast } = useToast();
 
   const fetchData = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -63,24 +69,16 @@ export default function Dashboard() {
     try {
       const [userResponse, expensesResponse, budgetsResponse] =
         await Promise.all([
-          fetch("/api/user", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }),
+          fetch("/api/user", { headers: { Authorization: `Bearer ${token}` } }),
           fetch("/api/expenses", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(
             `/api/budgets?month=${
               new Date().getMonth() + 1
             }&year=${new Date().getFullYear()}`,
             {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }
           ),
         ]);
@@ -108,7 +106,7 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, toast]);
 
   useEffect(() => {
     fetchData();
@@ -159,7 +157,7 @@ export default function Dashboard() {
         });
       }
     },
-    [router]
+    [router, toast]
   );
 
   const handleAddBudget = useCallback(
@@ -204,7 +202,7 @@ export default function Dashboard() {
         });
       }
     },
-    [router]
+    [router, toast]
   );
 
   const checkBudgetLimits = useCallback(
@@ -227,12 +225,10 @@ export default function Dashboard() {
         }
       }
     },
-    [budgets, expenses]
+    [budgets, expenses, toast]
   );
 
   const calculateFinancialHealthScore = useCallback(() => {
-    // ? we can implement a more sophisticated calculation based on various financial factors
-    // ? such as savings, adherence to budget, etc.
     const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
     const totalExpenses = expenses.reduce(
       (sum, expense) => sum + expense.amount,
@@ -253,122 +249,121 @@ export default function Dashboard() {
     return Math.min(Math.max(Math.round(score), 0), 100); // Ensure score is between 0 and 100
   }, [budgets, expenses]);
 
+  const handleSidebarToggle = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   const renderContent = useCallback(() => {
     const financialHealthScore = calculateFinancialHealthScore();
 
-    switch (activeView) {
-      case "dashboard":
-        return (
-          <>
-            <OverviewCards
+    return (
+      <Tabs
+        defaultValue={activeView}
+        onValueChange={(value) => setActiveView(value as typeof activeView)}
+        className="space-y-6"
+      >
+        <div className="flex items-center justify-between">
+          <TabsList className="grid w-full max-w-md grid-cols-4">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="expenses">Expenses</TabsTrigger>
+            <TabsTrigger value="budgets">Budgets</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContent value="dashboard" className="space-y-6">
+          <OverviewCards
+            expenses={expenses}
+            budgets={budgets}
+            isLoading={isLoading}
+          />
+          <div className="grid gap-6 ">
+            <BudgetOverview
               expenses={expenses}
               budgets={budgets}
               isLoading={isLoading}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8">
-              <LatestExpenses expenses={expenses} isLoading={isLoading} />
+          </div>
+          <div className="grid gap-6 md:grid-cols-1">
+            <LatestExpenses expenses={expenses} isLoading={isLoading} />
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <FinancialHealthScore
+              score={financialHealthScore}
+              isLoading={isLoading}
+            />
+            <TopSpendingCategories expenses={expenses} isLoading={isLoading} />
+          </div>
+        </TabsContent>
+        <TabsContent value="expenses">
+          <Card>
+            <CardHeader>
+              <CardTitle>Expenses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ExpensesTable expenses={expenses} isLoading={isLoading} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="budgets">
+          <Card>
+            <CardHeader>
+              <CardTitle>Budgets</CardTitle>
+            </CardHeader>
+            <CardContent>
               <BudgetOverview
                 expenses={expenses}
                 budgets={budgets}
                 isLoading={isLoading}
+                fullWidth
               />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <FinancialHealthScore
-                score={financialHealthScore}
-                isLoading={isLoading}
-              />
-              <TopSpendingCategories
-                expenses={expenses}
-                isLoading={isLoading}
-              />
-            </div>
-          </>
-        );
-      case "expenses":
-        return <ExpensesTable expenses={expenses} isLoading={isLoading} />;
-      case "budgets":
-        return (
-          <BudgetOverview
-            expenses={expenses}
-            budgets={budgets}
-            isLoading={isLoading}
-            fullWidth
-          />
-        );
-      case "reports":
-        return <Reports />;
-      default:
-        return null;
-    }
-  }, [activeView, expenses, budgets, isLoading, calculateFinancialHealthScore]);
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="reports">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reports</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Reports />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    );
+  }, [
+    activeView,
+    expenses,
+    budgets,
+    isLoading,
+    calculateFinancialHealthScore,
+    handleAddExpense,
+    handleAddBudget,
+  ]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-300 dark:from-neutral-900 dark:to-neutral-800 transition-colors duration-300">
+    <div className="flex h-screen bg-background">
       <Sidebar
         userName={userName}
         activeView={activeView}
         setActiveView={setActiveView}
         handleLogout={handleLogout}
       />
-
-      <main className="pt-16 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <Header>
-          <Dialog open={showExpenseModal} onOpenChange={setShowExpenseModal}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                <Plus className="mr-2 h-4 w-4" /> Add Expense
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Expense</DialogTitle>
-                <DialogDescription>
-                  Enter the details of your new expense below.
-                </DialogDescription>
-              </DialogHeader>
-              <ExpenseForm
-                onSubmit={(data) =>
-                  handleAddExpense({
-                    ...data,
-                    amount: parseFloat(data.amount),
-                  })
-                }
-                onCancel={() => setShowExpenseModal(false)}
-              />
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={showBudgetModal} onOpenChange={setShowBudgetModal}>
-            <DialogTrigger asChild>
-              <Button className="bg-green-500 hover:bg-green-600 text-white">
-                <PieChartIcon className="mr-2 h-4 w-4" /> Set Budget
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Set New Budget</DialogTitle>
-                <DialogDescription>
-                  Enter the details of your new budget below.
-                </DialogDescription>
-              </DialogHeader>
-              <BudgetForm
-                onSubmit={(data) =>
-                  handleAddBudget({
-                    ...data,
-                    amount: parseFloat(data.amount),
-                    month: parseInt(data.month, 10),
-                    year: parseInt(data.year, 10),
-                  })
-                }
-                onCancel={() => setShowBudgetModal(false)}
-              />
-            </DialogContent>
-          </Dialog>
-        </Header>
-
-        {renderContent()}
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header
+          userName={userName}
+          onLogout={handleLogout}
+          handleAddExpense={handleAddExpense}
+          handleAddBudget={handleAddBudget}
+        ></Header>
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
+            <ScrollArea className="h-[calc(100vh-theme(spacing.16))]">
+              {renderContent()}
+            </ScrollArea>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

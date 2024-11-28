@@ -78,30 +78,6 @@ export function Sidebar({
           <Button
             variant="ghost"
             className="w-full justify-start"
-            onClick={() => setActiveView("expenses")}
-          >
-            <DollarSign className="mr-2 h-4 w-4" />
-            Expenses
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => setActiveView("budgets")}
-          >
-            <PieChart className="mr-2 h-4 w-4" />
-            Budgets
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => setActiveView("reports")}
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            Reports
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
             onClick={() => router.push("/profile")}
           >
             <Settings className="mr-2 h-4 w-4" />

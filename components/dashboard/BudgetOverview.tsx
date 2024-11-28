@@ -6,9 +6,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { AlertCircle, DollarSign, TrendingUp, TrendingDown, PlusCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  PlusCircle,
+} from "lucide-react";
 
 const MotionCard = motion(Card);
 
@@ -31,7 +41,8 @@ export function BudgetOverview({
     0
   );
   const remainingBudget = totalBudget - totalExpenses;
-  const budgetUtilization = totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
+  const budgetUtilization =
+    totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
 
   const pieChartData = budgets.map((budget) => {
     const expensesForCategory = expenses
@@ -43,7 +54,14 @@ export function BudgetOverview({
     };
   });
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'];
+  const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#8884D8",
+    "#82ca9d",
+  ];
 
   const chartConfig = {
     expenses: {
@@ -69,7 +87,8 @@ export function BudgetOverview({
           <AlertCircle className="w-12 h-12 text-yellow-500 mb-4" />
           <h3 className="text-xl font-semibold mb-2">No Budgets Set</h3>
           <p className="text-center text-gray-500 dark:text-gray-400 mb-4">
-            You haven&apos;t set any budgets yet. Start by adding your first budget to track your expenses effectively.
+            You haven&apos;t set any budgets yet. Start by adding your first
+            budget to track your expenses effectively.
           </p>
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -94,9 +113,7 @@ export function BudgetOverview({
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Total Expenses:
               </span>
-              <span className="font-medium">
-                ${totalExpenses.toFixed(2)}
-              </span>
+              <span className="font-medium">${totalExpenses.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -127,9 +144,7 @@ export function BudgetOverview({
             </p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold mb-2">
-              Expense Distribution
-            </h3>
+            <h3 className="text-lg font-semibold mb-2">Expense Distribution</h3>
             <ChartContainer config={chartConfig} className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -143,7 +158,10 @@ export function BudgetOverview({
                     dataKey="value"
                   >
                     {pieChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
@@ -153,7 +171,10 @@ export function BudgetOverview({
             <div className="mt-4 grid grid-cols-2 gap-2">
               {pieChartData.map((entry, index) => (
                 <div key={`legend-${index}`} className="flex items-center">
-                  <div className="w-3 h-3 mr-2" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                  <div
+                    className="w-3 h-3 mr-2"
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  ></div>
                   <span className="text-xs">{entry.name}</span>
                 </div>
               ))}
@@ -166,8 +187,7 @@ export function BudgetOverview({
             const totalExpensesForCategory = expenses
               .filter((e) => e.category === budget.category)
               .reduce((sum, e) => sum + e.amount, 0);
-            const percentage =
-              (totalExpensesForCategory / budget.amount) * 100;
+            const percentage = (totalExpensesForCategory / budget.amount) * 100;
             return (
               <div key={budget.id} className="space-y-2 mb-4">
                 <div className="flex justify-between items-center">
@@ -196,12 +216,8 @@ export function BudgetOverview({
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Over Budget</AlertTitle>
                     <AlertDescription>
-                      You&apos;ve exceeded your budget for {budget.category}{" "}
-                      by $
-                      {(totalExpensesForCategory - budget.amount).toFixed(
-                        2
-                      )}
-                      .
+                      You&apos;ve exceeded your budget for {budget.category} by
+                      ${(totalExpensesForCategory - budget.amount).toFixed(2)}.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -215,7 +231,7 @@ export function BudgetOverview({
 
   return (
     <MotionCard
-      className={`bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700 ${
+      className={`bg-card backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700 ${
         fullWidth ? "w-full" : ""
       }`}
       initial={{ opacity: 0, x: 20 }}
@@ -229,9 +245,7 @@ export function BudgetOverview({
           Adjust Budget
         </Button>
       </CardHeader>
-      <CardContent>
-        {renderContent()}
-      </CardContent>
+      <CardContent>{renderContent()}</CardContent>
     </MotionCard>
   );
 }

@@ -1,21 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertCircle,
-  ArrowUpRight,
-  ArrowDownRight,
   DollarSign,
   Calendar,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 const MotionCard = motion(Card);
+const MotionLi = motion.li;
 
 interface Expense {
   id: string;
@@ -35,9 +43,9 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
 
   const getExpenseIcon = (amount: number) => {
     return amount > 100 ? (
-      <ArrowUpRight className="h-4 w-4 text-red-500" />
+      <TrendingUp className="h-4 w-4 text-red-500" />
     ) : (
-      <ArrowDownRight className="h-4 w-4 text-green-500" />
+      <TrendingDown className="h-4 w-4 text-green-500" />
     );
   };
 
@@ -55,19 +63,23 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
   if (isLoading) {
     return (
       <MotionCard
-        className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700"
+        className="bg-card text-card-foreground shadow-lg"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Latest Expenses
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Latest Expenses</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           {[...Array(5)].map((_, index) => (
-            <Skeleton key={index} className="w-full h-16 mb-4" />
+            <div key={index} className="flex items-center space-x-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-4 w-[150px]" />
+              </div>
+            </div>
           ))}
         </CardContent>
       </MotionCard>
@@ -77,15 +89,13 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
   if (expenses.length === 0) {
     return (
       <MotionCard
-        className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700"
+        className="bg-card text-card-foreground shadow-lg"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Latest Expenses
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Latest Expenses</CardTitle>
         </CardHeader>
         <CardContent>
           <Alert>
@@ -96,54 +106,56 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
               to see them here.
             </AlertDescription>
           </Alert>
-          <Button className="w-full mt-4">Add Your First Expense</Button>
         </CardContent>
+        <CardFooter>
+          <Button className="w-full">Add Your First Expense</Button>
+        </CardFooter>
       </MotionCard>
     );
   }
 
   return (
     <MotionCard
-      className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700"
+      className="bg-card text-card-foreground shadow-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl font-semibold">Latest Expenses</CardTitle>
-        <Button variant="outline" size="sm">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-2xl font-bold">Latest Expenses</CardTitle>
+        <Button variant="ghost" size="sm">
           View All
         </Button>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
+        <ScrollArea className="h-[400px] pr-4">
           <ul className="space-y-4">
-            {latestExpenses.map((expense) => (
-              <motion.li
+            {latestExpenses.map((expense, index) => (
+              <MotionLi
                 key={expense.id}
-                className="flex justify-between items-center p-3 bg-gray-50 dark:bg-neutral-700 rounded-lg"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
+                className="flex justify-between items-center p-4 bg-accent rounded-lg transition-colors hover:bg-accent/80"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0">
+                <div className="flex items-center space-x-4">
+                  <div
+                    className={cn(
+                      "p-2 rounded-full",
+                      getCategoryColor(expense.category)
+                    )}
+                  >
                     {getExpenseIcon(expense.amount)}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-neutral-100">
+                    <p className="font-semibold text-lg">
                       {expense.description}
                     </p>
                     <div className="flex items-center space-x-2 mt-1">
-                      <Badge
-                        variant="secondary"
-                        className={`${getCategoryColor(
-                          expense.category
-                        )} text-white`}
-                      >
+                      <Badge variant="secondary" className="text-xs">
                         {expense.category}
                       </Badge>
-                      <span className="text-xs text-gray-500 dark:text-neutral-400 flex items-center">
+                      <span className="text-xs text-muted-foreground flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
                         {new Date(expense.date).toLocaleDateString()}
                       </span>
@@ -151,12 +163,12 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-gray-900 dark:text-neutral-100 flex items-center">
+                  <p className="font-bold text-lg flex items-center">
                     <DollarSign className="h-4 w-4 mr-1" />
                     {expense.amount.toFixed(2)}
                   </p>
                 </div>
-              </motion.li>
+              </MotionLi>
             ))}
           </ul>
         </ScrollArea>

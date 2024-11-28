@@ -75,7 +75,7 @@ export function MonthlySpendingTrend({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700">
+      <Card className="bg-card backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700">
         <CardHeader>
           <CardTitle className="text-xl font-semibold flex items-center justify-between">
             Monthly Spending Trend

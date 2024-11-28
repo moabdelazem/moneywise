@@ -12,7 +12,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { TrendingUp, DollarSign, PiggyBank, CreditCard, Info, AlertCircle } from 'lucide-react';
+import {
+  TrendingUp,
+  DollarSign,
+  PiggyBank,
+  CreditCard,
+  Info,
+  AlertCircle,
+} from "lucide-react";
 
 interface FinancialHealthScoreProps {
   score: number | null;
@@ -43,22 +50,23 @@ export function FinancialHealthScore({
   const getScoreDetails = (score: number | null) => [
     {
       label: "Savings",
-      value: score === null ? "N/A" : (score >= 60 ? "On Track" : "Needs Attention"),
+      value:
+        score === null ? "N/A" : score >= 60 ? "On Track" : "Needs Attention",
       icon: PiggyBank,
     },
     {
       label: "Debt",
-      value: score === null ? "N/A" : (score >= 70 ? "Manageable" : "High"),
+      value: score === null ? "N/A" : score >= 70 ? "Manageable" : "High",
       icon: CreditCard,
     },
     {
       label: "Spending",
-      value: score === null ? "N/A" : (score >= 50 ? "Controlled" : "Excessive"),
+      value: score === null ? "N/A" : score >= 50 ? "Controlled" : "Excessive",
       icon: DollarSign,
     },
     {
       label: "Investments",
-      value: score === null ? "N/A" : (score >= 80 ? "Diversified" : "Limited"),
+      value: score === null ? "N/A" : score >= 80 ? "Diversified" : "Limited",
       icon: TrendingUp,
     },
   ];
@@ -86,7 +94,7 @@ export function FinancialHealthScore({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700">
+      <Card className="bg-card backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-xl font-semibold">
             Financial Health Score
@@ -107,26 +115,25 @@ export function FinancialHealthScore({
         </CardHeader>
         <CardContent className="flex flex-col items-center">
           <div
-            className={`w-32 h-32 rounded-full flex items-center justify-center text-3xl font-bold text-white ${getScoreColor(score)}`}
-          >
-            {score === null ? (
-              <AlertCircle className="w-12 h-12" />
-            ) : (
+            className={`w-32 h-32 rounded-full flex items-center justify-center text-3xl font-bold text-white ${getScoreColor(
               score
-            )}
+            )}`}
+          >
+            {score === null ? <AlertCircle className="w-12 h-12" /> : score}
           </div>
           <p className="mt-4 text-lg font-medium text-gray-700 dark:text-neutral-300">
             {getScoreText(score)}
           </p>
           {score !== null ? (
-            <Progress 
-              value={score} 
-              className="w-full mt-4" 
+            <Progress
+              value={score}
+              className="w-full mt-4"
               aria-label={`Financial health score: ${score} out of 100`}
             />
           ) : (
             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-              We don&apos;t have enough data to calculate your score yet. Keep using MoneyWise to get your financial health score.
+              We don&apos;t have enough data to calculate your score yet. Keep
+              using MoneyWise to get your financial health score.
             </p>
           )}
           <Button
@@ -146,7 +153,10 @@ export function FinancialHealthScore({
                 className="w-full mt-4 space-y-2"
               >
                 {getScoreDetails(score).map((detail, index) => (
-                  <div key={index} className="flex items-center justify-between">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center">
                       <detail.icon className="h-5 w-5 mr-2 text-gray-500" />
                       <span className="text-sm text-gray-600 dark:text-neutral-400">
