@@ -9,15 +9,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Home,
-  DollarSign,
-  PieChart,
-  FileText,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { Home, Settings, LogOut } from "lucide-react";
 
+// Sidebar Props Type
 interface SidebarProps {
   userName: string;
   activeView: string;
@@ -32,6 +26,7 @@ export function Sidebar({
   setActiveView,
   handleLogout,
 }: SidebarProps) {
+  // Router hook to navigate between pages
   const router = useRouter();
 
   return (
@@ -64,7 +59,9 @@ export function Sidebar({
             </Avatar>
             <div>
               <p className="text-sm font-medium leading-none">{userName}</p>
-              <p className="text-sm text-muted-foreground">example@email.com</p>
+              <p className="text-sm text-muted-foreground">
+                {userName.split(" ").join("").toLowerCase()}@email.com
+              </p>
             </div>
           </div>
           <Button

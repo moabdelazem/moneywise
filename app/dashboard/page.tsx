@@ -9,26 +9,13 @@ import { BudgetOverview } from "@/components/dashboard/BudgetOverview";
 import { ExpensesTable } from "@/components/dashboard/ExpensesTable";
 import { Reports } from "@/components/dashboard/Reports";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { ExpenseForm } from "@/components/ExpenseForm";
-import { BudgetForm } from "@/components/BudgetForm";
-import { Button } from "@/components/ui/button";
-import { Plus, PieChart, ArrowLeft } from "lucide-react";
 import { LatestExpenses } from "@/components/dashboard/LatestExpense";
 import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
 import { FinancialHealthScore } from "@/components/dashboard/FinancialHealthScore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { MonthlySpendingTrend } from "@/components/dashboard/MonthlySpendingTrend";
 
+// Define the Expense and Budget interfaces
 interface Expense {
   id: string;
   amount: number;
@@ -37,6 +24,7 @@ interface Expense {
   category: string;
 }
 
+// Define the Budget interface
 interface Budget {
   id: string;
   category: string;
@@ -46,33 +34,61 @@ interface Budget {
 }
 
 export default function Dashboard() {
+  // State variables
+  // User name State
   const [userName, setUserName] = useState<string>("");
+  // Expenses State
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  // Budgets State
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  // Loading State
   const [isLoading, setIsLoading] = useState(true);
+  // Expense Modal State
   const [showExpenseModal, setShowExpenseModal] = useState(false);
+  // Budget Modal State
   const [showBudgetModal, setShowBudgetModal] = useState(false);
+  // Active View State
   const [activeView, setActiveView] = useState<
     "dashboard" | "expenses" | "budgets" | "reports"
   >("dashboard");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Router Hook to navigate between pages
   const router = useRouter();
+  // Toast Hook to show toast notifications
   const { toast } = useToast();
 
+  /**
+   * Fetches user, expenses, and budgets data from the server.
+   * If the token is not found in local storage, redirects to the login page.
+   * If the fetch requests are successful, updates the state with the fetched data.
+   * If any fetch request fails, logs the error, shows a toast notification, and redirects to the login page.
+   *
+   * @async
+   * @function fetchData
+   * @returns {Promise<void>} A promise that resolves when the data fetching is complete.
+   */
   const fetchData = useCallback(async () => {
+    // Retrieve the authentication token from local storage
     const token = localStorage.getItem("token");
+    // Redirect to the login page if the token is not found
     if (!token) {
       router.push("/login");
       return;
     }
 
+    // Send requests to fetch user, expenses, and budgets data
     try {
+      // Send a request to fetch user data
       const [userResponse, expensesResponse, budgetsResponse] =
+        // Fetch user data
         await Promise.all([
+          // Fetch user data
           fetch("/api/user", { headers: { Authorization: `Bearer ${token}` } }),
+          // Fetch expenses data
           fetch("/api/expenses", {
             headers: { Authorization: `Bearer ${token}` },
           }),
+          // Fetch budgets data
           fetch(
             `/api/budgets?month=${
               new Date().getMonth() + 1
@@ -83,19 +99,24 @@ export default function Dashboard() {
           ),
         ]);
 
+      // Check if all requests were successful
       if (userResponse.ok && expensesResponse.ok && budgetsResponse.ok) {
+        // Parse the response JSON data
         const [userData, expensesData, budgetsData] = await Promise.all([
           userResponse.json(),
           expensesResponse.json(),
           budgetsResponse.json(),
         ]);
+        // Update the state with the fetched data
         setUserName(userData.name);
         setExpenses(expensesData);
         setBudgets(budgetsData);
       } else {
+        // Throw an error if any request fails
         throw new Error("Failed to fetch data");
       }
     } catch (error) {
+      // Log the error to the console
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
@@ -108,37 +129,63 @@ export default function Dashboard() {
     }
   }, [router, toast]);
 
+  // Fetch user data, expenses, and budgets on initial render
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  // Handles the logout action by removing the authentication token from local storage and redirecting to the login page.
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     router.push("/login");
   }, [router]);
 
+  /**
+   * Handles the addition of a new expense.
+   *
+   * This function is wrapped in a `useCallback` hook to memoize it and prevent unnecessary re-renders.
+   * It retrieves the authentication token from local storage and sends a POST request to the `/api/expenses` endpoint
+   * with the new expense data. If the request is successful, the new expense is added to the state, the expense modal
+   * is closed, budget limits are checked, and a success toast notification is shown. If the request fails, an error
+   * toast notification is shown.
+   *
+   * @param {Omit<Expense, "id">} newExpense - The new expense data, excluding the `id` field.
+   *
+   * @throws Will throw an error if the request to add the expense fails.
+   */
   const handleAddExpense = useCallback(
     async (newExpense: Omit<Expense, "id">) => {
+      // Retrieve the authentication token from local storage
       const token = localStorage.getItem("token");
+      // Redirect to the login page if the token is not found
       if (!token) {
         router.push("/login");
         return;
       }
 
+      // Send a POST request to add the new expense
       try {
+        // Send a POST request to the `/api/expenses` endpoint
         const response = await fetch("/api/expenses", {
           method: "POST",
+          // Include the authentication token in the request headers
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          // Convert the new expense object to a JSON string and include it in the request body
           body: JSON.stringify(newExpense),
         });
 
+        // Check if the request was successful
         if (response.ok) {
+          // Parse the response JSON data to get the added expense
           const addedExpense = await response.json();
+          // Update the expenses state by adding the new expense
           setExpenses((prevExpenses) => [addedExpense, ...prevExpenses]);
+          // Close the expense modal
           setShowExpenseModal(false);
+          // Check the budget limits for the new expense
           checkBudgetLimits(addedExpense);
           toast({
             title: "Expense added",
@@ -148,7 +195,9 @@ export default function Dashboard() {
           throw new Error("Failed to add expense");
         }
       } catch (error) {
+        // Log the error to the console
         console.error("Error adding expense:", error);
+        // Show an error toast notification
         toast({
           title: "Error adding expense",
           description:
@@ -160,40 +209,69 @@ export default function Dashboard() {
     [router, toast]
   );
 
+  /**
+   * Handles the addition of a new budget.
+   *
+   * This function uses a callback to asynchronously add a new budget by sending a POST request
+   * to the `/api/budgets` endpoint. It retrieves the authentication token from local storage
+   * and includes it in the request headers. If the token is not found, the user is redirected
+   * to the login page.
+   *
+   * On successful addition of the budget, the new budget is added to the state, the budget modal
+   * is closed, and a success toast notification is displayed. If the addition fails, an error
+   * toast notification is displayed.
+   *
+   * @param {Omit<Budget, "id">} newBudget - The new budget to be added, excluding the `id` property.
+   */
   const handleAddBudget = useCallback(
     async (newBudget: Omit<Budget, "id">) => {
+      // Retrieve the authentication token from local storage
       const token = localStorage.getItem("token");
+      // Redirect to the login page if the token is not found
+      // ? This is Not The Best Practice but it's okay for now
       if (!token) {
         router.push("/login");
         return;
       }
 
+      // Send a POST request to add the new budget
       try {
+        // Send a POST request to the `/api/budgets` endpoint
         const response = await fetch("/api/budgets", {
           method: "POST",
           headers: {
+            // Include the authentication token in the request headers
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          // Convert the new budget object to a JSON string and include it in the request body
           body: JSON.stringify(newBudget),
         });
 
+        // Check if the request was successful
         if (response.ok) {
+          // Parse the response JSON data to get the added budget
           const addedBudget = await response.json();
+          // Update the budgets state by adding the new budget
           setBudgets((prevBudgets) => [
             ...prevBudgets.filter((b) => b.category !== addedBudget.category),
             addedBudget,
           ]);
+          // Close the budget modal
           setShowBudgetModal(false);
+          // Show a success toast notification
           toast({
             title: "Budget set",
             description: "Your budget has been successfully set.",
           });
         } else {
+          // Throw an error if the request failed
           throw new Error("Failed to add budget");
         }
       } catch (error) {
+        // Log the error to the console
         console.error("Error adding budget:", error);
+        // Show an error toast notification
         toast({
           title: "Error setting budget",
           description:
@@ -205,17 +283,38 @@ export default function Dashboard() {
     [router, toast]
   );
 
+  /**
+   * Checks if the new expense exceeds 90% of the relevant budget limit and shows a toast notification if it does.
+   *
+   * @param {Expense} newExpense - The new expense to be checked against the budget limits.
+   *
+   * @returns {void}
+   *
+   * @callback
+   *
+   * @example
+   * const newExpense = { category: 'Food', amount: 50 };
+   * checkBudgetLimits(newExpense);
+   *
+   * @remarks
+   * This function uses the `budgets` and `expenses` arrays to find the relevant budget and calculate the total expenses for the given category.
+   * If the total expenses exceed 90% of the budget amount, a toast notification is displayed with a warning message.
+   */
   const checkBudgetLimits = useCallback(
     (newExpense: Expense) => {
+      // Find the relevant budget for the new expense
       const relevantBudget = budgets.find(
         (b) => b.category === newExpense.category
       );
+      // Calculate the total expenses for the given category
       if (relevantBudget) {
+        // Filter expenses by category and calculate the total amount
         const totalExpenses =
           expenses
             .filter((e) => e.category === newExpense.category)
             .reduce((sum, e) => sum + e.amount, 0) + newExpense.amount;
 
+        // Show a toast notification if the total expenses exceed 90% of the budget amount
         if (totalExpenses > relevantBudget.amount * 0.9) {
           toast({
             title: "Budget Alert",
@@ -228,13 +327,28 @@ export default function Dashboard() {
     [budgets, expenses, toast]
   );
 
+  /**
+   * Calculates the financial health score based on the provided budgets and expenses.
+   *
+   * The score is calculated as follows:
+   * - A base score of 50 points.
+   * - Up to 30 additional points based on the savings ratio, which is the proportion of the budget that remains after expenses.
+   * - 20 additional points if all expenses adhere to their respective budgets.
+   *
+   * The final score is constrained to be between 0 and 100.
+   *
+   * @returns {number} The calculated financial health score.
+   */
   const calculateFinancialHealthScore = useCallback(() => {
+    // Calculate total budget, total expenses, savings ratio, and budget adherence
     const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
     const totalExpenses = expenses.reduce(
       (sum, expense) => sum + expense.amount,
       0
     );
+    // Calculate the savings ratio as the proportion of the budget that remains after expenses
     const savingsRatio = (totalBudget - totalExpenses) / totalBudget;
+    // Check if all expenses adhere to their respective budgets
     const budgetAdherence = expenses.every((expense) => {
       const relevantBudget = budgets.find(
         (b) => b.category === expense.category
@@ -249,11 +363,8 @@ export default function Dashboard() {
     return Math.min(Math.max(Math.round(score), 0), 100); // Ensure score is between 0 and 100
   }, [budgets, expenses]);
 
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
   const renderContent = useCallback(() => {
+    // Calculate the financial health score
     const financialHealthScore = calculateFinancialHealthScore();
 
     return (
@@ -358,9 +469,7 @@ export default function Dashboard() {
         ></Header>
         <main className="flex-1 overflow-y-auto">
           <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
-            <ScrollArea className="h-[calc(100vh-theme(spacing.16))]">
-              {renderContent()}
-            </ScrollArea>
+            {renderContent()}
           </div>
         </main>
       </div>
