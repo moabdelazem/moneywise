@@ -20,8 +20,10 @@ import {
   PlusCircle,
 } from "lucide-react";
 
+// Motion card component for animations
 const MotionCard = motion(Card);
 
+// Budget overview component
 interface BudgetOverviewProps {
   expenses: { category: string; amount: number }[];
   budgets: { id: string; category: string; amount: number }[];
@@ -35,15 +37,25 @@ export function BudgetOverview({
   isLoading,
   fullWidth = false,
 }: BudgetOverviewProps) {
+  // Calculate total budget, total expenses, remaining budget, and budget utilization
   const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+  // Calculate total expenses
   const totalExpenses = expenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
+  // Calculate remaining budget
   const remainingBudget = totalBudget - totalExpenses;
+  // Calculate budget utilization
   const budgetUtilization =
     totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
 
+  // Calculate pie chart data
+  /**
+   * Generates data for a pie chart based on budgets and expenses.
+   *
+   * @returns An array of objects where each object represents a category with its name and the total expenses for that category.
+   */
   const pieChartData = budgets.map((budget) => {
     const expensesForCategory = expenses
       .filter((e) => e.category === budget.category)
@@ -54,6 +66,7 @@ export function BudgetOverview({
     };
   });
 
+  // Pie chart colors
   const COLORS = [
     "#0088FE",
     "#00C49F",
@@ -63,6 +76,7 @@ export function BudgetOverview({
     "#82ca9d",
   ];
 
+  // Chart configuration
   const chartConfig = {
     expenses: {
       label: "Expenses",
@@ -70,7 +84,9 @@ export function BudgetOverview({
     },
   };
 
+  // Render content based on loading state and data availability
   const renderContent = () => {
+    // Show skeleton loader if data is loading
     if (isLoading) {
       return (
         <div className="space-y-4">
@@ -81,6 +97,7 @@ export function BudgetOverview({
       );
     }
 
+    // Show message if no budgets are set
     if (budgets.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center h-64">

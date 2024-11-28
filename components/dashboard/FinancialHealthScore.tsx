@@ -21,6 +21,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
+// FinancialHealthScore TypeScript interface
 interface FinancialHealthScoreProps {
   score: number | null;
   isLoading: boolean;
@@ -30,8 +31,10 @@ export function FinancialHealthScore({
   score,
   isLoading,
 }: FinancialHealthScoreProps) {
+  // State variable to toggle showing the details
   const [showDetails, setShowDetails] = useState(false);
 
+  // Get the color of the score based on the score value
   const getScoreColor = (score: number | null) => {
     if (score === null) return "bg-gray-400";
     if (score >= 80) return "bg-green-500";
@@ -39,6 +42,7 @@ export function FinancialHealthScore({
     return "bg-red-500";
   };
 
+  // Get the text for the score based on the score value
   const getScoreText = (score: number | null) => {
     if (score === null) return "Not Available";
     if (score >= 80) return "Excellent";
@@ -47,6 +51,7 @@ export function FinancialHealthScore({
     return "Needs Improvement";
   };
 
+  // Get the details for the score based on the score value
   const getScoreDetails = (score: number | null) => [
     {
       label: "Savings",
@@ -71,9 +76,10 @@ export function FinancialHealthScore({
     },
   ];
 
+  // Check if the component is in a loading state
   if (isLoading) {
     return (
-      <Card className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700">
+      <Card className="bg-card backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">
             Financial Health Score

@@ -406,29 +406,17 @@ export default function Dashboard() {
           </div>
         </TabsContent>
         <TabsContent value="expenses">
-          <Card>
-            <CardHeader>
-              <CardTitle>Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ExpensesTable expenses={expenses} isLoading={isLoading} />
-            </CardContent>
-          </Card>
+          <ExpensesTable expenses={expenses} isLoading={isLoading} />
         </TabsContent>
         <TabsContent value="budgets">
-          <Card>
-            <CardHeader>
-              <CardTitle>Budgets</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <BudgetOverview
-                expenses={expenses}
-                budgets={budgets}
-                isLoading={isLoading}
-                fullWidth
-              />
-            </CardContent>
-          </Card>
+          <CardContent>
+            <BudgetOverview
+              expenses={expenses}
+              budgets={budgets}
+              isLoading={isLoading}
+              fullWidth
+            />
+          </CardContent>
         </TabsContent>
         <TabsContent value="reports">
           <Card>
