@@ -25,8 +25,8 @@ const MotionCard = motion(Card);
 
 // Budget overview component
 interface BudgetOverviewProps {
-  expenses: { category: string; amount: number }[];
-  budgets: { id: string; category: string; amount: number }[];
+  expenses: { category: string; amount: number; createdAt: Date }[];
+  budgets: { id: string; category: string; amount: number, createdAt: Date}[];
   isLoading: boolean;
   fullWidth?: boolean;
 }
@@ -38,12 +38,20 @@ export function BudgetOverview({
   fullWidth = false,
 }: BudgetOverviewProps) {
   // Calculate total budget, total expenses, remaining budget, and budget utilization
-  const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
-  // Calculate total expenses
-  const totalExpenses = expenses.reduce(
-    (sum, expense) => sum + expense.amount,
-    0
-  );
+  // ? the total budget is the sum of all the budgets in the current month
+  // const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+  const totalBudget = budgets
+    .filter((budget) => {
+      const budgetDate = new Date(budget.createdAt);
+      return budgetDate.getMonth() === new Date().getMonth();
+    }).reduce((sum, budget) => sum + budget.amount, 0);
+  // Calculate total expenses for the current month
+  const totalExpenses = expenses
+    .filter((expense) => {
+      const expenseDate = new Date(expense.createdAt);
+      return expenseDate.getMonth() === new Date().getMonth();
+    })
+    .reduce((sum, expense) => sum + expense.amount, 0);
   // Calculate remaining budget
   const remainingBudget = totalBudget - totalExpenses;
   // Calculate budget utilization
