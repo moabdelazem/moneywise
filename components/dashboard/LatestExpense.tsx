@@ -23,9 +23,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Expense } from "@/lib/types";
 
+// Motion components for animations
 const MotionCard = motion(Card);
 const MotionLi = motion.li;
-
 
 interface LatestExpensesProps {
   expenses: Expense[];
@@ -33,37 +33,43 @@ interface LatestExpensesProps {
 }
 
 export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
-  const latestExpenses = expenses.slice(0, 5); // Get the 5 most recent expenses
+  // Get 5 most recent expenses for display
+  const latestExpenses = expenses.slice(0, 5);
 
+  // Helper function to determine expense icon based on amount
   const getExpenseIcon = (amount: number) => {
     return amount > 100 ? (
-      <TrendingUp className="h-4 w-4 text-red-500" />
+      <TrendingUp className="h-4 w-4 text-red-500 dark:text-red-400" />
     ) : (
-      <TrendingDown className="h-4 w-4 text-green-500" />
+      <TrendingDown className="h-4 w-4 text-green-500 dark:text-green-400" />
     );
   };
 
+  // Category color mapping for visual distinction
   const getCategoryColor = (category: string) => {
     const colors: { [key: string]: string } = {
-      Food: "bg-blue-500",
-      Transport: "bg-green-500",
-      Entertainment: "bg-yellow-500",
-      Shopping: "bg-purple-500",
-      Bills: "bg-red-500",
+      Food: "bg-blue-500/20 dark:bg-blue-500/30",
+      Transport: "bg-green-500/20 dark:bg-green-500/30",
+      Entertainment: "bg-yellow-500/20 dark:bg-yellow-500/30",
+      Shopping: "bg-purple-500/20 dark:bg-purple-500/30",
+      Bills: "bg-red-500/20 dark:bg-red-500/30",
     };
-    return colors[category] || "bg-gray-500";
+    return colors[category] || "bg-gray-500/20 dark:bg-gray-500/30";
   };
 
+  // Loading state UI
   if (isLoading) {
     return (
       <MotionCard
-        className="bg-card text-card-foreground shadow-lg"
+        className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Latest Expenses</CardTitle>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Latest Expenses
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {[...Array(5)].map((_, index) => (
@@ -80,19 +86,22 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
     );
   }
 
+  // Empty state UI
   if (expenses.length === 0) {
     return (
       <MotionCard
-        className="bg-card text-card-foreground shadow-lg"
+        className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Latest Expenses</CardTitle>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Latest Expenses
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert>
+          <Alert className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>No Expenses</AlertTitle>
             <AlertDescription>
@@ -102,22 +111,27 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
           </Alert>
         </CardContent>
         <CardFooter>
-          <Button className="w-full">Add Your First Expense</Button>
+          <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white">
+            Add Your First Expense
+          </Button>
         </CardFooter>
       </MotionCard>
     );
   }
 
+  // Main expenses list UI
   return (
     <MotionCard
-      className="bg-card text-card-foreground shadow-lg"
+      className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-2xl font-bold">Latest Expenses</CardTitle>
-        <Button variant="ghost" size="sm">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-gray-100 dark:border-neutral-800">
+        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          Latest Expenses
+        </CardTitle>
+        <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50 dark:bg-neutral-800 dark:hover:bg-neutral-700">
           View All
         </Button>
       </CardHeader>
@@ -127,29 +141,30 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
             {latestExpenses.map((expense, index) => (
               <MotionLi
                 key={expense.id}
-                className="flex justify-between items-center p-4 bg-accent rounded-lg transition-colors hover:bg-accent/80"
+                className="flex justify-between items-center p-4 bg-white dark:bg-neutral-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
               >
                 <div className="flex items-center space-x-4">
                   <div
                     className={cn(
-                      "p-2 rounded-full",
+                      "p-3 rounded-full",
                       getCategoryColor(expense.category)
                     )}
                   >
                     {getExpenseIcon(expense.amount)}
                   </div>
                   <div>
-                    <p className="font-semibold text-lg">
+                    <p className="font-semibold text-lg text-gray-900 dark:text-gray-100">
                       {expense.description}
                     </p>
                     <div className="flex items-center space-x-2 mt-1">
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-xs font-medium">
                         {expense.category}
                       </Badge>
-                      <span className="text-xs text-muted-foreground flex items-center">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
                         {new Date(expense.date).toLocaleDateString()}
                       </span>
@@ -157,7 +172,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-lg flex items-center">
+                  <p className="font-bold text-lg flex items-center text-gray-900 dark:text-gray-100">
                     <DollarSign className="h-4 w-4 mr-1" />
                     {expense.amount.toFixed(2)}
                   </p>
