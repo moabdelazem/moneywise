@@ -21,17 +21,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { Expense } from "@/lib/types";
 
 const MotionCard = motion(Card);
 const MotionLi = motion.li;
 
-interface Expense {
-  id: string;
-  amount: number;
-  description: string;
-  date: string;
-  category: string;
-}
 
 interface LatestExpensesProps {
   expenses: Expense[];

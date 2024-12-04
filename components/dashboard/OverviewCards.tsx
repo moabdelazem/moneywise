@@ -12,12 +12,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { Budget, Expense } from "@/lib/types";
 
 const MotionCard = motion(Card);
 
 interface OverviewCardsProps {
-  expenses: { amount: number; category: string; date: string }[];
-  budgets: { id: string; amount: number; category: string }[];
+  expenses: Expense[];
+  budgets: Budget[];
   isLoading: boolean;
 }
 

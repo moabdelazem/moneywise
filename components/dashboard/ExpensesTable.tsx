@@ -31,18 +31,11 @@ import {
   SortDesc,
   Filter,
 } from "lucide-react";
+import { Expense } from "@/lib/types";
 
 // MotionCard is a Framer Motion component that animates the Card component
 const MotionCard = motion(Card);
 
-// Expense interface
-interface Expense {
-  id: string;
-  date: string;
-  description: string;
-  category: string;
-  amount: number;
-}
 
 // ExpensesTable component
 interface ExpensesTableProps {

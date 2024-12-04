@@ -14,24 +14,9 @@ import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategor
 import { FinancialHealthScore } from "@/components/dashboard/FinancialHealthScore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Budget } from "@/lib/types";
+import { Expense } from "@/lib/types";
 
-// Define the Expense and Budget interfaces
-interface Expense {
-  id: string;
-  amount: number;
-  description: string;
-  date: string;
-  category: string;
-}
-
-// Define the Budget interface
-interface Budget {
-  id: string;
-  category: string;
-  amount: number;
-  month: number;
-  year: number;
-}
 
 export default function Dashboard() {
   // State variables

@@ -19,14 +19,15 @@ import {
   TrendingDown,
   PlusCircle,
 } from "lucide-react";
+import { Budget, Expense } from "@/lib/types";
 
 // Motion card component for animations
 const MotionCard = motion(Card);
 
 // Budget overview component
 interface BudgetOverviewProps {
-  expenses: { category: string; amount: number; createdAt: Date }[];
-  budgets: { id: string; category: string; amount: number, createdAt: Date}[];
+  expenses: Expense[];
+  budgets: Budget[];
   isLoading: boolean;
   fullWidth?: boolean;
 }
@@ -42,13 +43,15 @@ export function BudgetOverview({
   // const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
   const totalBudget = budgets
     .filter((budget) => {
-      const budgetDate = new Date(budget.createdAt);
-      return budgetDate.getMonth() === new Date().getMonth();
-    }).reduce((sum, budget) => sum + budget.amount, 0);
+      const currentDate = new Date();
+      return budget.month === currentDate.getMonth() + 1 && 
+             budget.year === currentDate.getFullYear();
+    })
+    .reduce((sum, budget) => sum + budget.amount, 0);
   // Calculate total expenses for the current month
   const totalExpenses = expenses
     .filter((expense) => {
-      const expenseDate = new Date(expense.createdAt);
+      const expenseDate = new Date(expense.date);
       return expenseDate.getMonth() === new Date().getMonth();
     })
     .reduce((sum, expense) => sum + expense.amount, 0);
