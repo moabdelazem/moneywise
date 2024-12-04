@@ -3,7 +3,7 @@ export interface Expense {
   amount: number;
   description: string;
   category: string;
-  date: Date
+  date: Date;
 }
 
 export interface Budget {
@@ -13,3 +13,5 @@ export interface Budget {
   month: number;
   year: number;
 }
+
+export type AuthHeader = string | null;
