@@ -447,12 +447,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar
-        userName={userName}
-        activeView={activeView}
-        setActiveView={setActiveView}
-        handleLogout={handleLogout}
-      />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
           userName={userName}
