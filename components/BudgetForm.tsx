@@ -125,13 +125,15 @@ export function BudgetForm({ onSubmit, onCancel }: BudgetFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Food">Food</SelectItem>
-                    <SelectItem value="Transportation">
+                    <SelectItem value="FOOD">Food</SelectItem>
+                    <SelectItem value="TRANSPORTATION">
                       Transportation
                     </SelectItem>
-                    <SelectItem value="Entertainment">Entertainment</SelectItem>
-                    <SelectItem value="Utilities">Utilities</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="ENTERTAINMENT">Entertainment</SelectItem>
+                    <SelectItem value="UTILITIES">Utilities</SelectItem>
+                    <SelectItem value="HOUSING">Housing</SelectItem>
+                    <SelectItem value="AUTOMOBILE">Automobile</SelectItem>
+                    <SelectItem value="OTHER">Other</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

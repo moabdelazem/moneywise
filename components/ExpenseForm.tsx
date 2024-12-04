@@ -115,11 +115,13 @@ export function ExpenseForm({ onSubmit, onCancel }: ExpenseFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Food">Food</SelectItem>
-                  <SelectItem value="Transportation">Transportation</SelectItem>
-                  <SelectItem value="Entertainment">Entertainment</SelectItem>
-                  <SelectItem value="Utilities">Utilities</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  <SelectItem value="FOOD">Food</SelectItem>
+                  <SelectItem value="TRANSPORTATION">Transportation</SelectItem>
+                  <SelectItem value="HOUSING">Housing</SelectItem>
+                  <SelectItem value="UTILITIES">Utilities</SelectItem>
+                  <SelectItem value="AUTOMOBILE">Automobile</SelectItem>
+                  <SelectItem value="ENTERTAINMENT">Entertainment</SelectItem>
+                  <SelectItem value="OTHER">Other</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
