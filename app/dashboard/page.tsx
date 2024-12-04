@@ -28,10 +28,6 @@ export default function Dashboard() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   // Loading State
   const [isLoading, setIsLoading] = useState(true);
-  // Expense Modal State
-  const [showExpenseModal, setShowExpenseModal] = useState(false);
-  // Budget Modal State
-  const [showBudgetModal, setShowBudgetModal] = useState(false);
   // Active View State
   const [activeView, setActiveView] = useState<
     "dashboard" | "expenses" | "budgets" | "reports"
@@ -75,8 +71,7 @@ export default function Dashboard() {
           }),
           // Fetch budgets data
           fetch(
-            `/api/budgets?month=${
-              new Date().getMonth() + 1
+            `/api/budgets?month=${new Date().getMonth() + 1
             }&year=${new Date().getFullYear()}`,
             {
               headers: { Authorization: `Bearer ${token}` },
@@ -168,8 +163,6 @@ export default function Dashboard() {
           const addedExpense = await response.json();
           // Update the expenses state by adding the new expense
           setExpenses((prevExpenses) => [addedExpense, ...prevExpenses]);
-          // Close the expense modal
-          setShowExpenseModal(false);
           // Check the budget limits for the new expense
           checkBudgetLimits(addedExpense);
           toast({
@@ -242,8 +235,6 @@ export default function Dashboard() {
             ...prevBudgets.filter((b) => b.category !== addedBudget.category),
             addedBudget,
           ]);
-          // Close the budget modal
-          setShowBudgetModal(false);
           // Show a success toast notification
           toast({
             title: "Budget set",
@@ -337,7 +328,7 @@ export default function Dashboard() {
     const currentExpenses = expenses.filter(expense => {
       const expenseDate = new Date(expense.date);
       return expenseDate.getMonth() === currentDate.getMonth() &&
-             expenseDate.getFullYear() === currentDate.getFullYear();
+        expenseDate.getFullYear() === currentDate.getFullYear();
     });
 
     // Calculate total budget and expenses for current month

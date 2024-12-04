@@ -62,8 +62,10 @@ export function Header({
                 </DialogDescription>
               </DialogHeader>
               <ExpenseForm
-                onSubmit={(data) =>
+                onSubmit={(data) => {
                   handleAddExpense({ ...data, amount: parseFloat(data.amount) })
+                  setShowExpenseModal(false)
+                }
                 }
                 onCancel={() => setShowExpenseModal(false)}
               />
@@ -83,13 +85,15 @@ export function Header({
                 </DialogDescription>
               </DialogHeader>
               <BudgetForm
-                onSubmit={(data) =>
+                onSubmit={(data) => {
                   handleAddBudget({
                     ...data,
                     amount: parseFloat(data.amount),
                     month: parseInt(data.month, 10),
                     year: parseInt(data.year, 10),
                   })
+                  setShowBudgetModal(false)
+                }
                 }
                 onCancel={() => setShowBudgetModal(false)}
               />
