@@ -14,24 +14,9 @@ import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategor
 import { FinancialHealthScore } from "@/components/dashboard/FinancialHealthScore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Budget } from "@/lib/types";
+import { Expense } from "@/lib/types";
 
-// Define the Expense and Budget interfaces
-interface Expense {
-  id: string;
-  amount: number;
-  description: string;
-  date: string;
-  category: string;
-}
-
-// Define the Budget interface
-interface Budget {
-  id: string;
-  category: string;
-  amount: number;
-  month: number;
-  year: number;
-}
 
 export default function Dashboard() {
   // State variables
@@ -43,10 +28,6 @@ export default function Dashboard() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   // Loading State
   const [isLoading, setIsLoading] = useState(true);
-  // Expense Modal State
-  const [showExpenseModal, setShowExpenseModal] = useState(false);
-  // Budget Modal State
-  const [showBudgetModal, setShowBudgetModal] = useState(false);
   // Active View State
   const [activeView, setActiveView] = useState<
     "dashboard" | "expenses" | "budgets" | "reports"
@@ -90,8 +71,7 @@ export default function Dashboard() {
           }),
           // Fetch budgets data
           fetch(
-            `/api/budgets?month=${
-              new Date().getMonth() + 1
+            `/api/budgets?month=${new Date().getMonth() + 1
             }&year=${new Date().getFullYear()}`,
             {
               headers: { Authorization: `Bearer ${token}` },
@@ -183,8 +163,6 @@ export default function Dashboard() {
           const addedExpense = await response.json();
           // Update the expenses state by adding the new expense
           setExpenses((prevExpenses) => [addedExpense, ...prevExpenses]);
-          // Close the expense modal
-          setShowExpenseModal(false);
           // Check the budget limits for the new expense
           checkBudgetLimits(addedExpense);
           toast({
@@ -257,8 +235,6 @@ export default function Dashboard() {
             ...prevBudgets.filter((b) => b.category !== addedBudget.category),
             addedBudget,
           ]);
-          // Close the budget modal
-          setShowBudgetModal(false);
           // Show a success toast notification
           toast({
             title: "Budget set",
@@ -340,27 +316,56 @@ export default function Dashboard() {
    * @returns {number} The calculated financial health score.
    */
   const calculateFinancialHealthScore = useCallback(() => {
-    // Calculate total budget, total expenses, savings ratio, and budget adherence
-    const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
-    const totalExpenses = expenses.reduce(
-      (sum, expense) => sum + expense.amount,
-      0
+    // Only consider current month's budgets and expenses
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+
+    const currentBudgets = budgets.filter(
+      budget => budget.month === currentMonth && budget.year === currentYear
     );
-    // Calculate the savings ratio as the proportion of the budget that remains after expenses
-    const savingsRatio = (totalBudget - totalExpenses) / totalBudget;
-    // Check if all expenses adhere to their respective budgets
-    const budgetAdherence = expenses.every((expense) => {
-      const relevantBudget = budgets.find(
-        (b) => b.category === expense.category
-      );
-      return relevantBudget ? expense.amount <= relevantBudget.amount : true;
+
+    const currentExpenses = expenses.filter(expense => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate.getMonth() === currentDate.getMonth() &&
+        expenseDate.getFullYear() === currentDate.getFullYear();
     });
 
-    let score = 50; // Base score
-    score += savingsRatio * 30; // Up to 30 points for savings
-    score += budgetAdherence ? 20 : 0; // 20 points for sticking to budget
+    // Calculate total budget and expenses for current month
+    const totalBudget = currentBudgets.reduce((sum, budget) => sum + budget.amount, 0);
+    const totalExpenses = currentExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-    return Math.min(Math.max(Math.round(score), 0), 100); // Ensure score is between 0 and 100
+    // Base score starts at 50
+    let score = 50;
+
+    // Calculate savings ratio (up to 30 points)
+    if (totalBudget > 0) {
+      const savingsRatio = (totalBudget - totalExpenses) / totalBudget;
+      score += Math.max(0, savingsRatio * 30); // Prevent negative points
+    }
+
+    // Check budget adherence by category (up to 20 points)
+    const categoryAdherence = currentBudgets.map(budget => {
+      const categoryExpenses = currentExpenses
+        .filter(expense => expense.category === budget.category)
+        .reduce((sum, expense) => sum + expense.amount, 0);
+      return categoryExpenses <= budget.amount;
+    });
+
+    const adherenceRatio = categoryAdherence.filter(Boolean).length / categoryAdherence.length;
+    score += adherenceRatio * 20;
+
+    // Add bonus points for consistent savings (up to 10 points)
+    if (totalBudget > 0 && totalExpenses < totalBudget * 0.8) {
+      score += 10;
+    }
+
+    // Penalize for overspending (up to -10 points)
+    if (totalBudget > 0 && totalExpenses > totalBudget) {
+      score -= Math.min(10, ((totalExpenses - totalBudget) / totalBudget) * 10);
+    }
+
+    return Math.min(Math.max(Math.round(score), 0), 100);
   }, [budgets, expenses]);
 
   const renderContent = useCallback(() => {
@@ -442,12 +447,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar
-        userName={userName}
-        activeView={activeView}
-        setActiveView={setActiveView}
-        handleLogout={handleLogout}
-      />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
           userName={userName}

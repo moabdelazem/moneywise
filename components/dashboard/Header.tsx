@@ -39,6 +39,7 @@ export function Header({
   handleAddBudget,
   children,
 }: HeaderProps) {
+  // Modal state management
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const router = useRouter();
@@ -46,15 +47,19 @@ export function Header({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
+        {/* Left side - Reserved for logo/branding */}
         <div className="flex items-center space-x-4"></div>
+
+        {/* Right side - Actions and user menu */}
         <div className="flex flex-1 items-center justify-end space-x-4">
+          {/* Add Expense Modal */}
           <Dialog open={showExpenseModal} onOpenChange={setShowExpenseModal}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="bg-primary hover:bg-primary/90">
                 <Plus className="mr-2 h-4 w-4" /> Add Expense
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Add New Expense</DialogTitle>
                 <DialogDescription>
@@ -62,20 +67,23 @@ export function Header({
                 </DialogDescription>
               </DialogHeader>
               <ExpenseForm
-                onSubmit={(data) =>
+                onSubmit={(data) => {
                   handleAddExpense({ ...data, amount: parseFloat(data.amount) })
-                }
+                  setShowExpenseModal(false)
+                }}
                 onCancel={() => setShowExpenseModal(false)}
               />
             </DialogContent>
           </Dialog>
+
+          {/* Add Budget Modal */}
           <Dialog open={showBudgetModal} onOpenChange={setShowBudgetModal}>
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="border-primary/20 hover:bg-primary/10">
                 <PieChart className="mr-2 h-4 w-4" /> Set Budget
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Set New Budget</DialogTitle>
                 <DialogDescription>
@@ -83,30 +91,37 @@ export function Header({
                 </DialogDescription>
               </DialogHeader>
               <BudgetForm
-                onSubmit={(data) =>
+                onSubmit={(data) => {
                   handleAddBudget({
                     ...data,
                     amount: parseFloat(data.amount),
                     month: parseInt(data.month, 10),
                     year: parseInt(data.year, 10),
                   })
-                }
+                  setShowBudgetModal(false)
+                }}
                 onCancel={() => setShowBudgetModal(false)}
               />
             </DialogContent>
           </Dialog>
+
+          {/* Theme Toggle Button */}
           <ThemeToggle />
-          <Button variant="ghost" size="icon" className="relative">
+
+          {/* Notifications Button */}
+          <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
-            <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600"></span>
+            <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600 animate-pulse"></span>
           </Button>
+
+          {/* User Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8">
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-primary/10">
+                <Avatar className="h-8 w-8 ring-2 ring-primary/20">
                   <AvatarImage src="/avatars/01.png" alt={userName} />
-                  <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="bg-primary/10">{userName.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -120,14 +135,25 @@ export function Header({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push("/profile")}>
+              <DropdownMenuItem
+                onClick={() => router.push("/profile")}
+                className="cursor-pointer hover:bg-primary/10"
+              >
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push("/settings")}>
+              <DropdownMenuItem
+                onClick={() => router.push("/settings")}
+                className="cursor-pointer hover:bg-primary/10"
+              >
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onLogout}>Log out</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={onLogout}
+                className="cursor-pointer text-red-500 hover:text-red-600 hover:bg-red-50"
+              >
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

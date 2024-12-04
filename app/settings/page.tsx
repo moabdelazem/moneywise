@@ -12,6 +12,7 @@ import {
   Save,
   ArrowLeft,
   Lock,
+  Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface UserSettings {
   id: string;
@@ -47,24 +49,34 @@ interface UserSettings {
   pushNotifications: boolean;
 }
 
+interface FormErrors {
+  name?: string;
+  email?: string;
+}
+
 export default function SettingsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [deletePassword, setDeletePassword] = useState("");
-  // @esling-ignore-next-line
-  const [_, setShowDeleteConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
     fetchUserSettings();
-  // @esling-ignore-next-line
   }, []);
 
   const fetchUserSettings = async () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
       const response = await fetch("/api/user/settings", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -73,7 +85,8 @@ export default function SettingsPage() {
       if (!response.ok) throw new Error("Failed to fetch user settings");
       const data = await response.json();
       setSettings(data);
-    } catch {
+    } catch (error) {
+      console.error("Error fetching settings:", error);
       toast({
         title: "Error",
         description: "Failed to load user settings. Please try again.",
@@ -84,17 +97,41 @@ export default function SettingsPage() {
     }
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    
+    if (!settings?.name?.trim()) {
+      newErrors.name = "Name is required";
+    }
+    
+    if (!settings?.email?.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(settings.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSettings((prev) => (prev ? { ...prev, [name]: value } : null));
+    setIsDirty(true);
+    // Clear error when user starts typing
+    if (errors[name as keyof FormErrors]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
   };
 
   const handleSwitchChange = (name: string) => (checked: boolean) => {
     setSettings((prev) => (prev ? { ...prev, [name]: checked } : null));
+    setIsDirty(true);
   };
 
   const handleSave = async () => {
-    if (!settings) return;
+    if (!settings || !isDirty) return;
+    if (!validateForm()) return;
 
     setIsLoading(true);
     try {
@@ -107,17 +144,24 @@ export default function SettingsPage() {
         },
         body: JSON.stringify(settings),
       });
-      if (!response.ok) throw new Error("Failed to update settings");
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update settings");
+      }
+      
       const updatedSettings = await response.json();
       setSettings(updatedSettings);
+      setIsDirty(false);
       toast({
-        title: "Settings saved",
+        title: "Success",
         description: "Your settings have been successfully updated.",
       });
-    } catch {
+    } catch (error) {
+      console.error("Error saving settings:", error);
       toast({
         title: "Error",
-        description: "Failed to save settings. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save settings. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -146,7 +190,12 @@ export default function SettingsPage() {
         },
         body: JSON.stringify({ password: deletePassword }),
       });
-      if (!response.ok) throw new Error("Failed to delete account");
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete account");
+      }
+
       toast({
         title: "Account deleted",
         description: "Your account has been permanently deleted.",
@@ -154,11 +203,11 @@ export default function SettingsPage() {
       });
       localStorage.removeItem("token");
       router.push("/");
-    } catch {
+    } catch (error) {
+      console.error("Error deleting account:", error);
       toast({
         title: "Error",
-        description:
-          "Failed to delete account. Please check your password and try again.",
+        description: error instanceof Error ? error.message : "Failed to delete account. Please check your password and try again.",
         variant: "destructive",
       });
     } finally {
@@ -178,17 +227,24 @@ export default function SettingsPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) throw new Error("Failed to reset account");
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to reset account");
+      }
+
       const data = await response.json();
       setSettings(data.user);
+      setIsDirty(false);
       toast({
-        title: "Account reset",
+        title: "Success",
         description: "Your account data has been reset to default settings.",
       });
-    } catch {
+    } catch (error) {
+      console.error("Error resetting account:", error);
       toast({
         title: "Error",
-        description: "Failed to reset account. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to reset account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -197,7 +253,12 @@ export default function SettingsPage() {
   };
 
   if (!settings) {
-    return <Skeleton className="w-full h-[600px]" />;
+    return (
+      <div className="container mx-auto py-10 px-4 space-y-4">
+        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-[600px] w-full" />
+      </div>
+    );
   }
 
   return (
@@ -208,13 +269,17 @@ export default function SettingsPage() {
       className="container mx-auto py-10 px-4 sm:px-6 lg:px-8"
     >
       <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" onClick={() => router.back()} className="mr-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => router.back()} 
+          className="mr-4 hover:bg-primary/10"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
         <h1 className="text-3xl font-bold">Settings</h1>
       </div>
-      <Card>
+      <Card className="border-primary/10 shadow-lg">
         <CardHeader>
           <CardTitle>User Preferences</CardTitle>
           <CardDescription>
@@ -223,7 +288,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="account" className="space-y-4">
-            <TabsList>
+            <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
               <TabsTrigger value="account">
                 <User className="w-4 h-4 mr-2" />
                 Account
@@ -241,20 +306,35 @@ export default function SettingsPage() {
                   name="name"
                   value={settings.name}
                   onChange={handleInputChange}
+                  className={cn(
+                    "transition-colors",
+                    errors.name && "border-red-500 focus-visible:ring-red-500"
+                  )}
                 />
+                {errors.name && (
+                  <p className="text-sm text-red-500">{errors.name}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   name="email"
+                  type="email"
                   value={settings.email}
                   onChange={handleInputChange}
+                  className={cn(
+                    "transition-colors",
+                    errors.email && "border-red-500 focus-visible:ring-red-500"
+                  )}
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
             </TabsContent>
-            <TabsContent value="notifications" className="space-y-4">
-              <div className="flex items-center justify-between">
+            <TabsContent value="notifications" className="space-y-6">
+              <div className="flex items-center justify-between space-x-4">
                 <div className="space-y-0.5">
                   <Label htmlFor="email-notifications">
                     Email Notifications
@@ -269,7 +349,7 @@ export default function SettingsPage() {
                   onCheckedChange={handleSwitchChange("emailNotifications")}
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between space-x-4">
                 <div className="space-y-0.5">
                   <Label htmlFor="push-notifications">Push Notifications</Label>
                   <p className="text-sm text-muted-foreground">
@@ -285,10 +365,14 @@ export default function SettingsPage() {
             </TabsContent>
           </Tabs>
           <div className="mt-6">
-            <Button onClick={handleSave} disabled={isLoading}>
+            <Button 
+              onClick={handleSave} 
+              disabled={isLoading || !isDirty}
+              className="w-full sm:w-auto"
+            >
               {isLoading ? (
                 <>
-                  <Settings className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
               ) : (
@@ -301,9 +385,9 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
-      <Card className="mt-8">
+      <Card className="mt-8 border-destructive/50">
         <CardHeader>
-          <CardTitle className="text-red-600">Danger Zone</CardTitle>
+          <CardTitle className="text-destructive">Danger Zone</CardTitle>
           <CardDescription>
             Irreversible and destructive actions
           </CardDescription>
@@ -315,6 +399,7 @@ export default function SettingsPage() {
                 <Button
                   variant="destructive"
                   onClick={() => setShowDeleteConfirm(true)}
+                  className="w-full sm:w-auto"
                 >
                   <Trash className="mr-2 h-4 w-4" />
                   Delete Account
@@ -352,17 +437,17 @@ export default function SettingsPage() {
                   <AlertDialogAction
                     onClick={handleDeleteAccount}
                     className="bg-red-600 hover:bg-red-700"
-                    disabled={!deletePassword}
+                    disabled={!deletePassword || isLoading}
                   >
                     {isLoading ? (
                       <>
-                        <Lock className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Deleting...
                       </>
                     ) : (
                       <>
-                        <Lock className="mr-2 h-4 w-4" />
-                        Confirm Delete
+                        <Trash className="mr-2 h-4 w-4" />
+                        Delete Account
                       </>
                     )}
                   </AlertDialogAction>
@@ -371,7 +456,10 @@ export default function SettingsPage() {
             </AlertDialog>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="outline">
+                <Button 
+                  variant="outline" 
+                  className="w-full sm:w-auto border-destructive/50 hover:bg-destructive/10"
+                >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Reset Account
                 </Button>
@@ -388,8 +476,21 @@ export default function SettingsPage() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleResetAccount}>
-                    {isLoading ? "Resetting..." : "Yes, reset my account"}
+                  <AlertDialogAction 
+                    onClick={handleResetAccount}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Resetting...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        Reset Account
+                      </>
+                    )}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

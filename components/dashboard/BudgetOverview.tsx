@@ -19,14 +19,15 @@ import {
   TrendingDown,
   PlusCircle,
 } from "lucide-react";
+import { Budget, Expense } from "@/lib/types";
 
 // Motion card component for animations
 const MotionCard = motion(Card);
 
 // Budget overview component
 interface BudgetOverviewProps {
-  expenses: { category: string; amount: number }[];
-  budgets: { id: string; category: string; amount: number }[];
+  expenses: Expense[];
+  budgets: Budget[];
   isLoading: boolean;
   fullWidth?: boolean;
 }
@@ -38,24 +39,25 @@ export function BudgetOverview({
   fullWidth = false,
 }: BudgetOverviewProps) {
   // Calculate total budget, total expenses, remaining budget, and budget utilization
-  const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
-  // Calculate total expenses
-  const totalExpenses = expenses.reduce(
-    (sum, expense) => sum + expense.amount,
-    0
-  );
-  // Calculate remaining budget
+  const totalBudget = budgets
+    .filter((budget) => {
+      const currentDate = new Date();
+      return budget.month === currentDate.getMonth() + 1 &&
+        budget.year === currentDate.getFullYear();
+    })
+    .reduce((sum, budget) => sum + budget.amount, 0);
+
+  const totalExpenses = expenses
+    .filter((expense) => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate.getMonth() === new Date().getMonth();
+    })
+    .reduce((sum, expense) => sum + expense.amount, 0);
+
   const remainingBudget = totalBudget - totalExpenses;
-  // Calculate budget utilization
-  const budgetUtilization =
-    totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
+  const budgetUtilization = totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
 
   // Calculate pie chart data
-  /**
-   * Generates data for a pie chart based on budgets and expenses.
-   *
-   * @returns An array of objects where each object represents a category with its name and the total expenses for that category.
-   */
   const pieChartData = budgets.map((budget) => {
     const expensesForCategory = expenses
       .filter((e) => e.category === budget.category)
@@ -66,17 +68,16 @@ export function BudgetOverview({
     };
   });
 
-  // Pie chart colors
+  // Enhanced color palette with better contrast
   const COLORS = [
-    "#0088FE",
-    "#00C49F",
-    "#FFBB28",
-    "#FF8042",
-    "#8884D8",
-    "#82ca9d",
+    "#3B82F6", // Blue
+    "#10B981", // Green  
+    "#F59E0B", // Yellow
+    "#EF4444", // Red
+    "#8B5CF6", // Purple
+    "#EC4899", // Pink
   ];
 
-  // Chart configuration
   const chartConfig = {
     expenses: {
       label: "Expenses",
@@ -84,30 +85,29 @@ export function BudgetOverview({
     },
   };
 
-  // Render content based on loading state and data availability
   const renderContent = () => {
-    // Show skeleton loader if data is loading
     if (isLoading) {
       return (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-pulse">
           {[...Array(5)].map((_, index) => (
-            <Skeleton key={index} className="h-12 w-full" />
+            <Skeleton key={index} className="h-12 w-full rounded-lg" />
           ))}
         </div>
       );
     }
 
-    // Show message if no budgets are set
     if (budgets.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center h-64">
-          <AlertCircle className="w-12 h-12 text-yellow-500 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No Budgets Set</h3>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-4">
+        <div className="flex flex-col items-center justify-center h-64 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-neutral-900 dark:to-neutral-800 rounded-lg p-8">
+          <AlertCircle className="w-16 h-16 text-blue-500 mb-4 animate-bounce" />
+          <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            No Budgets Set
+          </h3>
+          <p className="text-center text-gray-600 dark:text-gray-300 mb-6 max-w-md">
             You haven&apos;t set any budgets yet. Start by adding your first
             budget to track your expenses effectively.
           </p>
-          <Button>
+          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200">
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Your First Budget
           </Button>
@@ -116,53 +116,68 @@ export function BudgetOverview({
     }
 
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Overall Budget</h3>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                Total Budget:
-              </span>
-              <span className="font-medium">${totalBudget.toFixed(2)}</span>
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 p-6 rounded-xl shadow-sm">
+            <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              Overall Budget
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-white dark:bg-neutral-800 rounded-lg shadow-sm">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Total Budget
+                </span>
+                <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                  ${totalBudget.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-white dark:bg-neutral-800 rounded-lg shadow-sm">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Total Expenses
+                </span>
+                <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                  ${totalExpenses.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-white dark:bg-neutral-800 rounded-lg shadow-sm">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Remaining
+                </span>
+                <span className={`text-lg font-bold flex items-center gap-2 
+                  ${remainingBudget >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                  ${Math.abs(remainingBudget).toFixed(2)}
+                  {remainingBudget >= 0 ? (
+                    <TrendingUp className="h-5 w-5" />
+                  ) : (
+                    <TrendingDown className="h-5 w-5" />
+                  )}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                Total Expenses:
-              </span>
-              <span className="font-medium">${totalExpenses.toFixed(2)}</span>
+            <div className="mt-6">
+              <Progress
+                value={budgetUtilization}
+                className="h-3 rounded-full"
+                style={{
+                  background: budgetUtilization > 100 ? "#FEE2E2" : "#F3F4F6",
+                  backgroundColor: budgetUtilization > 100
+                    ? "#EF4444"
+                    : budgetUtilization > 75
+                      ? "#F59E0B"
+                      : "#10B981",
+                }}
+              />
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-2">
+                {budgetUtilization.toFixed(1)}% of budget utilized
+              </p>
             </div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                Remaining:
-              </span>
-              <span
-                className={`font-medium ${
-                  remainingBudget >= 0 ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                ${Math.abs(remainingBudget).toFixed(2)}
-                {remainingBudget >= 0 ? (
-                  <TrendingUp className="inline ml-1 h-4 w-4" />
-                ) : (
-                  <TrendingDown className="inline ml-1 h-4 w-4" />
-                )}
-              </span>
-            </div>
-            <Progress
-              value={budgetUtilization}
-              className="mt-2"
-              style={{
-                background: budgetUtilization > 100 ? "#FCA5A5" : "#E5E7EB",
-              }}
-            />
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              {budgetUtilization.toFixed(1)}% of budget used
-            </p>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Expense Distribution</h3>
-            <ChartContainer config={chartConfig} className="h-[200px]">
+
+          <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 p-6 rounded-xl shadow-sm">
+            <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              Expense Distribution
+            </h3>
+            <ChartContainer config={chartConfig} className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -170,77 +185,90 @@ export function BudgetOverview({
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    outerRadius={80}
+                    outerRadius={100}
+                    innerRadius={60}
                     fill="#8884d8"
                     dataKey="value"
+                    paddingAngle={2}
                   >
                     {pieChartData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}
+                        className="hover:opacity-80 transition-opacity duration-200"
                       />
                     ))}
                   </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartTooltip
+                    content={<ChartTooltipContent />}
+                    wrapperClassName="bg-white dark:bg-neutral-800 shadow-lg rounded-lg p-2"
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
-            <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="mt-6 grid grid-cols-2 gap-3">
               {pieChartData.map((entry, index) => (
-                <div key={`legend-${index}`} className="flex items-center">
+                <div key={`legend-${index}`} className="flex items-center bg-white dark:bg-neutral-800 p-2 rounded-lg shadow-sm">
                   <div
-                    className="w-3 h-3 mr-2"
+                    className="w-4 h-4 rounded-full mr-3"
                     style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                  ></div>
-                  <span className="text-xs">{entry.name}</span>
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {entry.name}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Category Breakdown</h3>
-          {budgets.map((budget) => {
-            const totalExpensesForCategory = expenses
-              .filter((e) => e.category === budget.category)
-              .reduce((sum, e) => sum + e.amount, 0);
-            const percentage = (totalExpensesForCategory / budget.amount) * 100;
-            return (
-              <div key={budget.id} className="space-y-2 mb-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-700 dark:text-gray-300">
-                    {budget.category}
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    ${totalExpensesForCategory.toFixed(2)} / $
-                    {budget.amount.toFixed(2)}
-                  </span>
-                </div>
-                <Progress
-                  value={percentage}
-                  style={{
-                    background: percentage > 100 ? "#FCA5A5" : "#E5E7EB",
-                    backgroundColor:
-                      percentage > 100
+
+        <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 p-6 rounded-xl shadow-sm">
+          <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Category Breakdown
+          </h3>
+          <div className="space-y-6">
+            {budgets.map((budget) => {
+              const totalExpensesForCategory = expenses
+                .filter((e) => e.category === budget.category)
+                .reduce((sum, e) => sum + e.amount, 0);
+              const percentage = (totalExpensesForCategory / budget.amount) * 100;
+
+              return (
+                <div key={budget.id} className="space-y-3 bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                      {budget.category}
+                    </span>
+                    <span className="text-sm font-medium px-3 py-1 rounded-full bg-gray-100 dark:bg-neutral-700">
+                      ${totalExpensesForCategory.toFixed(2)} / ${budget.amount.toFixed(2)}
+                    </span>
+                  </div>
+                  <Progress
+                    value={percentage}
+                    className="h-2.5 rounded-full"
+                    style={{
+                      background: percentage > 100 ? "#FEE2E2" : "#F3F4F6",
+                      backgroundColor: percentage > 100
                         ? "#EF4444"
                         : percentage > 75
-                        ? "#FBBF24"
-                        : "#10B981",
-                  }}
-                />
-                {percentage > 100 && (
-                  <Alert variant="destructive" className="bg-white/80">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Over Budget</AlertTitle>
-                    <AlertDescription>
-                      You&apos;ve exceeded your budget for {budget.category} by
-                      ${(totalExpensesForCategory - budget.amount).toFixed(2)}.
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-            );
-          })}
+                          ? "#F59E0B"
+                          : "#10B981",
+                    }}
+                  />
+                  {percentage > 100 && (
+                    <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                      <AlertCircle className="h-5 w-5" />
+                      <AlertTitle className="font-semibold">Over Budget</AlertTitle>
+                      <AlertDescription className="text-sm">
+                        You&apos;ve exceeded your budget for {budget.category} by
+                        <span className="font-semibold"> ${(totalExpensesForCategory - budget.amount).toFixed(2)}</span>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
@@ -248,21 +276,26 @@ export function BudgetOverview({
 
   return (
     <MotionCard
-      className={`bg-card backdrop-blur-sm shadow-lg border border-gray-200 dark:border-neutral-700 ${
-        fullWidth ? "w-full" : ""
-      }`}
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.6 }}
+      className={`bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0 ${fullWidth ? "w-full" : ""
+        }`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl font-semibold">Budget Overview</CardTitle>
-        <Button variant="outline" size="sm">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 dark:border-neutral-800">
+        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          Budget Overview
+        </CardTitle>
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-white hover:bg-gray-50 dark:bg-neutral-800 dark:hover:bg-neutral-700 shadow-sm"
+        >
           <DollarSign className="mr-2 h-4 w-4" />
           Adjust Budget
         </Button>
       </CardHeader>
-      <CardContent>{renderContent()}</CardContent>
+      <CardContent className="p-6">{renderContent()}</CardContent>
     </MotionCard>
   );
 }

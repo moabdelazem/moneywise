@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
 import { jwtVerify } from "jose";
+import { AuthHeader } from "./types";
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
@@ -54,5 +55,14 @@ export async function verifyToken(token: string) {
     return payload as { userId: string };
   } catch {
     throw new Error("Invalid token");
+  }
+}
+
+// Check if the Authorization header is present and valid
+// If not, return an unauthorized response
+export async function checkOnAuthHeader(authHeader: AuthHeader) {
+  // if the auth header is not present, return an unauthorized response
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }

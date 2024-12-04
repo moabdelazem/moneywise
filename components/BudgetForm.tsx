@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 
+// Budget schema for form validation
 const budgetSchema = z.object({
   category: z.string().min(1, { message: "Category is required" }),
   amount: z
@@ -47,14 +48,18 @@ const budgetSchema = z.object({
     }),
 });
 
+// BudgetFormProps type
 type BudgetFormProps = {
   onSubmit: (data: z.infer<typeof budgetSchema>) => void;
   onCancel: () => void;
 };
 
+// BudgetForm component
 export function BudgetForm({ onSubmit, onCancel }: BudgetFormProps) {
+  // State for loading
   const [isLoading, setIsLoading] = useState(false);
 
+  // Form for budget
   const form = useForm<z.infer<typeof budgetSchema>>({
     resolver: zodResolver(budgetSchema),
     defaultValues: {
@@ -65,14 +70,19 @@ export function BudgetForm({ onSubmit, onCancel }: BudgetFormProps) {
     },
   });
 
+  // handle the form submission
   const handleSubmit = async (values: z.infer<typeof budgetSchema>) => {
+    // set loading to true
     setIsLoading(true);
     try {
+      // call the onSubmit function with the form values
       await onSubmit(values);
+      // toast the user
       toast({
         title: "Budget set successfully",
         description: `Budget for ${values.category} set to $${values.amount} for ${values.month}/${values.year}`,
       });
+      // reset the form
       form.reset();
     } catch {
       toast({
@@ -82,6 +92,7 @@ export function BudgetForm({ onSubmit, onCancel }: BudgetFormProps) {
         variant: "destructive",
       });
     } finally {
+      // set loading to false
       setIsLoading(false);
     }
   };
