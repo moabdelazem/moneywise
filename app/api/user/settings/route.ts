@@ -22,7 +22,6 @@ export async function GET(request: Request) {
         email: true,
         currency: true,
         emailNotifications: true,
-        pushNotifications: true,
       },
     });
 
@@ -48,15 +47,13 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const { name, email, currency, emailNotifications, pushNotifications } =
-      await request.json();
+    const { name, email, currency, emailNotifications } = await request.json();
 
     const updateData: {
       name?: string;
       email?: string;
       currency?: string;
       emailNotifications?: boolean;
-      pushNotifications?: boolean;
     } = {};
 
     if (name) updateData.name = name;
@@ -64,8 +61,6 @@ export async function PUT(request: Request) {
     if (currency) updateData.currency = currency;
     if (emailNotifications !== undefined)
       updateData.emailNotifications = emailNotifications;
-    if (pushNotifications !== undefined)
-      updateData.pushNotifications = pushNotifications;
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
@@ -76,7 +71,6 @@ export async function PUT(request: Request) {
         email: true,
         currency: true,
         emailNotifications: true,
-        pushNotifications: true,
       },
     });
 

@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Lock,
   Loader2,
+  DollarSign,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 interface UserSettings {
@@ -46,7 +54,7 @@ interface UserSettings {
   name: string;
   email: string;
   emailNotifications: boolean;
-  pushNotifications: boolean;
+  currency: string;
 }
 
 interface FormErrors {
@@ -99,11 +107,11 @@ export default function SettingsPage() {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    
+
     if (!settings?.name?.trim()) {
       newErrors.name = "Name is required";
     }
-    
+
     if (!settings?.email?.trim()) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(settings.email)) {
@@ -129,6 +137,11 @@ export default function SettingsPage() {
     setIsDirty(true);
   };
 
+  const handleCurrencyChange = (value: string) => {
+    setSettings((prev) => (prev ? { ...prev, currency: value } : null));
+    setIsDirty(true);
+  };
+
   const handleSave = async () => {
     if (!settings || !isDirty) return;
     if (!validateForm()) return;
@@ -144,12 +157,12 @@ export default function SettingsPage() {
         },
         body: JSON.stringify(settings),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to update settings");
       }
-      
+
       const updatedSettings = await response.json();
       setSettings(updatedSettings);
       setIsDirty(false);
@@ -190,7 +203,7 @@ export default function SettingsPage() {
         },
         body: JSON.stringify({ password: deletePassword }),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to delete account");
@@ -227,7 +240,7 @@ export default function SettingsPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to reset account");
@@ -269,9 +282,9 @@ export default function SettingsPage() {
       className="container mx-auto py-10 px-4 sm:px-6 lg:px-8"
     >
       <div className="flex items-center justify-between mb-6">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.back()} 
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
           className="mr-4 hover:bg-primary/10"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -288,7 +301,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="account" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+            <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
               <TabsTrigger value="account">
                 <User className="w-4 h-4 mr-2" />
                 Account
@@ -296,6 +309,10 @@ export default function SettingsPage() {
               <TabsTrigger value="notifications">
                 <Bell className="w-4 h-4 mr-2" />
                 Notifications
+              </TabsTrigger>
+              <TabsTrigger value="preferences">
+                <DollarSign className="w-4 h-4 mr-2" />
+                Preferences
               </TabsTrigger>
             </TabsList>
             <TabsContent value="account" className="space-y-4">
@@ -349,24 +366,30 @@ export default function SettingsPage() {
                   onCheckedChange={handleSwitchChange("emailNotifications")}
                 />
               </div>
-              <div className="flex items-center justify-between space-x-4">
-                <div className="space-y-0.5">
-                  <Label htmlFor="push-notifications">Push Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive push notifications on your mobile device.
-                  </p>
-                </div>
-                <Switch
-                  id="push-notifications"
-                  checked={settings.pushNotifications}
-                  onCheckedChange={handleSwitchChange("pushNotifications")}
-                />
+            </TabsContent>
+            <TabsContent value="preferences" className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="currency">Currency</Label>
+                <Select
+                  value={settings.currency}
+                  onValueChange={handleCurrencyChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD ($)</SelectItem>
+                    <SelectItem value="EUR">EUR (€)</SelectItem>
+                    <SelectItem value="GBP">GBP (£)</SelectItem>
+                    <SelectItem value="EGP">EGP (E£)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </TabsContent>
           </Tabs>
           <div className="mt-6">
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               disabled={isLoading || !isDirty}
               className="w-full sm:w-auto"
             >
@@ -456,8 +479,8 @@ export default function SettingsPage() {
             </AlertDialog>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full sm:w-auto border-destructive/50 hover:bg-destructive/10"
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
@@ -476,7 +499,7 @@ export default function SettingsPage() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction 
+                  <AlertDialogAction
                     onClick={handleResetAccount}
                     disabled={isLoading}
                   >

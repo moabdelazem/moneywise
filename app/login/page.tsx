@@ -135,9 +135,9 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="you@example.com" 
-                          {...field} 
+                        <Input
+                          placeholder="you@example.com"
+                          {...field}
                           className="bg-background"
                         />
                       </FormControl>
@@ -181,9 +181,9 @@ export default function LoginPage() {
                     </FormItem>
                   )}
                 />
-                <Button 
-                  type="submit" 
-                  className="w-full" 
+                <Button
+                  type="submit"
+                  className="w-full"
                   disabled={isLoading}
                 >
                   {isLoading ? (

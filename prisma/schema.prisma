@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,29 +7,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model User {
-//   id        String    @id @default(cuid())
-//   name      String
-//   email     String    @unique
-//   password  String
-//   createdAt DateTime  @default(now())
-//   updatedAt DateTime  @updatedAt
-//   Expense   Expense[]
-//   Budget    Budget[]
-// }
+enum Category {
+  FOOD
+  TRANSPORTATION
+  HOUSING
+  UTILITIES
+  AUTOMOBILE
+  ENTERTAINMENT
+  OTHER
+}
+
+enum GoalStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum TransactionType {
+  EXPENSE
+  INCOME
+  TRANSFER
+}
 
 model User {
-  id                 String    @id @default(uuid())
+  id                 String        @id @default(uuid())
   name               String
-  email              String    @unique
+  email              String        @unique
   password           String
-  currency           String    @default("USD")
-  emailNotifications Boolean   @default(true)
-  pushNotifications  Boolean   @default(true)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  currency           String        @default("EGP")
+  emailNotifications Boolean       @default(true)
+  isDeleted          Boolean       @default(false)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
   budgets            Budget[]
-  Expense            Expense[]
+  expenses           Expense[]
+  incomes            Income[]
+  savings            Savings[]
+  goals              Goal[]
+  transactions       Transaction[]
+  Reminder           Reminder[]
 }
 
 model Expense {
@@ -43,18 +53,25 @@ model Expense {
   amount      Float
   description String
   date        DateTime
-  category    String
+  category    Category
+  status      String   @default("PENDING")
+  notes       String?
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
+
+  @@index([userId, category])
 }
 
 model Budget {
   id        String   @id @default(cuid())
   userId    String
-  category  String
+  category  Category
   amount    Float
+  spent     Float    @default(0)
+  remaining Float    @default(0)
   month     Int
   year      Int
   createdAt DateTime @default(now())
@@ -62,4 +79,85 @@ model Budget {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, category, month, year])
+  @@index([userId])
+}
+
+model Income {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
+
+  @@index([userId])
+}
+
+model Savings {
+  id           String    @id @default(cuid())
+  amount       Float
+  description  String?
+  userId       String
+  category     String?   @default("Uncategorized")
+  tags         String[]  @default([])
+  goalProgress Float?
+  isActive     Boolean   @default(true)
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  lastUpdated  DateTime  @updatedAt
+  isDeleted    Boolean   @default(false)
+  User         User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Goal {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  name          String
+  amount        Float
+  currentAmount Float      @default(0)
+  status        GoalStatus @default(IN_PROGRESS)
+  dueDate       DateTime
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  isDeleted     Boolean    @default(false)
+
+  @@index([userId])
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  amount      Float
+  type        TransactionType
+  description String?
+  date        DateTime        @default(now())
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId, type])
+}
+
+model Reminder {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  title       String
+  amount      Float
+  dueDate     DateTime
+  category    Category
+  status      String    @default("PENDING")
+  isRecurring Boolean   @default(false)
+  frequency   String? // MONTHLY, WEEKLY, etc.
+  lastSent    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, status])
 }

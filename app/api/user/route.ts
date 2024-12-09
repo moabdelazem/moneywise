@@ -10,7 +10,6 @@ const prisma = new PrismaClient();
 export async function GET(request: Request) {
   // Check if the Authorization header is present and valid
   const authHeader = request.headers.get("authorization");
-  // Check if the Authorization header is present and valid
   await checkOnAuthHeader(authHeader);
 
   // if the auth header is not present, return an unauthorized response
@@ -26,7 +25,7 @@ export async function GET(request: Request) {
     // Find the user with the given ID
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, emailNotifications: true },
     });
 
     // if the user is not found, return a not found response
@@ -68,25 +67,36 @@ export async function PUT(request: Request) {
     }
 
     // Get the body from the request
-    const { name, email, password } = await request.json();
+    const { name, email, password, emailNotifications } = await request.json();
 
     // Create an object to update the user with the new data
-    const updateData: { name?: string; email?: string; password?: string } = {};
-    // Update the user with the new data
+    const updateData: {
+      name?: string;
+      email?: string;
+      password?: string;
+      emailNotifications?: boolean;
+    } = {};
+
     if (name) updateData.name = name;
-    // Update the user with the new email
     if (email) updateData.email = email;
-    // Update the user with the new password
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
       updateData.password = hashedPassword;
+    }
+    if (typeof emailNotifications === "boolean") {
+      updateData.emailNotifications = emailNotifications;
     }
 
     // Update the user with the new data
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: updateData,
-      select: { id: true, name: true, email: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailNotifications: true,
+      },
     });
 
     return NextResponse.json(updatedUser);

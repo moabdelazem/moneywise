@@ -30,7 +30,6 @@ export async function POST(request: Request) {
       data: {
         currency: "USD",
         emailNotifications: true,
-        pushNotifications: true,
       },
       select: {
         id: true,
@@ -38,7 +37,6 @@ export async function POST(request: Request) {
         email: true,
         currency: true,
         emailNotifications: true,
-        pushNotifications: true,
       },
     });
 
