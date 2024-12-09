@@ -96,14 +96,19 @@ model Income {
 }
 
 model Savings {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  amount      Float
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
+  id           String    @id @default(cuid())
+  amount       Float
+  description  String?
+  userId       String
+  category     String?   @default("Uncategorized")
+  tags         String[]  @default([])
+  goalProgress Float?
+  isActive     Boolean   @default(true)
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  lastUpdated  DateTime  @updatedAt
+  isDeleted    Boolean   @default(false)
+  User         User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
