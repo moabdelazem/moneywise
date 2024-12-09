@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Budget } from "@/lib/types";
 import { Expense } from "@/lib/types";
+import { Analysis } from "@/components/dashboard/Analysis";
 
 
 export default function Dashboard() {
@@ -30,7 +31,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   // Active View State
   const [activeView, setActiveView] = useState<
-    "dashboard" | "expenses" | "budgets" | "reports"
+    "dashboard" | "expenses" | "budgets" | "reports" | "analysis"
   >("dashboard");
   // const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   // Router Hook to navigate between pages
@@ -379,10 +380,11 @@ export default function Dashboard() {
         className="space-y-6"
       >
         <div className="flex items-center justify-between">
-          <TabsList className="grid w-full max-w-md grid-cols-4">
+          <TabsList className="grid w-full max-w-md grid-cols-5">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
             <TabsTrigger value="budgets">Budgets</TabsTrigger>
+            <TabsTrigger value="analysis">Analysis</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
           </TabsList>
         </div>
@@ -422,6 +424,13 @@ export default function Dashboard() {
               fullWidth
             />
           </CardContent>
+        </TabsContent>
+        <TabsContent value="analysis">
+          <Analysis
+            expenses={expenses}
+            budgets={budgets}
+            isLoading={isLoading}
+          />
         </TabsContent>
         <TabsContent value="reports">
           <Card>
