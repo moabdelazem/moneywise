@@ -45,6 +45,7 @@ model User {
   savings            Savings[]
   goals              Goal[]
   transactions       Transaction[]
+  Reminder           Reminder[]
 }
 
 model Expense {
@@ -141,4 +142,22 @@ model Transaction {
   updatedAt   DateTime        @updatedAt
 
   @@index([userId, type])
+}
+
+model Reminder {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  title       String
+  amount      Float
+  dueDate     DateTime
+  category    Category
+  status      String    @default("PENDING")
+  isRecurring Boolean   @default(false)
+  frequency   String? // MONTHLY, WEEKLY, etc.
+  lastSent    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, status])
 }
