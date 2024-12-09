@@ -20,6 +20,8 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { Budget, Expense } from "@/lib/types";
+import { useState } from "react";
+import { AdjustBudgetModal } from "./modals/AdjustBudgetModal";
 
 // Motion card component for animations
 const MotionCard = motion(Card);
@@ -38,6 +40,8 @@ export function BudgetOverview({
   isLoading,
   fullWidth = false,
 }: BudgetOverviewProps) {
+  const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
+
   // Calculate total budget, total expenses, remaining budget, and budget utilization
   const totalBudget = budgets
     .filter((budget) => {
@@ -275,27 +279,40 @@ export function BudgetOverview({
   };
 
   return (
-    <MotionCard
-      className={`bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0 ${fullWidth ? "w-full" : ""
-        }`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
-      <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 dark:border-neutral-800">
-        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-          Budget Overview
-        </CardTitle>
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-white hover:bg-gray-50 dark:bg-neutral-800 dark:hover:bg-neutral-700 shadow-sm"
-        >
-          <DollarSign className="mr-2 h-4 w-4" />
-          Adjust Budget
-        </Button>
-      </CardHeader>
-      <CardContent className="p-6">{renderContent()}</CardContent>
-    </MotionCard>
+    <>
+      <MotionCard
+        className={`bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0 ${fullWidth ? "w-full" : ""
+          }`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 dark:border-neutral-800">
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Budget Overview
+          </CardTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-white hover:bg-gray-50 dark:bg-neutral-800 dark:hover:bg-neutral-700 shadow-sm"
+            onClick={() => setIsAdjustModalOpen(true)}
+          >
+            <DollarSign className="mr-2 h-4 w-4" />
+            Adjust Budget
+          </Button>
+        </CardHeader>
+        <CardContent className="p-6">{renderContent()}</CardContent>
+      </MotionCard>
+
+      <AdjustBudgetModal
+        open={isAdjustModalOpen}
+        onOpenChange={setIsAdjustModalOpen}
+        currentBudgets={budgets}
+        onBudgetAdjusted={() => {
+          // Trigger a refresh of the budgets data
+          window.dispatchEvent(new CustomEvent("refresh-budgets"));
+        }}
+      />
+    </>
   );
 }
