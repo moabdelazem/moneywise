@@ -15,3 +15,26 @@ export interface Budget {
 }
 
 export type AuthHeader = string | null;
+
+export interface ReportConfig {
+  startDate: Date;
+  endDate: Date;
+  categories?: string[];
+  format: 'PDF' | 'CSV' | 'EXCEL';
+  type: 'EXPENSE' | 'BUDGET' | 'SAVINGS' | 'COMPLETE';
+}
+
+export interface ReportData {
+  expenses: Expense[];
+  budgets: Budget[];
+  summary: {
+    totalExpenses: number;
+    totalBudget: number;
+    savings: number;
+    categoryBreakdown: {
+      category: string;
+      amount: number;
+      percentage: number;
+    }[];
+  };
+}

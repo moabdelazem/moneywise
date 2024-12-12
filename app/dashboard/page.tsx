@@ -403,7 +403,7 @@ export default function Dashboard() {
         </TabsContent>
 
         <TabsContent value="reports">
-          <Reports />
+          <Reports expenses={expenses} budgets={budgets} isLoading={isLoading} />
         </TabsContent>
       </Tabs>
     );
