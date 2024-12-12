@@ -416,7 +416,7 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-4 space-x-4">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button

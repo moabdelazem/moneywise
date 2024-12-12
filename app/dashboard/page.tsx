@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/dashboard/Header";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import { OverviewCards } from "@/components/dashboard/OverviewCards";
 import { BudgetOverview } from "@/components/dashboard/BudgetOverview";
 import { ExpensesTable } from "@/components/dashboard/ExpensesTable";
@@ -11,8 +10,6 @@ import { Reports } from "@/components/dashboard/Reports";
 import { useToast } from "@/hooks/use-toast";
 import { LatestExpenses } from "@/components/dashboard/LatestExpense";
 import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
-import { FinancialHealthScore } from "@/components/dashboard/FinancialHealthScore";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Budget } from "@/lib/types";
 import { Expense } from "@/lib/types";
@@ -39,12 +36,14 @@ export default function Dashboard() {
 
   // Data Fetching
   const fetchDashboardData = useCallback(async () => {
+    // Fetch data from the server
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/login");
       return;
     }
 
+    // Fetch data from the server
     try {
       const endpoints = [
         { url: "/api/user", name: "user" },
@@ -56,17 +55,20 @@ export default function Dashboard() {
         { url: "/api/reminders", name: "reminders" }
       ];
 
+      // Fetch data from the server
       const responses = await Promise.all(
         endpoints.map(endpoint =>
           fetch(endpoint.url, { headers: { Authorization: `Bearer ${token}` } })
         )
       );
 
+      // Check if all responses are ok
       if (responses.every(res => res.ok)) {
         const [userData, expensesData, budgetsData, remindersData] = await Promise.all(
           responses.map(res => res.json())
         );
 
+        // Update the state with the fetched data
         setDashboardState(prev => ({
           ...prev,
           userName: userData.name,
@@ -89,6 +91,7 @@ export default function Dashboard() {
     }
   }, [router, toast]);
 
+  // Fetch data when the component mounts
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
@@ -99,6 +102,7 @@ export default function Dashboard() {
     router.push("/login");
   }, [router]);
 
+  // handle add expense
   const handleAddExpense = useCallback(async (newExpense: Omit<Expense, "id">) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -140,6 +144,7 @@ export default function Dashboard() {
     }
   }, [router, toast]);
 
+  // handle add budget 
   const handleAddBudget = useCallback(async (newBudget: Omit<Budget, "id">) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -180,15 +185,21 @@ export default function Dashboard() {
     }
   }, [router, toast]);
 
+  // handle budget limits
   const checkBudgetLimits = useCallback((newExpense: Expense) => {
+    // Check if the budget limits are exceeded
     const { budgets, expenses } = dashboardState;
+    // Find the relevant budget for the new expense
     const relevantBudget = budgets.find(b => b.category === newExpense.category);
 
+    // If the budget is found, check if the total expenses exceed 90% of the budget amount
     if (relevantBudget) {
+      // Calculate the total expenses for the category
       const totalExpenses = expenses
         .filter(e => e.category === newExpense.category)
         .reduce((sum, e) => sum + e.amount, 0) + newExpense.amount;
 
+      // If the total expenses exceed 90% of the budget amount, show a toast alert
       if (totalExpenses > relevantBudget.amount * 0.9) {
         toast({
           title: "Budget Alert",
@@ -199,6 +210,7 @@ export default function Dashboard() {
     }
   }, [dashboardState, toast]);
 
+  // handle add reminder
   const handleAddReminder = useCallback(async (newReminder: Omit<Reminder, "id">) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -207,7 +219,9 @@ export default function Dashboard() {
     }
 
     try {
+      // Verify the token to get the user ID
       const { userId } = await verifyToken(token);
+      // Send the new reminder to the server
       const response = await fetch("/api/reminders", {
         method: "POST",
         headers: {
@@ -226,6 +240,7 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
+        // Update the state with the new reminder
         const addedReminder = await response.json();
         setDashboardState(prev => ({
           ...prev,
@@ -248,6 +263,7 @@ export default function Dashboard() {
     }
   }, [router, toast]);
 
+  // handle update reminder
   const handleUpdateReminder = useCallback(async (id: string, status: string) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -256,6 +272,7 @@ export default function Dashboard() {
     }
 
     try {
+      // Send the update request to the server
       const response = await fetch("/api/reminders", {
         method: "PATCH",
         headers: {
@@ -266,6 +283,7 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
+        // Update the state with the updated reminder
         setDashboardState(prev => ({
           ...prev,
           reminders: prev.reminders.map(reminder =>
@@ -289,11 +307,13 @@ export default function Dashboard() {
     }
   }, [router, toast]);
 
-  // UI Components
+  // render dashboard content 
   const renderDashboardContent = useCallback(() => {
+    // Get the current state values
     const { activeView, expenses, budgets, reminders, isLoading } = dashboardState;
 
     return (
+      // Render the tabs with the current active view
       <Tabs
         defaultValue={activeView}
         onValueChange={(value) =>
