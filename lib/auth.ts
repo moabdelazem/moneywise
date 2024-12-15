@@ -8,12 +8,16 @@ import { NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 export async function signUp(name: string, email: string, password: string) {
+  // check if the user already exists
   const existingUser = await prisma.user.findUnique({ where: { email } });
+  // if the user already exists, throw an error
   if (existingUser) {
     throw new Error("User already exists");
   }
 
+  // hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
+  // create the user
   const user = await prisma.user.create({
     data: {
       name,
@@ -22,30 +26,40 @@ export async function signUp(name: string, email: string, password: string) {
     },
   });
 
-  const token = jwt.sign({ userId: user.id }, "JWT_SECRET", {
+  // create a token for the user
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
     expiresIn: "1d",
   });
 
+  // return the user and the token
   return { user, token };
 }
 
 export async function login(email: string, password: string) {
+  // check if the user exists
   const user = await prisma.user.findUnique({ where: { email } });
+  // if the user does not exist, throw an error
   if (!user) {
     throw new Error("Invalid credentials");
   }
 
+  // check if the password is valid
   const isPasswordValid = await bcrypt.compare(password, user.password);
+  // if the password is not valid, throw an error
   if (!isPasswordValid) {
     throw new Error("Invalid credentials");
   }
 
+  // create a token for the user
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
     expiresIn: "1d",
   });
+
+  // return the user and the token
   return { user, token };
 }
 
+// verify the token
 export async function verifyToken(token: string) {
   try {
     const { payload } = await jwtVerify(
