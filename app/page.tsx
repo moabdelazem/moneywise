@@ -9,137 +9,205 @@ import {
   Target,
   CheckCircle,
   Sparkles,
+  Wallet,
+  TrendingUp,
+  Sun,
+  Moon,
+  Laptop,
+  Star,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-// const metadata: Metadata = {
-//   title: "MoneyWise - Simple Budgeting App",
-//   description:
-//     "Track your expenses, set budgets, and achieve your financial goals with MoneyWise.",
-//   openGraph: {
-//     title: "MoneyWise - Simple Budgeting App",
-//     description:
-//       "Track your expenses, set budgets, and achieve your financial goals with MoneyWise.",
-//     images: [
-//       { url: "/og-image.jpg", width: 1200, height: 630, alt: "MoneyWise App" },
-//     ],
-//   },
-// };
-
+// Features of the app in the home page
 const features = [
   {
-    title: "Track Expenses",
-    description: "Easily log and categorize your daily expenses.",
+    title: "Smart Expense Tracking",
+    description: "Automatically categorize and analyze your spending patterns.",
     icon: BarChart2,
   },
   {
-    title: "Set Budgets",
-    description: "Create custom budgets for different spending categories.",
+    title: "Intelligent Budgeting",
+    description: "AI-powered budget recommendations based on your spending habits.",
     icon: PiggyBank,
   },
   {
-    title: "Achieve Goals",
-    description: "Set financial goals and track your progress over time.",
+    title: "Goal Achievement",
+    description: "Visual progress tracking with milestone celebrations.",
     icon: Target,
+  },
+  {
+    title: "Real-time Insights",
+    description: "Get instant notifications and spending alerts.",
+    icon: TrendingUp,
+  },
+  {
+    title: "Smart Savings",
+    description: "Automated savings suggestions and investment tips.",
+    icon: Wallet,
   },
 ];
 
+// Enhanced Framer Motion animations
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.2,
+      delayChildren: 0.3,
     },
   },
 };
 
+// Animation for the features
 const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
+  hidden: { y: 50, opacity: 0, scale: 0.9 },
   visible: {
     y: 0,
     opacity: 1,
+    scale: 1,
     transition: {
       type: "spring",
-      stiffness: 100,
+      stiffness: 80,
+      damping: 15,
     },
   },
 };
 
 export default function Home() {
+  // Theme toggle function
+  const { setTheme } = useTheme();
+
   return (
     <>
-      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-primary/10 via-background to-background">
+      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none backdrop-blur-3xl" />
+        <div className="absolute top-6 right-6 z-50">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="rounded-full backdrop-blur-sm">
+                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-xl backdrop-blur-md">
+              <DropdownMenuItem onClick={() => setTheme("light")} className="rounded-lg">
+                <Sun className="mr-2 h-4 w-4" />
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")} className="rounded-lg">
+                <Moon className="mr-2 h-4 w-4" />
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")} className="rounded-lg">
+                <Laptop className="mr-2 h-4 w-4" />
+                System
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <motion.div
-          className="container px-4 py-16 mx-auto sm:px-6 lg:px-8"
+          className="container px-8 py-24 mx-auto lg:px-12"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
-          <div className="flex flex-col items-center justify-center gap-12 text-center">
+          <div className="flex flex-col items-center justify-center gap-20 text-center">
             <motion.div
-              className="flex flex-col items-center w-full max-w-4xl"
+              className="flex flex-col items-center w-full max-w-6xl"
               variants={itemVariants}
             >
-              <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl mb-6">
+              <div className="relative mb-6">
+                <motion.div
+                  className="absolute -inset-2 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-2xl blur-xl"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0.8, 0.5],
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                  }}
+                />
+                <span className="relative px-6 py-3 text-sm font-medium text-primary bg-primary/10 rounded-full backdrop-blur-sm">
+                  🚀 Welcome to the Future of Finance
+                </span>
+              </div>
+              <h1 className="text-7xl font-black tracking-tighter sm:text-8xl lg:text-9xl mb-12 bg-gradient-to-r from-orange-500 via-orange-400 to-secondary bg-clip-text text-transparent">
                 Money
-                <span className="text-primary relative">
+                <span className="relative mx-3 text-primary">
                   Wise
                   <motion.span
-                    className="absolute -top-6 -right-6 text-yellow-400"
-                    animate={{ rotate: [0, 20, 0] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="absolute -top-10 -right-10 text-yellow-400"
+                    animate={{
+                      rotate: [0, 25, 0],
+                      scale: [1, 1.3, 1],
+                    }}
+                    transition={{ repeat: Infinity, duration: 4 }}
                   >
-                    <Sparkles className="w-8 h-8" />
+                    <Sparkles className="w-12 h-12" />
                   </motion.span>
                 </span>
               </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mb-8">
-                A simple and powerful budgeting app that helps you take
-                control of your finances and achieve your financial goals.
+              <p className="text-2xl text-muted-foreground max-w-4xl mb-12 leading-relaxed font-medium">
+                Experience the next generation of financial management with our
+                AI-powered budgeting tools and intelligent insights.
               </p>
               <motion.div
-                className="flex flex-col sm:flex-row gap-4 mt-4"
+                className="flex flex-col sm:flex-row gap-8 mt-6"
                 variants={itemVariants}
               >
-                <Button asChild size="lg" className="w-full sm:w-auto group">
+                <Button
+                  asChild
+                  size="lg"
+                  className="w-full sm:w-auto group px-10 py-7 text-lg hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-primary/30 rounded-2xl"
+                >
                   <Link href="/signup" className="flex items-center">
-                    Get Started
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Get Started Now
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-3" />
                   </Link>
                 </Button>
                 <Button
                   asChild
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto px-10 py-7 text-lg hover:bg-secondary/50 transition-all duration-500 rounded-2xl backdrop-blur-sm"
                 >
-                  <Link href="/login">Login</Link>
+                  <Link href="/login">Sign In</Link>
                 </Button>
               </motion.div>
             </motion.div>
+
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-4xl mt-16"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 w-full max-w-7xl mt-16"
               variants={containerVariants}
             >
               {features.map((feature, index) => (
                 <motion.div key={index} variants={itemVariants}>
-                  <Card className="transition-all duration-300 hover:shadow-lg overflow-hidden group">
+                  <Card className="h-full transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 bg-gradient-to-br from-background via-secondary/5 to-primary/5 border border-secondary/20 group rounded-3xl backdrop-blur-sm">
                     <CardHeader>
                       <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className="mb-2 text-primary"
+                        whileHover={{ scale: 1.2, rotate: 10 }}
+                        className="mb-6 text-primary bg-primary/10 p-5 rounded-2xl w-fit group-hover:bg-primary/20 transition-colors duration-500"
                       >
-                        <feature.icon className="h-12 w-12" />
+                        <feature.icon className="h-10 w-10" />
                       </motion.div>
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                      <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors duration-500">
                         {feature.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-lg text-muted-foreground leading-relaxed">
                         {feature.description}
                       </p>
                     </CardContent>
@@ -148,28 +216,26 @@ export default function Home() {
               ))}
             </motion.div>
           </div>
-        </motion.div>
-      </main>
-      <footer className="py-8 text-center text-sm text-muted-foreground ">
+        </motion.div >
+      </main >
+      <footer className="py-16 text-center text-base text-muted-foreground bg-secondary/5 backdrop-blur-sm">
         <motion.div
-          className="container mx-auto px-4"
-          initial={{ opacity: 0, y: 20 }}
+          className="container mx-auto px-6"
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.7 }}
         >
-          <div className="mb-4">
-            © {new Date().getFullYear()} MoneyWise. All rights reserved.
-          </div>
           <a
             href="https://github.com/moabdelazem/moneywise"
-            className="text-primary hover:underline mb-4 inline-block"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 hover:scale-105 mb-8 text-lg font-medium transition-all duration-500 bg-primary/5 px-6 py-3 rounded-full"
           >
-            The Project is Free and Open Source - View on GitHub
+            <Star className="h-5 w-5" />
+            Star us on GitHub - We're Open Source!
           </a>
-          <div className="flex items-center justify-center gap-2">
-            <CheckCircle className="h-4 w-4 text-green-500" />
+          <div className="flex items-center justify-center gap-4 text-lg">
+            <CheckCircle className="h-6 w-6 text-green-500" />
             <span>
-              Created with ❤️ by Mohamed Abdelazem, Monica Nader, Malak Ayman, and
+              Crafted with ❤️ by Mohamed Abdelazem, Monica Nader, Malak Ayman, and
               Rawan Medhat
             </span>
           </div>
