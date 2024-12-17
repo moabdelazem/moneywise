@@ -91,23 +91,31 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen mx-auto bg-gradient-to-b from-primary/20 via-background to-background">
+    <div className="flex items-center justify-center min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background">
+      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none backdrop-blur-3xl" />
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md px-4 sm:px-0"
+        className="w-full max-w-md px-4 sm:px-0 relative z-10"
       >
-        <Card className="shadow-lg border-primary/10">
+        <Card className="shadow-2xl border border-primary/10 backdrop-blur-sm bg-background/80">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-center">
-              Welcome back
-            </CardTitle>
-            <CardDescription className="text-center text-base">
-              Enter your credentials to access your MoneyWise account
-            </CardDescription>
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-center"
+            >
+              <CardTitle className="text-4xl font-black tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Welcome back
+              </CardTitle>
+              <CardDescription className="text-base mt-2 text-muted-foreground">
+                Enter your credentials to access your MoneyWise account
+              </CardDescription>
+            </motion.div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <AnimatePresence mode="wait">
               {loginError && (
                 <motion.div
@@ -117,7 +125,7 @@ export default function LoginPage() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Alert variant="destructive">
+                  <Alert variant="destructive" className="border-red-500/50 bg-red-500/10">
                     <AlertDescription>{loginError}</AlertDescription>
                   </Alert>
                 </motion.div>
@@ -133,12 +141,12 @@ export default function LoginPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-foreground/80">Email</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="you@example.com"
                           {...field}
-                          className="bg-background"
+                          className="bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/40 transition-colors"
                         />
                       </FormControl>
                       <FormMessage />
@@ -150,20 +158,20 @@ export default function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="text-foreground/80">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             {...field}
-                            className="bg-background pr-10"
+                            className="bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/40 transition-colors pr-10"
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors"
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (
@@ -183,7 +191,7 @@ export default function LoginPage() {
                 />
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -218,14 +226,14 @@ export default function LoginPage() {
               Don&apos;t have an account?{" "}
               <Link
                 href="/signup"
-                className="font-medium text-primary hover:underline"
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 Sign up
               </Link>
             </p>
             <Link
               href="/forgot-password"
-              className="text-sm text-muted-foreground hover:underline"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Forgot your password?
             </Link>
