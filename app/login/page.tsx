@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Loader2, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Loader2, Eye, EyeOff, LogIn, Home } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -91,13 +91,23 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background">
+    <div className="flex items-center justify-center min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background px-4 sm:px-6 lg:px-8">
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none backdrop-blur-3xl" />
+      <Button
+        asChild
+        variant="ghost"
+        className="absolute top-4 left-4 text-muted-foreground hover:text-primary"
+      >
+        <Link href="/" className="flex items-center gap-2">
+          <Home className="w-5 h-5" />
+          Back to Home
+        </Link>
+      </Button>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md px-4 sm:px-0 relative z-10"
+        className="w-full max-w-md relative z-10"
       >
         <Card className="shadow-2xl border border-primary/10 backdrop-blur-sm bg-background/80">
           <CardHeader className="space-y-1">

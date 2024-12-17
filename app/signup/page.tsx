@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight, UserPlus } from 'lucide-react';
+import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight, UserPlus, Home } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -111,26 +111,44 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen mx-auto bg-gradient-to-b from-primary/20 via-background to-background px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background px-4 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none backdrop-blur-3xl" />
+      <Button
+        asChild
+        variant="ghost"
+        className="absolute top-4 left-4 text-muted-foreground hover:text-primary"
+      >
+        <Link href="/" className="flex items-center gap-2">
+          <Home className="w-5 h-5" />
+          Back to Home
+        </Link>
+      </Button>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
-        <Card className="shadow-lg border-primary/10">
+        <Card className="shadow-2xl border border-primary/10 backdrop-blur-sm bg-background/80">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-center">
-              Join MoneyWise
-            </CardTitle>
-            <CardDescription className="text-center text-base">
-              Start your journey to financial wisdom today
-            </CardDescription>
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-center"
+            >
+              <CardTitle className="text-4xl font-black tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Join MoneyWise
+              </CardTitle>
+              <CardDescription className="text-base mt-2 text-muted-foreground">
+                Start your journey to financial wisdom today
+              </CardDescription>
+            </motion.div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Progress 
-              value={(step / 3) * 100} 
-              className="w-full h-2" 
+          <CardContent className="space-y-6">
+            <Progress
+              value={(step / 3) * 100}
+              className="w-full h-2 bg-primary/20"
             />
             <AnimatePresence mode="wait">
               {signupError && (
@@ -140,7 +158,7 @@ export default function SignupPage() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Alert variant="destructive">
+                  <Alert variant="destructive" className="border-red-500/50 bg-red-500/10">
                     <AlertDescription>{signupError}</AlertDescription>
                   </Alert>
                 </motion.div>
@@ -165,9 +183,13 @@ export default function SignupPage() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel className="text-foreground/80">Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="Ex: John Doe" {...field} className="bg-background" />
+                              <Input
+                                placeholder="Ex: John Doe"
+                                {...field}
+                                className="bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/40 transition-colors"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -188,9 +210,13 @@ export default function SignupPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel className="text-foreground/80">Email</FormLabel>
                             <FormControl>
-                              <Input placeholder="you@example.com" {...field} className="bg-background" />
+                              <Input
+                                placeholder="you@example.com"
+                                {...field}
+                                className="bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/40 transition-colors"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -212,20 +238,20 @@ export default function SignupPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel className="text-foreground/80">Password</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
                                   type={showPassword ? "text" : "password"}
                                   placeholder="••••••••"
                                   {...field}
-                                  className="bg-background pr-10"
+                                  className="bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/40 transition-colors pr-10"
                                 />
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors"
                                   onClick={() => setShowPassword(!showPassword)}
                                 >
                                   {showPassword ? (
@@ -248,20 +274,20 @@ export default function SignupPage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Confirm Password</FormLabel>
+                            <FormLabel className="text-foreground/80">Confirm Password</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
                                   type={showConfirmPassword ? "text" : "password"}
                                   placeholder="••••••••"
                                   {...field}
-                                  className="bg-background pr-10"
+                                  className="bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/40 transition-colors pr-10"
                                 />
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors"
                                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                 >
                                   {showConfirmPassword ? (
@@ -284,7 +310,12 @@ export default function SignupPage() {
                 </AnimatePresence>
                 <div className="flex justify-between pt-4">
                   {step > 1 && (
-                    <Button type="button" variant="outline" onClick={prevStep}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={prevStep}
+                      className="border-primary/20 hover:bg-primary/10"
+                    >
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Back
                     </Button>
@@ -292,7 +323,7 @@ export default function SignupPage() {
                   {step < 3 ? (
                     <Button
                       type="button"
-                      className="ml-auto"
+                      className="ml-auto bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
                       onClick={nextStep}
                     >
                       Next
@@ -301,7 +332,7 @@ export default function SignupPage() {
                   ) : (
                     <Button
                       type="submit"
-                      className="ml-auto"
+                      className="ml-auto bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
                       disabled={isLoading}
                     >
                       {isLoading ? (
@@ -333,12 +364,12 @@ export default function SignupPage() {
               </form>
             </Form>
           </CardContent>
-          <CardFooter className="flex justify-center">
+          <CardFooter className="flex flex-col items-center justify-center space-y-2">
             <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="font-medium text-primary hover:underline"
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 Log in
               </Link>
