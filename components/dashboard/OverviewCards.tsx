@@ -14,64 +14,92 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Budget, Expense } from "@/lib/types";
 
+// MotionCard is a motion component that wraps the Card component
 const MotionCard = motion(Card);
 
+// OverviewCardsProps is an interface that defines the props for the OverviewCards component
 interface OverviewCardsProps {
   expenses: Expense[];
   budgets: Budget[];
   isLoading: boolean;
 }
 
+// OverviewCards is a React component that displays the overview cards
 export function OverviewCards({
   expenses,
   budgets,
   isLoading,
 }: OverviewCardsProps) {
+  // Calculate the total expenses
   const totalExpenses = expenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
 
+  // Calculate the total budget
   const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
 
+  // Calculate the budget status
   const budgetStatus =
     totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
 
+  // Calculate the chart data
   const chartData = expenses.reduce((acc, expense) => {
+    // Find the category of the expense
     const category = expense.category;
+    // Find the existing category in the accumulator
     const existingCategory = acc.find((item) => item.category === category);
+    // If the category exists, add the amount to the existing category
     if (existingCategory) {
+      // Add the amount to the existing category
       existingCategory.amount += expense.amount;
     } else {
+      // Otherwise, add a new category to the accumulator
       acc.push({ category, amount: expense.amount });
     }
+    // Return the accumulator
     return acc;
   }, [] as { category: string; amount: number }[]);
 
+  // Find the top category by amount
   const topCategory =
     chartData.length > 0
       ? chartData.reduce((a, b) => (a.amount > b.amount ? a : b))
       : null;
 
+  // Calculate the monthly trend
+  /* 
+  The monthly trend is calculated by finding the total expenses for the current month and the previous month.
+  ? If the current month is January, the previous month is December.
+  */
   const currentMonth = new Date().getMonth();
+  // Find the expenses for the current month
   const currentMonthExpenses = expenses.filter(
     (expense) => new Date(expense.date).getMonth() === currentMonth
   );
+  // Calculate the total expenses for the current month
   const currentMonthTotal = currentMonthExpenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
 
+  // Find the expenses for the previous month
   const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
   const previousMonthExpenses = expenses.filter(
     (expense) => new Date(expense.date).getMonth() === previousMonth
   );
+  // Calculate the total expenses for the previous month
   const previousMonthTotal = previousMonthExpenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
 
+  // Calculate the monthly change and the monthly change percentage
   const monthlyChange = currentMonthTotal - previousMonthTotal;
+  // Calculate the monthly change percentage
+  /* 
+  The monthly change percentage is calculated by dividing the monthly change by the total expenses for the previous month.
+  */
   const monthlyChangePercentage =
     previousMonthTotal !== 0 ? (monthlyChange / previousMonthTotal) * 100 : 0;
 
@@ -212,8 +240,11 @@ export function OverviewCards({
                 ${currentMonthTotal.toFixed(2)}
               </motion.div>
               <div
-                className={`flex items-center mt-2 ${monthlyChange >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
-                  }`}
+                className={`flex items-center mt-2 ${
+                  monthlyChange >= 0
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
               >
                 {monthlyChange >= 0 ? (
                   <ArrowUp className="h-4 w-4 mr-1" />
