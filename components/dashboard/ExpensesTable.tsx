@@ -83,7 +83,10 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
   };
 
   // Calculate total amount
-  const totalAmount = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalAmount = filteredExpenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
 
   return (
     <MotionCard
@@ -161,14 +164,16 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
             </Select>
           </div>
         </div>
-        <div className="rounded-lg border bg-background/50">
+        <div className="rounded-lg bg-background/50">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-primary/5">
                 <TableHead className="w-[100px] font-semibold">Date</TableHead>
                 <TableHead className="font-semibold">Description</TableHead>
                 <TableHead className="font-semibold">Category</TableHead>
-                <TableHead className="text-right font-semibold">Amount</TableHead>
+                <TableHead className="text-right font-semibold">
+                  Amount
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -91,7 +91,7 @@ export function TopSpendingCategories({
     >
       <Card className="bg-neutral-50/80 dark:bg-neutral-900/80 backdrop-blur-xl shadow-xl text-card-foreground border border-gray-200/50 dark:border-neutral-800 overflow-hidden">
         <CardHeader className="pb-4">
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold">
             Top Spending Categories
           </CardTitle>
         </CardHeader>
@@ -121,7 +121,10 @@ export function TopSpendingCategories({
                   </Pie>
                   <Tooltip
                     formatter={(value: number) => [
-                      `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                      `$${value.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`,
                       "Amount",
                     ]}
                     labelFormatter={(label: string) => `Category: ${label}`}
@@ -157,7 +160,11 @@ export function TopSpendingCategories({
                           {category.category}
                         </span>
                         <span className="text-sm font-bold">
-                          ${category.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          $
+                          {category.amount.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                         </span>
                       </div>
                       <Progress
