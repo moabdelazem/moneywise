@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -33,20 +34,19 @@ import {
   DollarSign,
   Calendar,
 } from "lucide-react";
-import { Expense } from "@/lib/types";
+import type { Expense } from "@/lib/types";
 
-// MotionCard is a Framer Motion component that animates the Card component
 const MotionCard = motion(Card);
 
-// ExpensesTable component
 interface ExpensesTableProps {
   expenses: Expense[];
   isLoading: boolean;
 }
 
-// ExpensesTable component
-export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
-  // State variables
+export function ExpensesTable({
+  expenses,
+  isLoading,
+}: ExpensesTableProps): JSX.Element {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -82,7 +82,6 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
-  // Calculate total amount
   const totalAmount = filteredExpenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
@@ -90,51 +89,28 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
 
   return (
     <MotionCard
-      className="bg-card backdrop-blur-sm shadow-lg rounded-xl border-primary/10"
+      className="bg-card text-card-foreground shadow-lg rounded-[var(--radius)]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <CardHeader className="pb-4">
-        <CardTitle className="text-2xl font-bold flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>All Expenses</span>
-            <span className="text-sm font-normal text-muted-foreground">
-              Total: ${totalAmount.toFixed(2)}
-            </span>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleSortOrder}
-            className="hover:bg-primary/5 transition-colors"
-          >
-            {sortOrder === "asc" ? (
-              <SortAsc className="h-4 w-4" />
-            ) : (
-              <SortDesc className="h-4 w-4" />
-            )}
-          </Button>
-        </CardTitle>
+        <CardTitle className="text-3xl font-bold">Expense Tracker</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 flex items-center space-x-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search expenses..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-background/50 hover:bg-background/80 transition-colors"
-              />
-            </div>
+      <CardContent className="space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-6 w-6 text-primary" />
+            <span className="text-2xl font-semibold">
+              ${totalAmount.toFixed(2)}
+            </span>
+            <span className="text-muted-foreground">Total Expenses</span>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex flex-wrap gap-2">
             <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-[180px] bg-background/50 hover:bg-background/80 transition-colors">
-                <Filter className="h-4 w-4 mr-2 text-primary" />
-                <SelectValue placeholder="Filter by category" />
+              <SelectTrigger className="w-[140px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
@@ -149,11 +125,11 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
               value={sortBy}
               onValueChange={(value: "date" | "amount") => setSortBy(value)}
             >
-              <SelectTrigger className="w-[180px] bg-background/50 hover:bg-background/80 transition-colors">
+              <SelectTrigger className="w-[140px]">
                 {sortBy === "date" ? (
-                  <Calendar className="h-4 w-4 mr-2 text-primary" />
+                  <Calendar className="h-4 w-4 mr-2" />
                 ) : (
-                  <DollarSign className="h-4 w-4 mr-2 text-primary" />
+                  <DollarSign className="h-4 w-4 mr-2" />
                 )}
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
@@ -162,12 +138,33 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
                 <SelectItem value="amount">Amount</SelectItem>
               </SelectContent>
             </Select>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleSortOrder}
+              className="w-10 h-10"
+            >
+              {sortOrder === "asc" ? (
+                <SortAsc className="h-4 w-4" />
+              ) : (
+                <SortDesc className="h-4 w-4" />
+              )}
+            </Button>
           </div>
         </div>
-        <div className="rounded-lg bg-background/50">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search expenses..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <div className="rounded-[var(--radius)] border bg-card">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-primary/5">
+              <TableRow>
                 <TableHead className="w-[100px] font-semibold">Date</TableHead>
                 <TableHead className="font-semibold">Description</TableHead>
                 <TableHead className="font-semibold">Category</TableHead>
@@ -178,17 +175,22 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="h-24">
-                    <div className="flex items-center justify-center">
-                      <Skeleton className="h-8 w-8 rounded-full" />
-                      <div className="space-y-2 ml-4">
-                        <Skeleton className="h-4 w-[250px]" />
-                        <Skeleton className="h-4 w-[200px]" />
-                      </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-40" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-16 ml-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <AnimatePresence>
                   {paginatedExpenses.map((expense, index) => (
@@ -198,14 +200,13 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="hover:bg-primary/5 transition-colors"
                     >
                       <TableCell className="font-medium">
                         {new Date(expense.date).toLocaleDateString()}
                       </TableCell>
                       <TableCell>{expense.description}</TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-primary-foreground">
                           {expense.category}
                         </span>
                       </TableCell>
@@ -220,46 +221,42 @@ export function ExpensesTable({ expenses, isLoading }: ExpensesTableProps) {
           </Table>
         </div>
         {!isLoading && pageCount > 1 && (
-          <div className="flex items-center justify-between space-x-2 py-4">
-            <div className="flex space-x-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
-                className="hover:bg-primary/5"
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="hover:bg-primary/5"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
             </div>
-            <span className="text-sm font-medium text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               Page {currentPage} of {pageCount}
             </span>
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === pageCount}
-                className="hover:bg-primary/5"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 onClick={() => setCurrentPage(pageCount)}
                 disabled={currentPage === pageCount}
-                className="hover:bg-primary/5"
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>
