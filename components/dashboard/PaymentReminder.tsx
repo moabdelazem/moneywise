@@ -161,7 +161,7 @@ function ReminderItem({
       transition={{ duration: 0.2 }}
       className="mb-4 last:mb-0"
     >
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden border text-card-foreground border-primary/10">
         <CardContent className="p-0">
           <div className="flex items-center justify-between p-4 bg-card hover:bg-accent transition-colors duration-300">
             <div className="space-y-1.5">
