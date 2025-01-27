@@ -11,8 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LatestExpenses } from "@/components/dashboard/LatestExpense";
 import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Budget } from "@/lib/types";
-import { Expense } from "@/lib/types";
+import { Budget, Expense } from "@/lib/types";
 import { Analysis } from "@/components/dashboard/Analysis";
 import { Category, Reminder } from "@prisma/client";
 import { PaymentReminder } from "@/components/dashboard/PaymentReminder";
@@ -41,7 +40,6 @@ export default function Dashboard() {
 
   // Data Fetching
   const fetchDashboardData = useCallback(async () => {
-    // Fetch data from the server
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/login");
@@ -433,7 +431,13 @@ export default function Dashboard() {
         />
         <main className="flex-1 overflow-y-auto">
           <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
-            {renderDashboardContent()}
+            {dashboardState.isLoading ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="loader"></div>
+              </div>
+            ) : (
+              renderDashboardContent()
+            )}
           </div>
         </main>
       </div>
