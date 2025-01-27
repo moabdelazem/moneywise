@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    image: moabdelazem/moneywise:latest
+    ports:
+      - "80:80"
+    environment:
+      - ENV=production
+    depends_on:
+      - db
+    secrets:
+      - env_file
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: moneywise
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    secrets:
+      - db_user
+      - db_password
+
+volumes:
+  db_data:
+
+secrets:
+  env_file:
+    file: ./secrets/.env
+  db_user:
+    file: ./secrets/db_user
+  db_password:
+    file: ./secrets/db_password

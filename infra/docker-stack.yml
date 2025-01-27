@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  app:
+    image: moabdelazem/moneywise:latest
+    ports:
+      - "80:80"
+    environment:
+      - ENV=production
+    depends_on:
+      - db
+    secrets:
+      - env_file
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: yourdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    secrets:
+      - db_user
+      - db_password
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  db_data:
+
+secrets:
+  env_file:
+    file: ./secrets/.env
+  db_user:
+    file: ./secrets/db_user
+  db_password:
+    file: ./secrets/db_password
