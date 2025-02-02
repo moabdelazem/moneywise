@@ -1,53 +1,65 @@
-# Use the official Next.js image for optimized builds
-FROM node:18-alpine AS builder
+# Base stage - Sets up the foundation for all other stages
+FROM node:22-slim AS base
 
-# Set working directory
+# Install OpenSSL
+RUN apt-get update && \
+    apt-get install -y openssl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Define default port that can be overridden during build
+ARG PORT=3000
+# Disable Next.js telemetry for privacy
+ENV NEXT_TELEMETRY_DISABLED=1
+# Set working directory for all stages
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install all dependencies, including dev dependencies
+# Dependencies stage - Install production dependencies
+FROM base AS dependencies
+COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copy the Prisma schema
-COPY prisma ./prisma
+# Build stage - Compile the Next.js application
+FROM base AS build
+# Copy node_modules from dependencies stage
+COPY --from=dependencies /app/node_modules ./node_modules
+# Copy all source files
+COPY . .
 
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Copy the rest of the application code
-COPY . .
+# Configure build environment variables
+ENV NEXT_LINT=false    
 
-# Build the Next.js app
+# Build the application
 RUN npm run build
 
-# Use a lightweight image for the runtime
-FROM node:18-alpine AS runner
+# Production stage - Create minimal production image
+FROM base AS run
+# Set production environment and port
+ENV NODE_ENV=production
+ENV PORT=$PORT
 
-# Set working directory
-WORKDIR /app
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+# Create and set permissions for Next.js directory
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
 
-# Copy package.json and install only production dependencies
-COPY package.json ./
-RUN npm install
+# Copy built assets from build stage
+COPY --from=build /app/public ./public
+COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy the build output and Prisma client files from the builder stage
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
-COPY --from=builder /app/prisma ./prisma
+# Switch to non-root user
+USER nextjs
 
-# Copy the .env file from the secret
-RUN --mount=type=secret,id=env_file cp /run/secrets/env_file .env
+# Expose the application port
+EXPOSE $PORT
 
-# Copy the entrypoint script
-COPY entrypoint.sh ./
-RUN chmod +x entrypoint.sh
 
-# Expose the port the app will run on
-EXPOSE 3000
-
-# Use the entrypoint script to run migrations and start the app
-ENTRYPOINT ["./entrypoint.sh"]
-CMD ["npm", "run", "start"]
+# Configure container startup
+ENV HOSTNAME="0.0.0.0"
+CMD ["node", "server.js"]

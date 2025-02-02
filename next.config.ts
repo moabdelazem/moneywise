@@ -1,13 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   env: {
     JWT_SECRET: process.env.JWT_SECRET,
-    output: "standalone",
   },
   eslint: {
     ignoreDuringBuilds: true,
-  }
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -36,7 +36,8 @@ const features = [
   },
   {
     title: "Intelligent Budgeting",
-    description: "AI-powered budget recommendations based on your spending habits.",
+    description:
+      "AI-powered budget recommendations based on your spending habits.",
     icon: PiggyBank,
   },
   {
@@ -94,22 +95,38 @@ export default function Home() {
         <div className="absolute top-6 right-6 z-50">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full backdrop-blur-sm">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full backdrop-blur-sm"
+              >
                 <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                 <span className="sr-only">Toggle theme</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl backdrop-blur-md">
-              <DropdownMenuItem onClick={() => setTheme("light")} className="rounded-lg">
+            <DropdownMenuContent
+              align="end"
+              className="rounded-xl backdrop-blur-md"
+            >
+              <DropdownMenuItem
+                onClick={() => setTheme("light")}
+                className="rounded-lg"
+              >
                 <Sun className="mr-2 h-4 w-4" />
                 Light
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")} className="rounded-lg">
+              <DropdownMenuItem
+                onClick={() => setTheme("dark")}
+                className="rounded-lg"
+              >
                 <Moon className="mr-2 h-4 w-4" />
                 Dark
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")} className="rounded-lg">
+              <DropdownMenuItem
+                onClick={() => setTheme("system")}
+                className="rounded-lg"
+              >
                 <Laptop className="mr-2 h-4 w-4" />
                 System
               </DropdownMenuItem>
@@ -216,8 +233,8 @@ export default function Home() {
               ))}
             </motion.div>
           </div>
-        </motion.div >
-      </main >
+        </motion.div>
+      </main>
       <footer className="py-16 text-center text-base text-muted-foreground bg-secondary/5 backdrop-blur-sm">
         <motion.div
           className="container mx-auto px-6"
@@ -230,13 +247,13 @@ export default function Home() {
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 hover:scale-105 mb-8 text-lg font-medium transition-all duration-500 bg-primary/5 px-6 py-3 rounded-full"
           >
             <Star className="h-5 w-5" />
-            Star us on GitHub - We're Open Source!
+            Star us on GitHub - We &apos; re Open Source!
           </a>
           <div className="flex items-center justify-center gap-4 text-lg">
             <CheckCircle className="h-6 w-6 text-green-500" />
             <span>
-              Crafted with ❤️ by Mohamed Abdelazem, Monica Nader, Malak Ayman, and
-              Rawan Medhat
+              Crafted with ❤️ by Mohamed Abdelazem, Monica Nader, Malak Ayman,
+              and Rawan Medhat
             </span>
           </div>
         </motion.div>
