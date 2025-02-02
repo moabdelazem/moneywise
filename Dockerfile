@@ -48,6 +48,10 @@ RUN adduser --system --uid 1001 nextjs
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
+# Copy migration script
+COPY --chmod=755 docker/init.sh .
+COPY --from=build /app/prisma ./prisma
+
 # Copy built assets from build stage
 COPY --from=build /app/public ./public
 COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
@@ -59,7 +63,6 @@ USER nextjs
 # Expose the application port
 EXPOSE $PORT
 
-
 # Configure container startup
 ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
+CMD ["./init.sh", "node", "server.js"]
