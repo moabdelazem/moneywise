@@ -7,25 +7,18 @@ import {
   PiggyBank,
   BarChart2,
   Target,
-  CheckCircle,
   Sparkles,
   Wallet,
   TrendingUp,
-  Sun,
-  Moon,
-  Laptop,
   Star,
+  Github,
+  Linkedin,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Navbar } from "@/components/navbar";
+import { PageTransition } from "@/components/page-transition";
 
 // Features of the app in the home page
 const features = [
@@ -84,57 +77,45 @@ const itemVariants = {
   },
 };
 
-export default function Home() {
-  // Theme toggle function
-  const { setTheme } = useTheme();
+const creators = [
+  {
+    name: "Mohamed Abdelazem",
+    role: "Full Stack Developer",
+    image: "/mohamed.jpg", // Add actual image paths
+    github: "https://github.com/moabdelazem",
+    linkedin: "https://linkedin.com/in/moabdelazem",
+  },
+  {
+    name: "Monica Nader",
+    role: "Backend Developer",
+    image: "/monica.jpg",
+    github: "https://github.com/monicanader",
+    linkedin: "https://linkedin.com/in/monicanader",
+  },
+  {
+    name: "Malak Ayman",
+    role: "Frontend Developer",
+    image: "/malak.jpg",
+    github: "https://github.com/malakayman",
+    linkedin: "https://linkedin.com/in/malakayman",
+  },
+  {
+    name: "Rawan Medhat",
+    role: "UI/UX Designer",
+    image: "/rawan.jpg",
+    github: "https://github.com/rawanmedhat",
+    linkedin: "https://linkedin.com/in/rawanmedhat",
+  },
+];
 
+export default function Home() {
   return (
-    <>
+    <PageTransition>
+      <Navbar />
       <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10">
         <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none backdrop-blur-3xl" />
-        <div className="absolute top-6 right-6 z-50">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full backdrop-blur-sm"
-              >
-                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="rounded-xl backdrop-blur-md"
-            >
-              <DropdownMenuItem
-                onClick={() => setTheme("light")}
-                className="rounded-lg"
-              >
-                <Sun className="mr-2 h-4 w-4" />
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setTheme("dark")}
-                className="rounded-lg"
-              >
-                <Moon className="mr-2 h-4 w-4" />
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setTheme("system")}
-                className="rounded-lg"
-              >
-                <Laptop className="mr-2 h-4 w-4" />
-                System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
         <motion.div
-          className="container px-8 py-24 mx-auto lg:px-12"
+          className="container px-8 py-24 mx-auto lg:px-12 mt-16"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -232,32 +213,133 @@ export default function Home() {
                 </motion.div>
               ))}
             </motion.div>
+
+            {/* Meet the Creators Section */}
+            <motion.div
+              className="container py-24"
+              variants={containerVariants}
+            >
+              <motion.div variants={itemVariants} className="text-center mb-16">
+                <span className="relative px-6 py-3 text-sm font-medium text-primary bg-primary/10 rounded-full backdrop-blur-sm">
+                  👥 Meet the Team
+                </span>
+                <h2 className="text-4xl font-bold mt-6">
+                  The Creators Behind MoneyWise
+                </h2>
+                <p className="text-xl text-muted-foreground mt-4 max-w-2xl mx-auto">
+                  Meet our talented team of developers and designers who are
+                  passionate about making financial management accessible to
+                  everyone.
+                </p>
+              </motion.div>
+
+              <motion.div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                variants={containerVariants}
+              >
+                {creators.map((creator) => (
+                  <motion.div
+                    key={creator.name}
+                    variants={itemVariants}
+                    className="text-center"
+                  >
+                    <Card className="overflow-hidden backdrop-blur-sm hover:shadow-xl transition-all duration-500">
+                      <CardHeader className="relative pb-0"></CardHeader>
+                      <CardContent className="pt-4">
+                        <h3 className="text-xl font-semibold">
+                          {creator.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {creator.role}
+                        </p>
+                        <div className="flex items-center justify-center gap-4">
+                          <Button variant="ghost" size="icon" asChild>
+                            <a
+                              href={creator.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Github className="w-5 h-5" />
+                            </a>
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild>
+                            <a
+                              href={creator.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Linkedin className="w-5 h-5" />
+                            </a>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </motion.div>
+
+            {/* Open Source Section */}
+            <motion.div
+              className="w-full max-w-5xl mt-32 text-center"
+              variants={containerVariants}
+            >
+              <motion.div
+                className="relative inline-block mb-8"
+                variants={itemVariants}
+              >
+                <motion.div
+                  className="absolute -inset-2 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-2xl blur-xl"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0.8, 0.5],
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                  }}
+                />
+                <span className="relative px-6 py-3 text-sm font-medium text-primary bg-primary/10 rounded-full backdrop-blur-sm">
+                  💻 Open Source Project
+                </span>
+              </motion.div>
+              <motion.h2
+                className="text-4xl font-bold mb-6"
+                variants={itemVariants}
+              >
+                Built in Public, For the Community
+              </motion.h2>
+              <motion.p
+                className="text-xl text-muted-foreground mb-8"
+                variants={itemVariants}
+              >
+                MoneyWise is proudly open source. We believe in transparency and
+                community-driven development. Join us in building the future of
+                personal finance management.
+              </motion.p>
+              <motion.div variants={itemVariants}>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="group px-8 py-6 text-lg hover:scale-105 transition-all duration-500 rounded-2xl backdrop-blur-sm"
+                >
+                  <a
+                    href="https://github.com/moabdelazem/moneywise"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2"
+                  >
+                    <Star className="w-5 h-5" />
+                    Star us on GitHub
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-3" />
+                  </a>
+                </Button>
+              </motion.div>
+            </motion.div>
           </div>
         </motion.div>
       </main>
-      <footer className="py-16 text-center text-base text-muted-foreground bg-secondary/5 backdrop-blur-sm">
-        <motion.div
-          className="container mx-auto px-6"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          <a
-            href="https://github.com/moabdelazem/moneywise"
-            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 hover:scale-105 mb-8 text-lg font-medium transition-all duration-500 bg-primary/5 px-6 py-3 rounded-full"
-          >
-            <Star className="h-5 w-5" />
-            Star us on GitHub - We &apos; re Open Source!
-          </a>
-          <div className="flex items-center justify-center gap-4 text-lg">
-            <CheckCircle className="h-6 w-6 text-green-500" />
-            <span>
-              Crafted with ❤️ by Mohamed Abdelazem, Monica Nader, Malak Ayman,
-              and Rawan Medhat
-            </span>
-          </div>
-        </motion.div>
-      </footer>
-    </>
+    </PageTransition>
   );
 }
