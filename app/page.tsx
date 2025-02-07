@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/page-transition";
+import { Footer } from "@/components/footer";
 
 // Features of the app in the home page
 const features = [
@@ -142,9 +143,9 @@ export default function Home() {
                 </span>
               </div>
               <h1 className="text-7xl font-black tracking-tighter sm:text-8xl lg:text-9xl mb-12 bg-gradient-to-r from-orange-500 via-orange-400 to-secondary bg-clip-text text-transparent">
-                Money
+                Smart
                 <span className="relative mx-3 text-primary">
-                  Wise
+                  Money
                   <motion.span
                     className="absolute -top-10 -right-10 text-yellow-400"
                     animate={{
@@ -156,6 +157,7 @@ export default function Home() {
                     <Sparkles className="w-12 h-12" />
                   </motion.span>
                 </span>
+                Moves
               </h1>
               <p className="text-2xl text-muted-foreground max-w-4xl mb-12 leading-relaxed font-medium">
                 Experience the next generation of financial management with our
@@ -340,6 +342,7 @@ export default function Home() {
           </div>
         </motion.div>
       </main>
+      <Footer />
     </PageTransition>
   );
 }

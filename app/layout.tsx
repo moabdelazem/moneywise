@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import { usePathname } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
-import { Navbar } from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,7 +31,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
           <AnimatePresence mode="wait">
             <main key={pathname}>{children}</main>
           </AnimatePresence>

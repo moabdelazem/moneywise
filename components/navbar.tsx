@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Sun, Moon, Laptop } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
-import { memo } from "react"; // Add this import
+import { memo } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 
 export const Navbar = memo(function Navbar() {
   const { setTheme } = useTheme();
-  const pathname = usePathname(); // Add this hook
+  const pathname = usePathname();
 
   // Add this helper function
   const isActivePath = (path: string) => {
@@ -34,7 +34,7 @@ export const Navbar = memo(function Navbar() {
       <div className="container flex items-center justify-between h-16 px-4">
         <Link
           href="/"
-          className="text-xl font-bold bg-gradient-to-r from-orange-500 via-orange-400 to-secondary bg-clip-text text-transparent"
+          className="text-xl font-bold text-primary hover:text-primary/50 transition-colors"
         >
           MoneyWise
         </Link>
