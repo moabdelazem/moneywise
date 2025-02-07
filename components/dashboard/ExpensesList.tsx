@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Expense } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -85,7 +84,7 @@ export function ExpensesList({ expenses }: ExpensesListProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="group relative flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent transition-colors"
+              className="border-border group relative flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent transition-colors"
             >
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">

@@ -20,7 +20,7 @@ export function ExpensesPreviewModal({
 }: ExpensesPreviewModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[85vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-4xl border-border h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Expense History
