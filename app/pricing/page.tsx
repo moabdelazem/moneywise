@@ -116,7 +116,7 @@ export default function PricingPage() {
             {plans.map((plan) => (
               <motion.div key={plan.name} variants={itemVariants}>
                 <Card
-                  className={`relative flex h-full flex-col ${
+                  className={`relative flex h-full flex-col border-border ${
                     plan.popular ? "border-primary shadow-lg" : ""
                   } backdrop-blur-sm`}
                 >

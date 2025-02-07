@@ -75,7 +75,7 @@ export function PaymentReminder({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <Card className="bg-gradient-to-br from-card/90 to-card/70 backdrop-blur-xl shadow-xl border-opacity-50">
+        <Card className="bg-gradient-to-br from-card/90 to-card/70 backdrop-blur-xl shadow-xl border-opacity-50 border-border">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-2xl font-bold flex items-center gap-2">
               <Bell className="h-6 w-6 text-primary" />
@@ -161,9 +161,9 @@ function ReminderItem({
       transition={{ duration: 0.2 }}
       className="mb-4 last:mb-0"
     >
-      <Card className="overflow-hidden border text-card-foreground border-primary/10">
+      <Card className="overflow-hidden border-border text-card-foreground ">
         <CardContent className="p-0">
-          <div className="flex items-center justify-between p-4 bg-card hover:bg-accent transition-colors duration-300">
+          <div className="flex items-center justify-between p-4 bg-card hover:bg-accent transition-colors duration-300 ">
             <div className="space-y-1.5">
               <h4 className="font-semibold tracking-tight text-lg">
                 {reminder.title}

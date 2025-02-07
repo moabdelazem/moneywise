@@ -151,7 +151,7 @@ export function BudgetOverview({
   return (
     <>
       <MotionCard
-        className={`bg-background-primary text-card-foreground shadow-lg p-6 ${
+        className={`bg-background-primary text-card-foreground border-border shadow-lg p-6 ${
           fullWidth ? "w-full" : ""
         }`}
         initial={{ opacity: 0, y: 20 }}

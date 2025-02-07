@@ -165,7 +165,7 @@ export function TopSpendingCategories({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Card className="bg-card text-card-foreground shadow-xl overflow-hidden">
+      <Card className="bg-card text-card-foreground shadow-xl overflow-hidden border-border">
         <CardHeader className="pb-4">
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
             <DollarSign className="h-6 w-6 text-primary" />

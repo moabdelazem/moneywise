@@ -121,7 +121,7 @@ export default function FeaturesPage() {
             >
               {features.map((feature, index) => (
                 <motion.div key={index} variants={itemVariants}>
-                  <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 h-full">
+                  <Card className="relative border-border overflow-hidden group hover:shadow-xl transition-all duration-500 h-full">
                     <CardHeader>
                       <div
                         className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}

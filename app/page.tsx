@@ -245,7 +245,7 @@ export default function Home() {
                     variants={itemVariants}
                     className="text-center"
                   >
-                    <Card className="overflow-hidden backdrop-blur-sm hover:shadow-xl transition-all duration-500">
+                    <Card className="overflow-hidden backdrop-blur-sm hover:shadow-xl transition-all duration-500 border-border">
                       <CardHeader className="relative pb-0"></CardHeader>
                       <CardContent className="pt-4">
                         <h3 className="text-xl font-semibold">
