@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -22,6 +23,8 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Expense } from "@/lib/types";
+import Link from "next/link";
+import { ExpensesPreviewModal } from "./ExpensesPreviewModal";
 
 // Motion components for animations
 const MotionCard = motion(Card);
@@ -30,9 +33,15 @@ const MotionLi = motion.li;
 interface LatestExpensesProps {
   expenses: Expense[];
   isLoading: boolean;
+  onAddExpense: () => void;
 }
 
-export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
+export function LatestExpenses({
+  expenses,
+  isLoading,
+  onAddExpense,
+}: LatestExpensesProps) {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   // Get 5 most recent expenses for display
   const latestExpenses = expenses.slice(0, 5);
 
@@ -61,7 +70,7 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
   if (isLoading) {
     return (
       <MotionCard
-        className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0"
+        className="bg-background border-border"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
@@ -90,18 +99,18 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
   if (expenses.length === 0) {
     return (
       <MotionCard
-        className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0"
+        className="bg-background border-border"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <CardHeader>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-foreground">
             Latest Expenses
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <Alert className="bg-primary/10 border-primary/20">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>No Expenses</AlertTitle>
             <AlertDescription>
@@ -111,7 +120,10 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
           </Alert>
         </CardContent>
         <CardFooter>
-          <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white">
+          <Button
+            onClick={onAddExpense}
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
             Add Your First Expense
           </Button>
         </CardFooter>
@@ -121,67 +133,78 @@ export function LatestExpenses({ expenses, isLoading }: LatestExpensesProps) {
 
   // Main expenses list UI
   return (
-    <MotionCard
-      className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-800 shadow-xl border-0"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-gray-100 dark:border-neutral-800">
-        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-          Latest Expenses
-        </CardTitle>
-        <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50 dark:bg-neutral-800 dark:hover:bg-neutral-700">
-          View All
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[400px] pr-4">
-          <ul className="space-y-4">
-            {latestExpenses.map((expense, index) => (
-              <MotionLi
-                key={expense.id}
-                className="flex justify-between items-center p-4 bg-white dark:bg-neutral-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="flex items-center space-x-4">
-                  <div
-                    className={cn(
-                      "p-3 rounded-full",
-                      getCategoryColor(expense.category)
-                    )}
-                  >
-                    {getExpenseIcon(expense.amount)}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-lg text-gray-900 dark:text-gray-100">
-                      {expense.description}
-                    </p>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <Badge variant="secondary" className="text-xs font-medium">
-                        {expense.category}
-                      </Badge>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {new Date(expense.date).toLocaleDateString()}
-                      </span>
+    <>
+      <MotionCard
+        className="bg-background border-border"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border">
+          <CardTitle className="text-2xl font-bold text-foreground">
+            Latest Expenses
+          </CardTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-background hover:bg-muted text-foreground border-border"
+            onClick={() => setIsPreviewOpen(true)}
+          >
+            View All
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[400px] pr-4">
+            <ul className="space-y-4">
+              {latestExpenses.map((expense, index) => (
+                <MotionLi
+                  key={expense.id}
+                  className="flex justify-between items-center p-4 bg-muted/50 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-border"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div
+                      className={cn(
+                        "p-3 rounded-full",
+                        getCategoryColor(expense.category)
+                      )}
+                    >
+                      {getExpenseIcon(expense.amount)}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-lg text-foreground">
+                        {expense.description}
+                      </p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Badge variant="secondary">{expense.category}</Badge>
+                        <span className="text-xs text-muted-foreground flex items-center">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          {new Date(expense.date).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-lg flex items-center text-gray-900 dark:text-gray-100">
-                    <DollarSign className="h-4 w-4 mr-1" />
-                    {expense.amount.toFixed(2)}
-                  </p>
-                </div>
-              </MotionLi>
-            ))}
-          </ul>
-        </ScrollArea>
-      </CardContent>
-    </MotionCard>
+                  <div className="text-right">
+                    <p className="font-bold text-lg flex items-center text-foreground">
+                      <DollarSign className="h-4 w-4 mr-1" />
+                      {expense.amount.toFixed(2)}
+                    </p>
+                  </div>
+                </MotionLi>
+              ))}
+            </ul>
+          </ScrollArea>
+        </CardContent>
+      </MotionCard>
+
+      <ExpensesPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        expenses={expenses}
+      />
+    </>
   );
 }

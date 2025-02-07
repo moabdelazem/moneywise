@@ -111,7 +111,7 @@ export function OverviewCards({
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <MotionCard
-        className="bg-gradient-to-br from-blue-50 to-white dark:from-neutral-900 dark:to-neutral-800 border border-blue-100 dark:border-neutral-700 shadow-lg hover:shadow-xl transition-shadow duration-200"
+        className="bg-gradient-to-br from-blue-50/10 to-blue-900/5 dark:from-blue-950 dark:to-neutral-900 border-blue-200/20 dark:border-blue-800/20 shadow-lg hover:shadow-xl transition-shadow duration-200"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
@@ -142,7 +142,7 @@ export function OverviewCards({
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-gradient-to-br from-green-50 to-white dark:from-neutral-900 dark:to-neutral-800 border border-green-100 dark:border-neutral-700 shadow-lg hover:shadow-xl transition-shadow duration-200"
+        className="bg-gradient-to-br from-green-50/10 to-green-900/5 dark:from-green-950 dark:to-neutral-900 border-green-200/20 dark:border-green-800/20 shadow-lg hover:shadow-xl transition-shadow duration-200"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
@@ -179,7 +179,7 @@ export function OverviewCards({
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-gradient-to-br from-purple-50 to-white dark:from-neutral-900 dark:to-neutral-800 border border-purple-100 dark:border-neutral-700 shadow-lg hover:shadow-xl transition-shadow duration-200"
+        className="bg-gradient-to-br from-purple-50/10 to-purple-900/5 dark:from-purple-950 dark:to-neutral-900 border-purple-200/20 dark:border-purple-800/20 shadow-lg hover:shadow-xl transition-shadow duration-200"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
@@ -214,7 +214,7 @@ export function OverviewCards({
         </CardContent>
       </MotionCard>
       <MotionCard
-        className="bg-gradient-to-br from-orange-50 to-white dark:from-neutral-900 dark:to-neutral-800 border border-orange-100 dark:border-neutral-700 shadow-lg hover:shadow-xl transition-shadow duration-200"
+        className="bg-gradient-to-br from-orange-50/10 to-orange-900/5 dark:from-orange-950 dark:to-neutral-900 border-orange-200/20 dark:border-orange-800/20 shadow-lg hover:shadow-xl transition-shadow duration-200"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >

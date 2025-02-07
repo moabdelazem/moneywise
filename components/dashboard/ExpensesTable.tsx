@@ -89,7 +89,7 @@ export function ExpensesTable({
 
   return (
     <MotionCard
-      className="bg-card text-card-foreground shadow-lg rounded-[var(--radius)]"
+      className="bg-white/5 dark:bg-neutral-900/50 backdrop-blur-xl border-neutral-200/10 dark:border-neutral-800/10 shadow-xl"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
@@ -164,7 +164,7 @@ export function ExpensesTable({
         <div className="rounded-[var(--radius)] border bg-card">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="border-neutral-200/10 dark:border-neutral-800/10">
                 <TableHead className="w-[100px] font-semibold">Date</TableHead>
                 <TableHead className="font-semibold">Description</TableHead>
                 <TableHead className="font-semibold">Category</TableHead>
@@ -200,6 +200,7 @@ export function ExpensesTable({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
+                      className="border-neutral-200/10 dark:border-neutral-800/10 hover:bg-neutral-100/5 dark:hover:bg-neutral-800/30"
                     >
                       <TableCell className="font-medium">
                         {new Date(expense.date).toLocaleDateString()}

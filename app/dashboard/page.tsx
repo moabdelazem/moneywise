@@ -315,6 +315,15 @@ export default function Dashboard() {
     [router, toast]
   );
 
+  const handleTabChange = useCallback((value: string) => {
+    setDashboardState((prev) => ({
+      ...prev,
+      activeView: value as typeof prev.activeView,
+    }));
+    // Update URL without full page refresh
+    window.history.pushState({}, "", `/dashboard?view=${value}`);
+  }, []);
+
   const renderDashboardContent = useCallback(() => {
     const { activeView, expenses, budgets, reminders, isLoading } =
       dashboardState;
@@ -322,12 +331,7 @@ export default function Dashboard() {
     return (
       <Tabs
         defaultValue={activeView}
-        onValueChange={(value) =>
-          setDashboardState((prev) => ({
-            ...prev,
-            activeView: value as typeof prev.activeView,
-          }))
-        }
+        onValueChange={handleTabChange}
         className="space-y-6"
       >
         <div className="flex items-center justify-between">
@@ -386,7 +390,14 @@ export default function Dashboard() {
             <TopSpendingCategories expenses={expenses} isLoading={isLoading} />
           </div>
           <div className="grid gap-6 md:grid-cols-1">
-            <LatestExpenses expenses={expenses} isLoading={isLoading} />
+            <LatestExpenses
+              expenses={expenses}
+              isLoading={isLoading}
+              onAddExpense={() => {
+                // Open add expense dialog
+                document.getElementById("add-expense-trigger")?.click();
+              }}
+            />
           </div>
         </TabsContent>
 

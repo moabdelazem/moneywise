@@ -37,7 +37,12 @@ export function FinancialHealthScore({
   const [scoreChange, setScoreChange] = useState<number>(0);
 
   useEffect(() => {
-    if (score !== null && prevScore !== null && !isNaN(score) && !isNaN(prevScore)) {
+    if (
+      score !== null &&
+      prevScore !== null &&
+      !isNaN(score) &&
+      !isNaN(prevScore)
+    ) {
       setScoreChange(score - prevScore);
     }
     if (score !== null && !isNaN(score)) {
@@ -63,27 +68,51 @@ export function FinancialHealthScore({
   const getScoreDetails = (score: number | null) => [
     {
       label: "Savings",
-      value: score === null || isNaN(score) ? "N/A" : score >= 60 ? "On Track" : "Needs Attention",
+      value:
+        score === null || isNaN(score)
+          ? "N/A"
+          : score >= 60
+          ? "On Track"
+          : "Needs Attention",
       icon: PiggyBank,
-      percentage: score === null || isNaN(score) ? 0 : Math.min(100, (score / 60) * 100),
+      percentage:
+        score === null || isNaN(score) ? 0 : Math.min(100, (score / 60) * 100),
     },
     {
       label: "Debt",
-      value: score === null || isNaN(score) ? "N/A" : score >= 70 ? "Manageable" : "High",
+      value:
+        score === null || isNaN(score)
+          ? "N/A"
+          : score >= 70
+          ? "Manageable"
+          : "High",
       icon: CreditCard,
-      percentage: score === null || isNaN(score) ? 0 : Math.min(100, (score / 70) * 100),
+      percentage:
+        score === null || isNaN(score) ? 0 : Math.min(100, (score / 70) * 100),
     },
     {
       label: "Spending",
-      value: score === null || isNaN(score) ? "N/A" : score >= 50 ? "Controlled" : "Excessive",
+      value:
+        score === null || isNaN(score)
+          ? "N/A"
+          : score >= 50
+          ? "Controlled"
+          : "Excessive",
       icon: DollarSign,
-      percentage: score === null || isNaN(score) ? 0 : Math.min(100, (score / 50) * 100),
+      percentage:
+        score === null || isNaN(score) ? 0 : Math.min(100, (score / 50) * 100),
     },
     {
       label: "Investments",
-      value: score === null || isNaN(score) ? "N/A" : score >= 80 ? "Diversified" : "Limited",
+      value:
+        score === null || isNaN(score)
+          ? "N/A"
+          : score >= 80
+          ? "Diversified"
+          : "Limited",
       icon: TrendingUp,
-      percentage: score === null || isNaN(score) ? 0 : Math.min(100, (score / 80) * 100),
+      percentage:
+        score === null || isNaN(score) ? 0 : Math.min(100, (score / 80) * 100),
     },
   ];
 
@@ -110,13 +139,21 @@ export function FinancialHealthScore({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Card className="bg-neutral-50/80 dark:bg-neutral-900/80 backdrop-blur-xl shadow-xl border border-gray-200/50 dark:border-neutral-800 rounded-2xl overflow-hidden">
+      <Card className="bg-white/5 dark:bg-neutral-900/50 backdrop-blur-xl border-neutral-200/10 dark:border-neutral-800/10 shadow-xl">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-2xl font-bold flex items-center gap-3">
             Financial Health Score
             {!isNaN(scoreChange) && scoreChange !== 0 && (
-              <span className={`text-base ${scoreChange > 0 ? 'text-emerald-500' : 'text-rose-500'} flex items-center font-semibold`}>
-                {scoreChange > 0 ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
+              <span
+                className={`text-base ${
+                  scoreChange > 0 ? "text-emerald-500" : "text-rose-500"
+                } flex items-center font-semibold`}
+              >
+                {scoreChange > 0 ? (
+                  <ArrowUpRight className="w-5 h-5" />
+                ) : (
+                  <ArrowDownRight className="w-5 h-5" />
+                )}
                 {Math.abs(scoreChange)}
               </span>
             )}
@@ -129,7 +166,8 @@ export function FinancialHealthScore({
               <TooltipContent side="left" className="max-w-xs">
                 <p>
                   Your overall financial health based on savings, debt,
-                  spending, and investments. Updated monthly based on your financial activity.
+                  spending, and investments. Updated monthly based on your
+                  financial activity.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -137,14 +175,19 @@ export function FinancialHealthScore({
         </CardHeader>
         <CardContent className="flex flex-col items-center pt-4">
           <motion.div
-            className={`w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-lg ${getScoreColor(
-              score
-            )}`}
+            className={`relative w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-lg
+              ${getScoreColor(
+                score
+              )} dark:bg-opacity-90 before:content-[''] before:absolute before:inset-0 before:rounded-full before:bg-black/5 dark:before:bg-black/20`}
             initial={{ scale: 0.8, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 15 }}
           >
-            {score === null || isNaN(score) ? <AlertCircle className="w-16 h-16" /> : score}
+            {score === null || isNaN(score) ? (
+              <AlertCircle className="w-16 h-16" />
+            ) : (
+              score
+            )}
           </motion.div>
           <p className="mt-6 text-xl font-semibold bg-gradient-to-r from-gray-700 to-gray-900 dark:from-neutral-300 dark:to-neutral-100 bg-clip-text text-transparent">
             {getScoreText(score)}
@@ -184,10 +227,14 @@ export function FinancialHealthScore({
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-all duration-300 border border-transparent hover:border-gray-200/50 dark:hover:border-neutral-700"
+                    className="p-3 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/30 transition-all duration-300 border border-transparent hover:border-neutral-200/10 dark:hover:border-neutral-700/30"
                   >
                     <div className="flex items-center">
-                      <div className={`p-2 rounded-lg ${getScoreColor(score)} bg-opacity-10 mr-3`}>
+                      <div
+                        className={`p-2 rounded-lg ${getScoreColor(
+                          score
+                        )} bg-opacity-10 mr-3`}
+                      >
                         <detail.icon className="h-5 w-5 text-gray-700 dark:text-neutral-300" />
                       </div>
                       <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
