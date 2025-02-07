@@ -16,6 +16,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
 
+/**
+ * Feature item type definition
+ * @typedef {Object} Feature
+ * @property {string} title - The feature's title
+ * @property {string} description - Detailed description of the feature
+ * @property {LucideIcon} icon - Lucide icon component for the feature
+ * @property {string} color - Gradient color classes for the feature card
+ * @property {string} demo - Call-to-action text for the feature
+ */
+
+/**
+ * Array of feature items displaying MoneyWise's main functionalities
+ * Each feature includes an icon, title, description, and demo text
+ */
 const features = [
   {
     title: "Smart Expense Tracking",
@@ -67,6 +81,10 @@ const features = [
   },
 ];
 
+/**
+ * Animation variants for the container
+ * Controls the staggered animation of child elements
+ */
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -75,6 +93,10 @@ const containerVariants = {
   },
 };
 
+/**
+ * Animation variants for individual items
+ * Defines the entry animation for each feature card
+ */
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
@@ -87,6 +109,18 @@ const itemVariants = {
   },
 };
 
+/**
+ * FeaturesPage Component
+ *
+ * Displays a grid of feature cards showcasing MoneyWise's main functionalities.
+ * Features:
+ * - Animated entry with staggered animations
+ * - Responsive grid layout
+ * - Interactive cards with hover effects
+ * - Call-to-action section
+ *
+ * @returns {JSX.Element} Rendered features page component
+ */
 export default function FeaturesPage() {
   return (
     <>

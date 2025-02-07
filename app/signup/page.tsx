@@ -6,7 +6,15 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight, UserPlus, Home } from 'lucide-react';
+import {
+  Loader2,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  ArrowRight,
+  UserPlus,
+  Home,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -31,6 +39,13 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+/**
+ * Schema for user signup validation
+ * @requires name - Minimum 2 characters
+ * @requires email - Valid email format (automatically converted to lowercase)
+ * @requires password - Minimum 8 characters, must contain uppercase, lowercase, number, and special character
+ * @requires confirmPassword - Must match password field
+ */
 const signupSchema = z
   .object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -55,6 +70,20 @@ const signupSchema = z
     path: ["confirmPassword"],
   });
 
+/**
+ * SignupPage Component
+ *
+ * A multi-step signup form with client-side validation and animations.
+ * Features:
+ * - 3-step registration process
+ * - Real-time form validation
+ * - Password visibility toggle
+ * - Animated transitions between steps
+ * - Progress indicator
+ * - Error handling and display
+ *
+ * @returns {JSX.Element} Rendered signup page component
+ */
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -137,10 +166,10 @@ export default function SignupPage() {
               transition={{ duration: 0.5 }}
               className="text-center"
             >
-              <CardTitle className="text-4xl font-black tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <CardTitle className="text-4xl font-extrabold tracking-tight bg-gradient-to-br from-primary via-primary/80 to-secondary bg-clip-text text-transparent">
                 Join MoneyWise
               </CardTitle>
-              <CardDescription className="text-base mt-2 text-muted-foreground">
+              <CardDescription className="text-base mt-3 text-muted-foreground/90 font-medium">
                 Start your journey to financial wisdom today
               </CardDescription>
             </motion.div>
@@ -158,7 +187,10 @@ export default function SignupPage() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Alert variant="destructive" className="border-red-500/50 bg-red-500/10">
+                  <Alert
+                    variant="destructive"
+                    className="border-red-500/50 bg-red-500/10"
+                  >
                     <AlertDescription>{signupError}</AlertDescription>
                   </Alert>
                 </motion.div>
@@ -183,7 +215,9 @@ export default function SignupPage() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground/80">Name</FormLabel>
+                            <FormLabel className="text-sm font-semibold text-foreground/90">
+                              Name
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="Ex: John Doe"
@@ -210,7 +244,9 @@ export default function SignupPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground/80">Email</FormLabel>
+                            <FormLabel className="text-sm font-semibold text-foreground/90">
+                              Email
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="you@example.com"
@@ -238,7 +274,9 @@ export default function SignupPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground/80">Password</FormLabel>
+                            <FormLabel className="text-sm font-semibold text-foreground/90">
+                              Password
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
@@ -260,7 +298,9 @@ export default function SignupPage() {
                                     <Eye className="h-4 w-4" />
                                   )}
                                   <span className="sr-only">
-                                    {showPassword ? "Hide password" : "Show password"}
+                                    {showPassword
+                                      ? "Hide password"
+                                      : "Show password"}
                                   </span>
                                 </Button>
                               </div>
@@ -274,11 +314,15 @@ export default function SignupPage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground/80">Confirm Password</FormLabel>
+                            <FormLabel className="text-sm font-semibold text-foreground/90">
+                              Confirm Password
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
-                                  type={showConfirmPassword ? "text" : "password"}
+                                  type={
+                                    showConfirmPassword ? "text" : "password"
+                                  }
                                   placeholder="••••••••"
                                   {...field}
                                   className="bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/40 transition-colors pr-10"
@@ -288,7 +332,9 @@ export default function SignupPage() {
                                   variant="ghost"
                                   size="sm"
                                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors"
-                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                  onClick={() =>
+                                    setShowConfirmPassword(!showConfirmPassword)
+                                  }
                                 >
                                   {showConfirmPassword ? (
                                     <EyeOff className="h-4 w-4" />
@@ -296,7 +342,9 @@ export default function SignupPage() {
                                     <Eye className="h-4 w-4" />
                                   )}
                                   <span className="sr-only">
-                                    {showConfirmPassword ? "Hide password" : "Show password"}
+                                    {showConfirmPassword
+                                      ? "Hide password"
+                                      : "Show password"}
                                   </span>
                                 </Button>
                               </div>
@@ -365,11 +413,11 @@ export default function SignupPage() {
             </Form>
           </CardContent>
           <CardFooter className="flex flex-col items-center justify-center space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm font-medium text-muted-foreground/80">
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="font-medium text-primary hover:text-primary/80 transition-colors"
+                className="font-semibold text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
               >
                 Log in
               </Link>
