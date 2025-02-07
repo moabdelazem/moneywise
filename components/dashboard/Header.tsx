@@ -26,7 +26,7 @@ import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   userName: string;
-  userEmail: string; // Add this line
+  userEmail: string;
   onLogout: () => void;
   handleAddExpense: (data: any) => void;
   handleAddBudget: (data: any) => void;
@@ -35,7 +35,7 @@ interface HeaderProps {
 
 export function Header({
   userName,
-  userEmail, // Add this line
+  userEmail,
   onLogout,
   handleAddExpense,
   handleAddBudget,
@@ -61,7 +61,7 @@ export function Header({
                 <Plus className="mr-2 h-4 w-4" /> Add Expense
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] border-border">
               <DialogHeader>
                 <DialogTitle>Add New Expense</DialogTitle>
                 <DialogDescription>
@@ -91,7 +91,7 @@ export function Header({
                 <PieChart className="mr-2 h-4 w-4" /> Set Budget
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] border-border">
               <DialogHeader>
                 <DialogTitle>Set New Budget</DialogTitle>
                 <DialogDescription>

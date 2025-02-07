@@ -108,7 +108,7 @@ export const Navbar = memo(function Navbar() {
               <Link href="/login">Sign In</Link>
             </Button>
             <Button asChild>
-              <Link href="/signup">Get Started</Link>
+              <Link href="/signup">Join Us</Link>
             </Button>
           </div>
         </div>

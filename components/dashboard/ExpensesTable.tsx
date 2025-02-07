@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -161,10 +160,10 @@ export function ExpensesTable({
             className="pl-10"
           />
         </div>
-        <div className="rounded-[var(--radius)] border bg-card">
+        <div className="rounded-[var(--radius)] border-border bg-card">
           <Table>
             <TableHeader>
-              <TableRow className="border-neutral-200/10 dark:border-neutral-800/10">
+              <TableRow className="border-border">
                 <TableHead className="w-[100px] font-semibold">Date</TableHead>
                 <TableHead className="font-semibold">Description</TableHead>
                 <TableHead className="font-semibold">Category</TableHead>
@@ -200,7 +199,7 @@ export function ExpensesTable({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="border-neutral-200/10 dark:border-neutral-800/10 hover:bg-neutral-100/5 dark:hover:bg-neutral-800/30"
+                      className="border-border hover:bg-neutral-100/5 dark:hover:bg-neutral-800/30"
                     >
                       <TableCell className="font-medium">
                         {new Date(expense.date).toLocaleDateString()}

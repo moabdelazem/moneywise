@@ -53,7 +53,7 @@ export function ExpenseForm({ onSubmit, onCancel }: ExpenseFormProps) {
 
   const handleSubmit = async (values: z.infer<typeof expenseSchema>) => {
     setIsLoading(true);
-    await onSubmit(values);
+    onSubmit(values);
     setIsLoading(false);
   };
 

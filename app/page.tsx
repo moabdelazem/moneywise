@@ -78,31 +78,32 @@ const itemVariants = {
   },
 };
 
+// List of creators with their information
 const creators = [
   {
     name: "Mohamed Abdelazem",
-    role: "Full Stack Developer",
+    role: "Lead Developer",
     image: "/mohamed.jpg", // Add actual image paths
     github: "https://github.com/moabdelazem",
     linkedin: "https://linkedin.com/in/moabdelazem",
   },
   {
     name: "Monica Nader",
-    role: "Backend Developer",
+    role: "Developer",
     image: "/monica.jpg",
     github: "https://github.com/monicanader",
     linkedin: "https://linkedin.com/in/monicanader",
   },
   {
     name: "Malak Ayman",
-    role: "Frontend Developer",
+    role: "Designer",
     image: "/malak.jpg",
     github: "https://github.com/malakayman",
     linkedin: "https://linkedin.com/in/malakayman",
   },
   {
     name: "Rawan Medhat",
-    role: "UI/UX Designer",
+    role: "Designer",
     image: "/rawan.jpg",
     github: "https://github.com/rawanmedhat",
     linkedin: "https://linkedin.com/in/rawanmedhat",
