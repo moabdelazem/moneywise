@@ -24,6 +24,25 @@ export function CategoryBreakdown({
   hoveredCategory,
   setHoveredCategory,
 }: CategoryBreakdownProps) {
+  // Add utility function for date filtering
+  const isCurrentMonth = (expenseDate: string | Date) => {
+    const date =
+      expenseDate instanceof Date ? expenseDate : new Date(expenseDate);
+    const now = new Date();
+    return (
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  };
+
+  const getCurrentMonthExpenses = (categoryExpenses: Expense[]) => {
+    return categoryExpenses.filter((expense) => {
+      const stringDate = expense.date;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return isCurrentMonth(stringDate);
+    });
+  };
+
   return (
     <div className="bg-card p-6 rounded-xl shadow-sm">
       <h3 className="text-xl font-bold mb-6 text-foreground">
@@ -31,9 +50,16 @@ export function CategoryBreakdown({
       </h3>
       <div className="space-y-6">
         {budgets.map((budget, index) => {
-          const totalExpensesForCategory = expenses
-            .filter((e) => e.category === budget.category)
-            .reduce((sum, e) => sum + e.amount, 0);
+          const categoryExpenses = expenses.filter(
+            (e) => e.category === budget.category
+          );
+          const currentMonthExpenses =
+            getCurrentMonthExpenses(categoryExpenses);
+          const totalExpensesForCategory = currentMonthExpenses.reduce(
+            (sum, e) => sum + e.amount,
+            0
+          );
+
           const percentage = (totalExpensesForCategory / budget.amount) * 100;
 
           return (

@@ -30,20 +30,23 @@ export function BudgetOverview({
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
 
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+
   const totalBudget = budgets
-    .filter((budget) => {
-      const currentDate = new Date();
-      return (
-        budget.month === currentDate.getMonth() + 1 &&
-        budget.year === currentDate.getFullYear()
-      );
-    })
+    .filter(
+      (budget) => budget.month === currentMonth && budget.year === currentYear
+    )
     .reduce((sum, budget) => sum + budget.amount, 0);
 
   const totalExpenses = expenses
     .filter((expense) => {
       const expenseDate = new Date(expense.date);
-      return expenseDate.getMonth() === new Date().getMonth();
+      return (
+        expenseDate.getMonth() + 1 === currentMonth &&
+        expenseDate.getFullYear() === currentYear
+      );
     })
     .reduce((sum, expense) => sum + expense.amount, 0);
 
@@ -51,15 +54,26 @@ export function BudgetOverview({
   const budgetUtilization =
     totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
 
-  const pieChartData = budgets.map((budget) => {
-    const expensesForCategory = expenses
-      .filter((e) => e.category === budget.category)
-      .reduce((sum, e) => sum + e.amount, 0);
-    return {
-      name: budget.category,
-      value: expensesForCategory,
-    };
-  });
+  const pieChartData = budgets
+    .filter(
+      (budget) => budget.month === currentMonth && budget.year === currentYear
+    )
+    .map((budget) => {
+      const expensesForCategory = expenses
+        .filter((e) => {
+          const expenseDate = new Date(e.date);
+          return (
+            e.category === budget.category &&
+            expenseDate.getMonth() + 1 === currentMonth &&
+            expenseDate.getFullYear() === currentYear
+          );
+        })
+        .reduce((sum, e) => sum + e.amount, 0);
+      return {
+        name: budget.category,
+        value: expensesForCategory,
+      };
+    });
 
   const COLORS = [
     "hsl(var(--chart-1))",
