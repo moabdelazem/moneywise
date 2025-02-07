@@ -21,6 +21,7 @@ export default function Dashboard() {
   // State Management
   const [dashboardState, setDashboardState] = useState({
     userName: "",
+    userEmail: "", // Add this line
     expenses: [] as Expense[],
     budgets: [] as Budget[],
     isLoading: true,
@@ -72,6 +73,7 @@ export default function Dashboard() {
         setDashboardState((prev) => ({
           ...prev,
           userName: userData.name,
+          userEmail: userData.email, // Add this line
           expenses: expensesData,
           budgets: budgetsData,
           reminders: remindersData,
@@ -425,6 +427,7 @@ export default function Dashboard() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
           userName={dashboardState.userName}
+          userEmail={dashboardState.userEmail} // Add this line
           onLogout={handleLogout}
           handleAddExpense={handleAddExpense}
           handleAddBudget={handleAddBudget}

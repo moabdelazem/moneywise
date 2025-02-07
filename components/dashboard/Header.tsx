@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   userName: string;
+  userEmail: string; // Add this line
   onLogout: () => void;
   handleAddExpense: (data: any) => void;
   handleAddBudget: (data: any) => void;
@@ -34,6 +35,7 @@ interface HeaderProps {
 
 export function Header({
   userName,
+  userEmail, // Add this line
   onLogout,
   handleAddExpense,
   handleAddBudget,
@@ -68,8 +70,11 @@ export function Header({
               </DialogHeader>
               <ExpenseForm
                 onSubmit={(data) => {
-                  handleAddExpense({ ...data, amount: parseFloat(data.amount) })
-                  setShowExpenseModal(false)
+                  handleAddExpense({
+                    ...data,
+                    amount: parseFloat(data.amount),
+                  });
+                  setShowExpenseModal(false);
                 }}
                 onCancel={() => setShowExpenseModal(false)}
               />
@@ -79,7 +84,10 @@ export function Header({
           {/* Add Budget Modal */}
           <Dialog open={showBudgetModal} onOpenChange={setShowBudgetModal}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="border-primary/20 hover:bg-primary/10">
+              <Button
+                variant="outline"
+                className="border-primary/20 hover:bg-primary/10"
+              >
                 <PieChart className="mr-2 h-4 w-4" /> Set Budget
               </Button>
             </DialogTrigger>
@@ -97,8 +105,8 @@ export function Header({
                     amount: parseFloat(data.amount),
                     month: parseInt(data.month, 10),
                     year: parseInt(data.year, 10),
-                  })
-                  setShowBudgetModal(false)
+                  });
+                  setShowBudgetModal(false);
                 }}
                 onCancel={() => setShowBudgetModal(false)}
               />
@@ -109,7 +117,11 @@ export function Header({
           <ThemeToggle />
 
           {/* Notifications Button */}
-          <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative hover:bg-primary/10"
+          >
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
             <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600 animate-pulse"></span>
@@ -118,10 +130,15 @@ export function Header({
           {/* User Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-primary/10">
+              <Button
+                variant="ghost"
+                className="relative h-8 w-8 rounded-full hover:bg-primary/10"
+              >
                 <Avatar className="h-8 w-8 ring-2 ring-primary/20">
                   <AvatarImage src="/avatars/01.png" alt={userName} />
-                  <AvatarFallback className="bg-primary/10">{userName.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="bg-primary/10">
+                    {userName.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -130,7 +147,7 @@ export function Header({
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{userName}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {userName.toLowerCase()}@example.com
+                    {userEmail}
                   </p>
                 </div>
               </DropdownMenuLabel>
