@@ -49,8 +49,17 @@ export function Header({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
-        {/* Left side - Reserved for logo/branding */}
-        <div className="flex items-center space-x-4"></div>
+        {/* Left side - Logo */}
+        <div className="flex items-center space-x-4">
+          <div
+            className="cursor-pointer"
+            onClick={() => router.push("/dashboard")}
+          >
+            <h1 className="text-xl font-bold text-primary hover:text-primary/50 transition-colors">
+              MoneyWise
+            </h1>
+          </div>
+        </div>
 
         {/* Right side - Actions and user menu */}
         <div className="flex flex-1 items-center justify-end space-x-4">
@@ -91,7 +100,7 @@ export function Header({
                 <PieChart className="mr-2 h-4 w-4" /> Set Budget
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] border-border">
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Set New Budget</DialogTitle>
                 <DialogDescription>
