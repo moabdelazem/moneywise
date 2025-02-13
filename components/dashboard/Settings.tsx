@@ -23,6 +23,14 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, User, Mail, DollarSign, Bell } from "lucide-react";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface SettingsProps {
   initialSettings: {
@@ -61,6 +69,66 @@ export function Settings({ initialSettings }: SettingsProps) {
       toast({
         title: "Error",
         description: "Failed to update settings",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/user/settings/account", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to delete account");
+
+      toast({
+        title: "Success",
+        description: "Account deleted successfully",
+      });
+      // Redirect or perform additional actions after account deletion
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetAccount = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/user/settings/account/reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to reset account");
+
+      toast({
+        title: "Success",
+        description: "Account reset successfully",
+      });
+      // Redirect or perform additional actions after account reset
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to reset account",
         variant: "destructive",
       });
     } finally {
@@ -219,6 +287,103 @@ export function Settings({ initialSettings }: SettingsProps) {
                 "Save Changes"
               )}
             </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="space-y-6"
+          >
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-1 bg-red-600 rounded-full" />
+              <h3 className="text-xl font-semibold text-red-600">
+                Danger Zone
+              </h3>
+            </div>
+            <div className="grid gap-6 pl-4">
+              <div className="flex items-center justify-between gap-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      disabled={isLoading}
+                      variant="outline"
+                      className="flex-1 h-12 border-red-600 text-red-600"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Deleting Account...
+                        </>
+                      ) : (
+                        "Delete Account"
+                      )}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete your account? This action
+                      cannot be undone.
+                    </DialogDescription>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsLoading(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleDeleteAccount}
+                      >
+                        Delete
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <Separator orientation="vertical" className="h-12" />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      disabled={isLoading}
+                      variant="outline"
+                      className="flex-1 h-12 border-secondary text-secondary"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Resetting Account...
+                        </>
+                      ) : (
+                        "Reset Account"
+                      )}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogTitle>Confirm Reset</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to reset your account? This action
+                      will remove all your data.
+                    </DialogDescription>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsLoading(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleResetAccount}
+                      >
+                        Reset
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
           </motion.div>
         </CardContent>
       </Card>
