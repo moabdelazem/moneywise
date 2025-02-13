@@ -125,10 +125,10 @@ export default function Home() {
   return (
     <PageTransition>
       <Navbar />
-      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10">
+      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10 px-4 sm:px-8">
         <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none backdrop-blur-3xl" />
         <motion.div
-          className="container px-8 py-24 mx-auto lg:px-12 mt-16"
+          className="container px-4 sm:px-8 py-24 mx-auto lg:px-12 mt-16"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -201,7 +201,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 w-full max-w-7xl mt-16"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10 w-full max-w-7xl mt-16"
               variants={containerVariants}
             >
               {features.map((feature, index) => (
@@ -230,7 +230,7 @@ export default function Home() {
 
             {/* Meet the Creators Section */}
             <motion.div
-              className="container py-24"
+              className="container py-12 sm:py-24"
               variants={containerVariants}
             >
               <motion.div variants={itemVariants} className="text-center mb-16">
@@ -248,7 +248,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
                 variants={containerVariants}
               >
                 {creators.map((creator) => (
@@ -295,7 +295,7 @@ export default function Home() {
 
             {/* Open Source Section */}
             <motion.div
-              className="w-full max-w-5xl mt-32 text-center"
+              className="w-full max-w-5xl mt-16 sm:mt-32 text-center"
               variants={containerVariants}
             >
               <motion.div

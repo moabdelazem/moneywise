@@ -365,7 +365,7 @@ export default function Dashboard() {
     };
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {activeView === "dashboard" && (
           <>
             <OverviewCards
@@ -373,7 +373,7 @@ export default function Dashboard() {
               budgets={budgets}
               isLoading={isLoading}
             />
-            <div className="grid gap-6">
+            <div className="grid gap-4 sm:gap-6">
               <BudgetOverview
                 expenses={expenses}
                 budgets={budgets}
@@ -387,7 +387,7 @@ export default function Dashboard() {
                 isLoading={isLoading}
               />
             </div>
-            <div className="grid gap-6 md:grid-cols-1">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-1">
               <LatestExpenses
                 expenses={expenses}
                 isLoading={isLoading}
@@ -486,7 +486,7 @@ export default function Dashboard() {
           handleAddBudget={handleAddBudget}
         />
         <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
+          <div className="container mx-auto py-4 sm:py-6 px-4 md:px-6 lg:px-8">
             <DashboardBreadcrumb activeView={dashboardState.activeView} />
             {dashboardState.isLoading ? (
               <div className="flex justify-center items-center h-full">
