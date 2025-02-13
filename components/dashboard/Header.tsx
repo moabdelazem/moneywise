@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Bell, Search, Plus, PieChart, Router } from "lucide-react";
+import { Plus, PieChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "./ThemeToggle";
 import {
   Dialog,
@@ -104,17 +103,6 @@ export function Header({
 
           {/* Theme Toggle Button */}
           <ThemeToggle />
-
-          {/* Notifications Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative hover:bg-primary/10"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
-            <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600 animate-pulse"></span>
-          </Button>
         </div>
       </div>
       {children}

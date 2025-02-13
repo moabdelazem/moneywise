@@ -7,7 +7,6 @@ import {
   LuChartBar,
   LuChartArea,
   LuSettings,
-  LuUser,
   LuLogOut,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";

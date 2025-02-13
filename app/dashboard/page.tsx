@@ -17,6 +17,7 @@ import { PaymentReminder } from "@/components/dashboard/PaymentReminder";
 import { verifyToken } from "@/lib/auth";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Settings } from "@/components/dashboard/Settings"; // Add this import
+import { DashboardBreadcrumb } from "@/components/dashboard/DashboardBreadcrumb";
 
 export default function Dashboard() {
   // State Management
@@ -475,6 +476,7 @@ export default function Dashboard() {
         />
         <main className="flex-1 overflow-y-auto">
           <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
+            <DashboardBreadcrumb activeView={dashboardState.activeView} />
             {dashboardState.isLoading ? (
               <div className="flex justify-center items-center h-full">
                 <div className="loader"></div>

@@ -4,14 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  Settings,
   User,
   Bell,
   Trash,
   RefreshCw,
   Save,
   ArrowLeft,
-  Lock,
   Loader2,
   DollarSign,
 } from "lucide-react";
@@ -174,7 +172,10 @@ export default function SettingsPage() {
       console.error("Error saving settings:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save settings. Please try again.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to save settings. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -220,7 +221,10 @@ export default function SettingsPage() {
       console.error("Error deleting account:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete account. Please check your password and try again.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to delete account. Please check your password and try again.",
         variant: "destructive",
       });
     } finally {
@@ -257,7 +261,10 @@ export default function SettingsPage() {
       console.error("Error resetting account:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to reset account. Please try again.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to reset account. Please try again.",
         variant: "destructive",
       });
     } finally {
