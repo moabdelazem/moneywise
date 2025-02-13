@@ -9,6 +9,7 @@ import {
   LuSettings,
   LuLogOut,
   LuBell,
+  LuBrain, // Import the new icon
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -59,6 +60,12 @@ const menuItems = [
     label: "Payment Reminders",
     icon: LuBell,
     description: "Reminders for payments",
+  },
+  {
+    id: "analyze-with-ai",
+    label: "Analyze with AI",
+    icon: LuBrain,
+    description: "Leverage AI for analysis",
   },
 ];
 

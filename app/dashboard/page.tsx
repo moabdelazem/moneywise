@@ -18,6 +18,7 @@ import { verifyToken } from "@/lib/auth";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Settings } from "@/components/dashboard/Settings"; // Add this import
 import { DashboardBreadcrumb } from "@/components/dashboard/DashboardBreadcrumb";
+import { AnalyzeWithAI } from "@/components/dashboard/AnalyzeWithAI";
 
 export default function Dashboard() {
   // State Management
@@ -34,7 +35,8 @@ export default function Dashboard() {
       | "reports"
       | "analysis"
       | "settings"
-      | "reminders",
+      | "reminders"
+      | "analyze-with-ai",
     reminders: [] as Reminder[],
     isSidebarOpen: false,
     currency: "USD",
@@ -454,6 +456,7 @@ export default function Dashboard() {
             onUpdateReminder={handleUpdateReminder}
           />
         )}
+        {activeView === "analyze-with-ai" && <AnalyzeWithAI />}
       </div>
     );
   }, [dashboardState, handleAddReminder, handleUpdateReminder, handleLogout]);
