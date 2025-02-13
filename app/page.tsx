@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/page-transition";
 import { Footer } from "@/components/footer";
+import { AnalyzeWithAI } from "@/components/dashboard/AnalyzeWithAI";
 
 // Features of the app in the home page
 const features = [
@@ -83,41 +84,51 @@ const creators = [
   {
     name: "Mohamed Abdelazem",
     role: "Lead Developer",
-    image: "/mohamed.jpg", // Add actual image paths
     github: "https://github.com/moabdelazem",
     linkedin: "https://linkedin.com/in/moabdelazem",
   },
   {
     name: "Monica Nader",
     role: "Developer",
-    image: "/monica.jpg",
     github: "https://github.com/monicanader",
     linkedin: "https://linkedin.com/in/monicanader",
   },
   {
     name: "Malak Ayman",
     role: "Designer",
-    image: "/malak.jpg",
     github: "https://github.com/malakayman",
     linkedin: "https://linkedin.com/in/malakayman",
   },
   {
     name: "Rawan Medhat",
     role: "Designer",
-    image: "/rawan.jpg",
     github: "https://github.com/rawanmedhat",
     linkedin: "https://linkedin.com/in/rawanmedhat",
   },
 ];
 
 export default function Home() {
+  const expenses = [
+    // Example expenses data
+    { date: "2023-10-01", amount: 50, category: "Food" },
+    { date: "2023-10-02", amount: 20, category: "Transport" },
+    // Add more expenses as needed
+  ];
+
+  const budgets = [
+    // Example budgets data
+    { category: "Food", amount: 300 },
+    { category: "Transport", amount: 100 },
+    // Add more budgets as needed
+  ];
+
   return (
     <PageTransition>
       <Navbar />
-      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10">
+      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10 px-4 sm:px-8">
         <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none backdrop-blur-3xl" />
         <motion.div
-          className="container px-8 py-24 mx-auto lg:px-12 mt-16"
+          className="container px-4 sm:px-8 py-24 mx-auto lg:px-12 mt-16"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -174,7 +185,7 @@ export default function Home() {
                   className="w-full sm:w-auto group px-10 py-7 text-lg hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-primary/30 rounded-2xl"
                 >
                   <Link href="/signup" className="flex items-center">
-                    Get Started Now
+                    Join Us Now
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-3" />
                   </Link>
                 </Button>
@@ -190,7 +201,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 w-full max-w-7xl mt-16"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10 w-full max-w-7xl mt-16"
               variants={containerVariants}
             >
               {features.map((feature, index) => (
@@ -219,7 +230,7 @@ export default function Home() {
 
             {/* Meet the Creators Section */}
             <motion.div
-              className="container py-24"
+              className="container py-12 sm:py-24"
               variants={containerVariants}
             >
               <motion.div variants={itemVariants} className="text-center mb-16">
@@ -237,7 +248,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
                 variants={containerVariants}
               >
                 {creators.map((creator) => (
@@ -284,7 +295,7 @@ export default function Home() {
 
             {/* Open Source Section */}
             <motion.div
-              className="w-full max-w-5xl mt-32 text-center"
+              className="w-full max-w-5xl mt-16 sm:mt-32 text-center"
               variants={containerVariants}
             >
               <motion.div

@@ -41,7 +41,7 @@ Moneywise is a Next.js application designed to manage and track expenses, provid
 
    ```plaintext
    DATABASE_URL="postgresql://user:password@localhost:5432/moneywise"
-   NEXTAUTH_SECRET="your_secret_key"
+   JWT_SECRET="your_secret_key"
    ```
 
    Replace `user`, `password`, and `database_name` with your PostgreSQL credentials.
@@ -67,13 +67,3 @@ Moneywise is a Next.js application designed to manage and track expenses, provid
    ```
 
 7. Open your browser and visit [http://localhost:3000](http://localhost:3000) to see the app.
-
-## Available Scripts
-
-- `npm run dev`: Starts the development server.
-- `docker-compose up -d`: Starts the database in detached mode.
-- `npx prisma migrate dev`: Runs migrations on the database.
-
-## Contributing
-
-Feel free to fork this repository and submit pull requests.

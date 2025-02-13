@@ -1,23 +1,18 @@
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  const token = request.headers.get("Authorization")?.split(" ")[1];
+  if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const { userId } = await verifyToken(token);
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
-        id: true,
         name: true,
         email: true,
         currency: true,
@@ -30,43 +25,33 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(user);
-  } catch {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request: Request) {
+  const token = request.headers.get("Authorization")?.split(" ")[1];
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const token = request.headers.get("Authorization")?.split(" ")[1];
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { userId } = await verifyToken(token);
-    if (!userId) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    const { name, email, currency, emailNotifications } = await request.json();
-
-    const updateData: {
-      name?: string;
-      email?: string;
-      currency?: string;
-      emailNotifications?: boolean;
-    } = {};
-
-    if (name) updateData.name = name;
-    if (email) updateData.email = email;
-    if (currency) updateData.currency = currency;
-    if (emailNotifications !== undefined)
-      updateData.emailNotifications = emailNotifications;
+    const data = await request.json();
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: updateData,
+      data: {
+        name: data.name,
+        email: data.email,
+        currency: data.currency,
+        emailNotifications: data.emailNotifications,
+      },
       select: {
-        id: true,
         name: true,
         email: true,
         currency: true,
@@ -76,7 +61,6 @@ export async function PUT(request: Request) {
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error("Error updating user settings:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

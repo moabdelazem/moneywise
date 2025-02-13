@@ -10,18 +10,21 @@ import { Reports } from "@/components/dashboard/Reports";
 import { useToast } from "@/hooks/use-toast";
 import { LatestExpenses } from "@/components/dashboard/LatestExpense";
 import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Budget, Expense } from "@/lib/types";
 import { Analysis } from "@/components/dashboard/Analysis";
 import { Category, Reminder } from "@prisma/client";
 import { PaymentReminder } from "@/components/dashboard/PaymentReminder";
 import { verifyToken } from "@/lib/auth";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { Settings } from "@/components/dashboard/Settings"; // Add this import
+import { DashboardBreadcrumb } from "@/components/dashboard/DashboardBreadcrumb";
+import { AnalyzeWithAI } from "@/components/dashboard/AnalyzeWithAI";
 
 export default function Dashboard() {
   // State Management
   const [dashboardState, setDashboardState] = useState({
     userName: "",
-    userEmail: "", // Add this line
+    userEmail: "",
     expenses: [] as Expense[],
     budgets: [] as Budget[],
     isLoading: true,
@@ -30,9 +33,14 @@ export default function Dashboard() {
       | "expenses"
       | "budgets"
       | "reports"
-      | "analysis",
+      | "analysis"
+      | "settings"
+      | "reminders"
+      | "analyze-with-ai",
     reminders: [] as Reminder[],
-    isSidebarOpen: true,
+    isSidebarOpen: false,
+    currency: "USD",
+    emailNotifications: false,
   });
 
   // Hooks
@@ -73,7 +81,7 @@ export default function Dashboard() {
         setDashboardState((prev) => ({
           ...prev,
           userName: userData.name,
-          userEmail: userData.email, // Add this line
+          userEmail: userData.email,
           expenses: expensesData,
           budgets: budgetsData,
           reminders: remindersData,
@@ -324,127 +332,162 @@ export default function Dashboard() {
     window.history.pushState({}, "", `/dashboard?view=${value}`);
   }, []);
 
+  const handleToggleSidebar = useCallback(() => {
+    setDashboardState((prev) => ({
+      ...prev,
+      isSidebarOpen: !prev.isSidebarOpen,
+    }));
+  }, []);
+
   const renderDashboardContent = useCallback(() => {
     const { activeView, expenses, budgets, reminders, isLoading } =
       dashboardState;
 
-    return (
-      <Tabs
-        defaultValue={activeView}
-        onValueChange={handleTabChange}
-        className="space-y-6"
-      >
-        <div className="flex items-center justify-between">
-          <TabsList className="grid w-full max-w-md grid-cols-5">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-            <TabsTrigger value="budgets">Budgets</TabsTrigger>
-            <TabsTrigger value="analysis">Analysis</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
-          </TabsList>
-        </div>
+    if (activeView === "settings") {
+      return (
+        <Settings
+          initialSettings={{
+            name: dashboardState.userName,
+            email: dashboardState.userEmail,
+            currency: dashboardState.currency,
+            emailNotifications: dashboardState.emailNotifications,
+          }}
+        />
+      );
+    }
 
-        <TabsContent value="dashboard" className="space-y-6">
-          <OverviewCards
-            expenses={expenses}
-            budgets={budgets}
-            isLoading={isLoading}
-          />
-          <div className="grid gap-6">
-            <BudgetOverview
+    const handleAddBudgetClick = () => {
+      // Find and click the add budget button in the header
+      const addBudgetButton = document.getElementById("add-budget-trigger");
+      if (addBudgetButton) {
+        addBudgetButton.click();
+      }
+    };
+
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        {activeView === "dashboard" && (
+          <>
+            <OverviewCards
               expenses={expenses}
               budgets={budgets}
               isLoading={isLoading}
             />
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            <PaymentReminder
-              reminders={reminders.map((r) => ({
-                id: r.id,
-                title: r.title,
-                amount: r.amount,
-                dueDate: r.dueDate,
-                category: r.category,
-                status: r.status,
-                isRecurring: r.isRecurring,
-                frequency: r.frequency || undefined,
-              }))}
-              isLoading={isLoading}
-              onAddReminder={async (reminder) => {
-                const newReminder = {
-                  ...reminder,
-                  userId: "",
-                  lastSent: null,
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  frequency: reminder.frequency || null,
-                };
-                await handleAddReminder({
-                  ...newReminder,
-                  category: reminder.category as Category,
-                  status: "PENDING",
-                });
-              }}
-              onUpdateReminder={handleUpdateReminder}
-            />
-            <TopSpendingCategories expenses={expenses} isLoading={isLoading} />
-          </div>
-          <div className="grid gap-6 md:grid-cols-1">
-            <LatestExpenses
-              expenses={expenses}
-              isLoading={isLoading}
-              onAddExpense={() => {
-                // Open add expense dialog
-                document.getElementById("add-expense-trigger")?.click();
-              }}
-            />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="expenses">
+            <div className="grid gap-4 sm:gap-6">
+              <BudgetOverview
+                expenses={expenses}
+                budgets={budgets}
+                isLoading={isLoading}
+                onAddBudget={handleAddBudgetClick}
+              />
+            </div>
+            <div>
+              <TopSpendingCategories
+                expenses={expenses}
+                isLoading={isLoading}
+              />
+            </div>
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-1">
+              <LatestExpenses
+                expenses={expenses}
+                isLoading={isLoading}
+                onAddExpense={() => {
+                  // Open add expense dialog
+                  document.getElementById("add-expense-trigger")?.click();
+                }}
+              />
+            </div>
+          </>
+        )}
+        {activeView === "expenses" && (
           <ExpensesTable expenses={expenses} isLoading={isLoading} />
-        </TabsContent>
-
-        <TabsContent value="budgets">
+        )}
+        {activeView === "budgets" && (
           <BudgetOverview
             expenses={expenses}
             budgets={budgets}
             isLoading={isLoading}
             fullWidth
+            onAddBudget={handleAddBudgetClick}
           />
-        </TabsContent>
-
-        <TabsContent value="analysis">
+        )}
+        {activeView === "analysis" && (
           <Analysis
             expenses={expenses}
             budgets={budgets}
             isLoading={isLoading}
           />
-        </TabsContent>
-
-        <TabsContent value="reports">
+        )}
+        {activeView === "reports" && (
           <Reports
             expenses={expenses}
             budgets={budgets}
             isLoading={isLoading}
           />
-        </TabsContent>
-      </Tabs>
+        )}
+        {activeView === "reminders" && (
+          <PaymentReminder
+            reminders={reminders.map((r) => ({
+              id: r.id,
+              title: r.title,
+              amount: r.amount,
+              dueDate: r.dueDate,
+              category: r.category,
+              status: r.status,
+              isRecurring: r.isRecurring,
+              frequency: r.frequency || undefined,
+            }))}
+            isLoading={isLoading}
+            onAddReminder={async (reminder) => {
+              const newReminder = {
+                ...reminder,
+                userId: "",
+                lastSent: null,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                frequency: reminder.frequency || null,
+              };
+              await handleAddReminder({
+                ...newReminder,
+                category: reminder.category as Category,
+                status: "PENDING",
+              });
+            }}
+            onUpdateReminder={handleUpdateReminder}
+          />
+        )}
+        {activeView === "analyze-with-ai" && (
+          <AnalyzeWithAI
+            budgets={dashboardState.budgets}
+            expenses={dashboardState.expenses}
+          />
+        )}
+      </div>
     );
-  }, [dashboardState, handleAddReminder, handleUpdateReminder]);
+  }, [dashboardState, handleAddReminder, handleUpdateReminder, handleLogout]);
 
   return (
     <div className="flex h-screen bg-background">
+      <Sidebar
+        activeView={dashboardState.activeView}
+        onViewChange={handleTabChange}
+        isSidebarOpen={dashboardState.isSidebarOpen}
+        onToggleSidebar={handleToggleSidebar}
+        userName={dashboardState.userName}
+        userEmail={dashboardState.userEmail}
+        onLogout={handleLogout}
+      />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
           userName={dashboardState.userName}
-          userEmail={dashboardState.userEmail} // Add this line
+          userEmail={dashboardState.userEmail}
           onLogout={handleLogout}
           handleAddExpense={handleAddExpense}
           handleAddBudget={handleAddBudget}
         />
         <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
+          <div className="container mx-auto py-4 sm:py-6 px-4 md:px-6 lg:px-8">
+            <DashboardBreadcrumb activeView={dashboardState.activeView} />
             {dashboardState.isLoading ? (
               <div className="flex justify-center items-center h-full">
                 <div className="loader"></div>

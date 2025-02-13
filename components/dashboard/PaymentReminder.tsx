@@ -12,7 +12,6 @@ import {
   Calendar,
   DollarSign,
   AlertCircle,
-  ArrowRight,
   CheckCircle2,
 } from "lucide-react";
 import { AddReminderModal } from "./modals/AddReminderModal";
@@ -60,13 +59,6 @@ export function PaymentReminder({
   const sortedReminders = reminders.sort(
     (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
   );
-
-  const getStatusColor = (status: string, daysUntilDue: number) => {
-    if (status === "PAID") return "bg-emerald-500 text-emerald-50";
-    if (daysUntilDue <= 0) return "bg-red-500 text-red-50";
-    if (daysUntilDue <= 3) return "bg-amber-500 text-amber-50";
-    return "bg-blue-500 text-blue-50";
-  };
 
   return (
     <>
