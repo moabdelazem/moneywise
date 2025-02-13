@@ -456,7 +456,12 @@ export default function Dashboard() {
             onUpdateReminder={handleUpdateReminder}
           />
         )}
-        {activeView === "analyze-with-ai" && <AnalyzeWithAI />}
+        {activeView === "analyze-with-ai" && (
+          <AnalyzeWithAI
+            budgets={dashboardState.budgets}
+            expenses={dashboardState.expenses}
+          />
+        )}
       </div>
     );
   }, [dashboardState, handleAddReminder, handleUpdateReminder, handleLogout]);
