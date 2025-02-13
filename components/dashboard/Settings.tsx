@@ -175,7 +175,7 @@ export function Settings({ initialSettings }: SettingsProps) {
                 </Select>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
+              <div className="flex items-center justify-between p-4 bg-card rounded-lg border-border border">
                 <div className="space-y-0.5">
                   <Label
                     htmlFor="notifications"
