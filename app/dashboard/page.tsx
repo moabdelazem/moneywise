@@ -10,13 +10,13 @@ import { Reports } from "@/components/dashboard/Reports";
 import { useToast } from "@/hooks/use-toast";
 import { LatestExpenses } from "@/components/dashboard/LatestExpense";
 import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Budget, Expense } from "@/lib/types";
 import { Analysis } from "@/components/dashboard/Analysis";
 import { Category, Reminder } from "@prisma/client";
 import { PaymentReminder } from "@/components/dashboard/PaymentReminder";
 import { verifyToken } from "@/lib/auth";
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { Settings } from "@/components/dashboard/Settings"; // Add this import
 
 export default function Dashboard() {
   // State Management
@@ -31,9 +31,12 @@ export default function Dashboard() {
       | "expenses"
       | "budgets"
       | "reports"
-      | "analysis",
+      | "analysis"
+      | "settings",
     reminders: [] as Reminder[],
     isSidebarOpen: false,
+    currency: "USD",
+    emailNotifications: false,
   });
 
   // Hooks
@@ -336,6 +339,19 @@ export default function Dashboard() {
     const { activeView, expenses, budgets, reminders, isLoading } =
       dashboardState;
 
+    if (activeView === "settings") {
+      return (
+        <Settings
+          initialSettings={{
+            name: dashboardState.userName,
+            email: dashboardState.userEmail,
+            currency: dashboardState.currency,
+            emailNotifications: dashboardState.emailNotifications,
+          }}
+        />
+      );
+    }
+
     const handleAddBudgetClick = () => {
       // Find and click the add budget button in the header
       const addBudgetButton = document.getElementById("add-budget-trigger");
@@ -436,7 +452,7 @@ export default function Dashboard() {
         )}
       </div>
     );
-  }, [dashboardState, handleAddReminder, handleUpdateReminder]);
+  }, [dashboardState, handleAddReminder, handleUpdateReminder, handleLogout]);
 
   return (
     <div className="flex h-screen bg-background">
@@ -445,6 +461,9 @@ export default function Dashboard() {
         onViewChange={handleTabChange}
         isSidebarOpen={dashboardState.isSidebarOpen}
         onToggleSidebar={handleToggleSidebar}
+        userName={dashboardState.userName}
+        userEmail={dashboardState.userEmail}
+        onLogout={handleLogout}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
