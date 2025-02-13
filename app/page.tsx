@@ -174,7 +174,7 @@ export default function Home() {
                   className="w-full sm:w-auto group px-10 py-7 text-lg hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-primary/30 rounded-2xl"
                 >
                   <Link href="/signup" className="flex items-center">
-                    Get Started Now
+                    Join Us Now
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-3" />
                   </Link>
                 </Button>
