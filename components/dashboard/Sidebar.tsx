@@ -1,103 +1,113 @@
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Home, Settings, LogOut } from "lucide-react";
+  LuLayoutDashboard,
+  LuReceipt,
+  LuFileText,
+  LuChevronLeft,
+  LuChartBar,
+  LuChartArea,
+} from "react-icons/lu";
+import { Button } from "@/components/ui/button";
 
-// Sidebar Props Type
 interface SidebarProps {
-  userName: string;
   activeView: string;
-  setActiveView: (
-    view: "dashboard" | "expenses" | "budgets" | "reports"
-  ) => void;
-  handleLogout: () => void;
+  onViewChange: (view: string) => void;
+  isSidebarOpen: boolean;
+  onToggleSidebar: () => void;
 }
 
-export function Sidebar({
-  userName,
-  setActiveView,
-  handleLogout,
-}: SidebarProps) {
-  // Router hook to navigate between pages
-  const router = useRouter();
+const menuItems = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LuLayoutDashboard,
+    description: "Overview of your finances",
+  },
+  {
+    id: "expenses",
+    label: "Expenses",
+    icon: LuReceipt,
+    description: "Track your spending",
+  },
+  {
+    id: "budgets",
+    label: "Budgets",
+    icon: LuChartBar,
+    description: "Manage your budgets",
+  },
+  {
+    id: "analysis",
+    label: "Analysis",
+    icon: LuChartArea,
+    description: "Financial insights",
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    icon: LuFileText,
+    description: "Generate reports",
+  },
+];
 
+export function Sidebar({
+  activeView,
+  onViewChange,
+  isSidebarOpen,
+  onToggleSidebar,
+}: SidebarProps) {
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="fixed top-4 left-4 z-50"
-        >
-          <Home className="h-[1.2rem] w-[1.2rem]" />
-          <span className="sr-only">Toggle navigation</span>
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left">
-        <SheetHeader>
-          <SheetTitle>Moneywise</SheetTitle>
-          <SheetDescription>
-            Keep track of your expenses and budgets
-          </SheetDescription>
-        </SheetHeader>
-        <div className="mt-6 space-y-4">
-          <div className="flex items-center space-x-4 mb-6 pb-6 border-b dark:border-gray-700">
-            <Avatar>
-              <AvatarImage
-                src={`https://api.dicebear.com/6.x/initials/svg?seed=${userName}`}
-                alt={userName}
-              />
-              <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-medium leading-none">{userName}</p>
-              <p className="text-sm text-muted-foreground">
-                {userName.split(" ").join("").toLowerCase()}@email.com
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => setActiveView("dashboard")}
-          >
-            <Home className="mr-2 h-4 w-4" />
-            Dashboard
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => router.push("/profile")}
-          >
-            <Settings className="mr-2 h-4 w-4" />
-            Profile Settings
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => router.push("/settings")}
-          >
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-            onClick={handleLogout}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
+    <aside
+      className={cn(
+        "bg-card border-border border-r transition-all duration-300 ease-in-out relative",
+        isSidebarOpen ? "w-64" : "w-20"
+      )}
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute border-border -right-4 top-6 h-8 w-8 rounded-full border bg-background"
+        onClick={onToggleSidebar}
+      >
+        <LuChevronLeft
+          className={cn(
+            "h-4 w-4 transition-transform",
+            isSidebarOpen ? "" : "rotate-180"
+          )}
+        />
+      </Button>
+
+      <div className="p-6">
+        <nav className="space-y-2">
+          {menuItems.map(({ id, label, icon: Icon, description }) => (
+            <button
+              key={id}
+              onClick={() => onViewChange(id)}
+              className={cn(
+                "flex items-center w-full rounded-lg transition-colors",
+                "hover:bg-accent hover:text-accent-foreground",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "disabled:pointer-events-none disabled:opacity-50",
+                activeView === id
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground",
+                isSidebarOpen ? "p-3" : "p-3 justify-center"
+              )}
+            >
+              <Icon className="h-5 w-5 shrink-0" />
+              {isSidebarOpen && (
+                <div className="flex flex-col items-start ml-3">
+                  <span className="text-sm font-medium leading-none">
+                    {label}
+                  </span>
+                  <span className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                    {description}
+                  </span>
+                </div>
+              )}
+            </button>
+          ))}
+        </nav>
+      </div>
+    </aside>
   );
 }

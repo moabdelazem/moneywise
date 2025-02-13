@@ -47,20 +47,8 @@ export function Header({
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b border-border/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
-        {/* Left side - Logo */}
-        <div className="flex items-center space-x-4">
-          <div
-            className="cursor-pointer"
-            onClick={() => router.push("/dashboard")}
-          >
-            <h1 className="text-xl font-bold text-primary hover:text-primary/50 transition-colors">
-              MoneyWise
-            </h1>
-          </div>
-        </div>
-
         {/* Right side - Actions and user menu */}
         <div className="flex flex-1 items-center justify-end space-x-4">
           {/* Add Expense Modal */}
