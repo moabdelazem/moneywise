@@ -328,6 +328,14 @@ export default function Dashboard() {
     const { activeView, expenses, budgets, reminders, isLoading } =
       dashboardState;
 
+    const handleAddBudgetClick = () => {
+      // Find and click the add budget button in the header
+      const addBudgetButton = document.getElementById("add-budget-trigger");
+      if (addBudgetButton) {
+        addBudgetButton.click();
+      }
+    };
+
     return (
       <Tabs
         defaultValue={activeView}
@@ -355,6 +363,7 @@ export default function Dashboard() {
               expenses={expenses}
               budgets={budgets}
               isLoading={isLoading}
+              onAddBudget={handleAddBudgetClick}
             />
           </div>
           <div className="grid gap-6 md:grid-cols-2">
@@ -411,6 +420,7 @@ export default function Dashboard() {
             budgets={budgets}
             isLoading={isLoading}
             fullWidth
+            onAddBudget={handleAddBudgetClick}
           />
         </TabsContent>
 

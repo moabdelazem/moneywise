@@ -19,6 +19,7 @@ interface BudgetOverviewProps {
   budgets: Budget[];
   isLoading: boolean;
   fullWidth?: boolean;
+  onAddBudget?: () => void; // Add this prop
 }
 
 export function BudgetOverview({
@@ -26,6 +27,7 @@ export function BudgetOverview({
   budgets,
   isLoading,
   fullWidth = false,
+  onAddBudget, // Add this prop
 }: BudgetOverviewProps) {
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
@@ -112,7 +114,10 @@ export function BudgetOverview({
             You haven&apos;t set any budgets yet. Start by adding your first
             budget to track your expenses effectively.
           </p>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={onAddBudget} // Add onClick handler
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Your First Budget
           </Button>

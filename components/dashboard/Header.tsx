@@ -94,6 +94,7 @@ export function Header({
           <Dialog open={showBudgetModal} onOpenChange={setShowBudgetModal}>
             <DialogTrigger asChild>
               <Button
+                id="add-budget-trigger" // Add this ID
                 variant="outline"
                 className="border-primary/20 hover:bg-primary/10"
               >
