@@ -33,7 +33,8 @@ export default function Dashboard() {
       | "budgets"
       | "reports"
       | "analysis"
-      | "settings",
+      | "settings"
+      | "reminders",
     reminders: [] as Reminder[],
     isSidebarOpen: false,
     currency: "USD",
@@ -378,36 +379,7 @@ export default function Dashboard() {
                 onAddBudget={handleAddBudgetClick}
               />
             </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <PaymentReminder
-                reminders={reminders.map((r) => ({
-                  id: r.id,
-                  title: r.title,
-                  amount: r.amount,
-                  dueDate: r.dueDate,
-                  category: r.category,
-                  status: r.status,
-                  isRecurring: r.isRecurring,
-                  frequency: r.frequency || undefined,
-                }))}
-                isLoading={isLoading}
-                onAddReminder={async (reminder) => {
-                  const newReminder = {
-                    ...reminder,
-                    userId: "",
-                    lastSent: null,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    frequency: reminder.frequency || null,
-                  };
-                  await handleAddReminder({
-                    ...newReminder,
-                    category: reminder.category as Category,
-                    status: "PENDING",
-                  });
-                }}
-                onUpdateReminder={handleUpdateReminder}
-              />
+            <div>
               <TopSpendingCategories
                 expenses={expenses}
                 isLoading={isLoading}
@@ -449,6 +421,37 @@ export default function Dashboard() {
             expenses={expenses}
             budgets={budgets}
             isLoading={isLoading}
+          />
+        )}
+        {activeView === "reminders" && (
+          <PaymentReminder
+            reminders={reminders.map((r) => ({
+              id: r.id,
+              title: r.title,
+              amount: r.amount,
+              dueDate: r.dueDate,
+              category: r.category,
+              status: r.status,
+              isRecurring: r.isRecurring,
+              frequency: r.frequency || undefined,
+            }))}
+            isLoading={isLoading}
+            onAddReminder={async (reminder) => {
+              const newReminder = {
+                ...reminder,
+                userId: "",
+                lastSent: null,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                frequency: reminder.frequency || null,
+              };
+              await handleAddReminder({
+                ...newReminder,
+                category: reminder.category as Category,
+                status: "PENDING",
+              });
+            }}
+            onUpdateReminder={handleUpdateReminder}
           />
         )}
       </div>

@@ -8,6 +8,7 @@ import {
   LuChartArea,
   LuSettings,
   LuLogOut,
+  LuBell,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -52,6 +53,12 @@ const menuItems = [
     label: "Reports",
     icon: LuFileText,
     description: "Generate reports",
+  },
+  {
+    id: "reminders",
+    label: "Payment Reminders",
+    icon: LuBell,
+    description: "Reminders for payments",
   },
 ];
 
@@ -116,11 +123,11 @@ export function Sidebar({
                 onClick={() => onViewChange(id)}
                 className={cn(
                   "flex items-center w-full rounded-lg transition-colors",
-                  "hover:bg-accent hover:text-accent-foreground",
+                  "hover:bg-primary/10 hover:text-accent-foreground",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   "disabled:pointer-events-none disabled:opacity-50",
                   activeView === id
-                    ? "bg-accent text-accent-foreground"
+                    ? "bg-primary/20 text-accent-foreground"
                     : "text-muted-foreground",
                   isSidebarOpen ? "p-3" : "p-3 justify-center"
                 )}
