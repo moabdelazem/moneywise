@@ -19,7 +19,11 @@ Moneywise is a Next.js application designed to manage and track expenses, provid
 ### Prerequisites
 
 - **Docker** and **Docker Compose**: Make sure Docker is installed on your machine.
+
   - [Get Docker here](https://docs.docker.com/get-docker/)
+
+- **Nodejs**: Make sure Nodejs is installed on your machine.
+  - [Get Nodejs](https://nodejs.org/en/download)
 
 ### Installation
 
@@ -42,6 +46,7 @@ Moneywise is a Next.js application designed to manage and track expenses, provid
    ```plaintext
    DATABASE_URL="postgresql://user:password@localhost:5432/moneywise"
    JWT_SECRET="your_secret_key"
+   NEXT_PUBLIC_GEMINI_API_KEY="your_api_key"
    ```
 
    Replace `user`, `password`, and `database_name` with your PostgreSQL credentials.
