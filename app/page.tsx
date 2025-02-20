@@ -20,7 +20,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/page-transition";
 import { Footer } from "@/components/footer";
-import { AnalyzeWithAI } from "@/components/dashboard/AnalyzeWithAI";
 
 // Features of the app in the home page
 const features = [
