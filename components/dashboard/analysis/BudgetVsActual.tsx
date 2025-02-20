@@ -63,12 +63,14 @@ export function BudgetVsActual({
   }
 
   return (
-    <Card className="bg-card text-card-foreground shadow-lg">
-      <CardHeader>
-        <CardTitle>Budget vs Actual</CardTitle>
+    <Card className="bg-card/80 backdrop-blur-xl border border-border/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-primary/20">
+      <CardHeader className="border-b border-border/10">
+        <CardTitle className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+          Budget vs Actual
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="h-[300px]">
+      <CardContent className="p-6">
+        <div className="h-[300px] transition-transform duration-300 hover:scale-[1.02]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={comparisonData}
@@ -82,8 +84,46 @@ export function BudgetVsActual({
                 labelFormatter={(label) => `Category: ${label}`}
               />
               <Legend />
-              <Bar dataKey="budget" fill="hsl(var(--primary))" name="Budget" />
-              <Bar dataKey="spent" fill="hsl(var(--secondary))" name="Spent" />
+              <defs>
+                <linearGradient id="budgetGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="hsl(var(--primary))"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="hsl(var(--primary))"
+                    stopOpacity={0.2}
+                  />
+                </linearGradient>
+                <linearGradient id="spentGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="hsl(var(--secondary))"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="hsl(var(--secondary))"
+                    stopOpacity={0.2}
+                  />
+                </linearGradient>
+              </defs>
+              <Bar
+                dataKey="budget"
+                fill="url(#budgetGradient)"
+                name="Budget"
+                radius={[4, 4, 0, 0]}
+                className="transition-all duration-300 hover:opacity-80"
+              />
+              <Bar
+                dataKey="spent"
+                fill="url(#spentGradient)"
+                name="Spent"
+                radius={[4, 4, 0, 0]}
+                className="transition-all duration-300 hover:opacity-80"
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
