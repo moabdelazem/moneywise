@@ -1,3 +1,7 @@
 #!/bin/bash
 
-# TODO: create deployment script
+echo "Running database migrations..."
+npx prisma migrate deploy
+
+echo "Starting application..."
+exec "$@"
