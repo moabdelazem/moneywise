@@ -4,12 +4,16 @@ export interface Expense {
   description: string;
   category: string;
   date: Date;
+  status: string;
+  notes?: string;
 }
 
 export interface Budget {
   id: string;
   category: string;
   amount: number;
+  spent: number;
+  remaining: number;
   month: number;
   year: number;
 }
@@ -37,4 +41,17 @@ export interface ReportData {
       percentage: number;
     }[];
   };
+}
+
+export interface AnalysisRequest {
+  prompt: string;
+  data: {
+    budgets: Budget[];
+    expenses: Expense[];
+  };
+}
+
+export interface AnalysisResponse {
+  analysis: string;
+  error?: string;
 }
