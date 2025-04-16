@@ -5,13 +5,13 @@ services:
     image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: moneywise
+      POSTGRES_USER: moneywise
+      POSTGRES_PASSWORD: moneywise_password
+      POSTGRES_DB: moneywise_db
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - moneywise_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  moneywise_postgres_data:
