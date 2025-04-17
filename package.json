@@ -66,6 +66,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/dom-speech-recognition": "^0.0.6",
     "@types/dotenv": "^6.1.1",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20",
