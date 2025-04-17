@@ -5,6 +5,7 @@ const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/
 
 const MAX_RETRIES = 3;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
+const SIMILARITY_THRESHOLD = 0.3; // Threshold for matching predefined templates
 
 interface PromptTemplate {
   type: string;
@@ -14,49 +15,79 @@ interface PromptTemplate {
 const promptTemplates: Record<string, PromptTemplate> = {
   spendingHabits: {
     type: "analysis",
-    template: `Analyze the spending habits based on the provided expenses and budgets. Focus on:
-1. Top spending categories
-2. Budget adherence
-3. Spending trends
-4. Areas of concern
-5. Potential savings opportunities`,
+    template: `Analyze the spending habits based on the provided expenses and budgets. Format your response using Markdown. Focus on:
+- **Top spending categories:** Identify the categories with the highest spending.
+- **Budget adherence:** Compare spending against the budget for key categories.
+- **Spending trends:** Note any significant changes or patterns over time (if data allows).
+- **Areas of concern:** Highlight categories where spending exceeds the budget or seems unusually high.
+- **Potential savings opportunities:** Suggest specific areas where savings might be possible.
+Use headings (e.g., ## Top Categories) and bullet points for clarity.
+
+**IMPORTANT:** The following sections contain financial data for your analysis. Do NOT include the 'Financial Data Summary' or 'Detailed Data' sections in your final response to the user. Base your response ONLY on the user's request and the provided data.`,
   },
   budgetStatus: {
     type: "analysis",
-    template: `Evaluate the current budget status:
-1. Budget utilization by category
-2. Over/under budget areas
-3. Remaining budget analysis
-4. Budget effectiveness
-5. Recommendations for adjustments`,
+    template: `Evaluate the current budget status based on provided expenses and budgets. Format your response using Markdown. Focus on:
+- **Budget utilization by category:** Show how much of the budget has been used for each category.
+- **Over/under budget areas:** Clearly identify categories that are over or under budget.
+- **Remaining budget analysis:** Summarize the total remaining budget and category-specific remainders.
+- **Budget effectiveness:** Briefly assess how well the current budget aligns with spending patterns.
+- **Recommendations for adjustments:** Suggest specific, actionable adjustments to the budget if necessary.
+Use headings (e.g., ## Budget Utilization) and bullet points for clarity.
+
+**IMPORTANT:** The following sections contain financial data for your analysis. Do NOT include the 'Financial Data Summary' or 'Detailed Data' sections in your final response to the user. Base your response ONLY on the user's request and the provided data.`,
   },
   savingsSuggestions: {
     type: "recommendations",
-    template: `Based on the spending patterns and budget allocation, suggest ways to save money:
-1. Identify potential areas of overspending
-2. Specific actionable recommendations
-3. Category-specific saving strategies
-4. Budget reallocation suggestions
-5. Long-term saving opportunities`,
+    template: `Based on the spending patterns and budget allocation, suggest ways to save money. Format your response using Markdown. Focus on:
+- **Identify potential areas of overspending:** Pinpoint specific categories where spending can be reduced.
+- **Specific actionable recommendations:** Provide concrete steps the user can take (e.g., "Reduce dining out frequency").
+- **Category-specific saving strategies:** Offer tailored tips for different spending categories.
+- **Budget reallocation suggestions:** Propose shifting funds between categories if appropriate.
+- **Long-term saving opportunities:** Mention broader strategies for improving savings over time.
+Use headings (e.g., ## Savings Recommendations) and bullet points for clarity.
+
+**IMPORTANT:** The following sections contain financial data for your analysis. Do NOT include the 'Financial Data Summary' or 'Detailed Data' sections in your final response to the user. Base your response ONLY on the user's request and the provided data.`,
   },
 };
+
+// Generic template for prompts that don't match specific analyses
+const genericTemplate = `Based on the provided financial data, answer the following user request. Format your response using Markdown where appropriate (lists, bolding). Keep the response concise and directly address the user's question.
+
+**IMPORTANT:** The following sections contain financial data for context. Do NOT include the 'Financial Data Summary' or 'Detailed Data' sections in your final response to the user. Base your response ONLY on the user's request and the provided data.`;
 
 function preparePrompt(
   userPrompt: string,
   data: { budgets: Budget[]; expenses: Expense[] }
 ): string {
-  // Identify the most relevant template based on the user's prompt
-  const template = Object.values(promptTemplates).reduce((best, current) => {
-    const currentScore = calculateSimilarity(
-      userPrompt.toLowerCase(),
-      current.type.toLowerCase()
-    );
-    const bestScore = calculateSimilarity(
-      userPrompt.toLowerCase(),
-      best.type.toLowerCase()
-    );
-    return currentScore > bestScore ? current : best;
-  }, promptTemplates.spendingHabits);
+  let selectedTemplate: string;
+  let bestScore = 0;
+
+  // Find the best matching template and its score
+  const bestMatch = Object.values(promptTemplates).reduce(
+    (best, current) => {
+      const currentScore = calculateSimilarity(
+        userPrompt.toLowerCase(),
+        current.type.toLowerCase() + " " + current.template.toLowerCase() // Compare against type and template text
+      );
+      if (currentScore > best.score) {
+        return { template: current.template, score: currentScore };
+      }
+      return best;
+    },
+    { template: promptTemplates.spendingHabits.template, score: 0 } // Default
+  );
+
+  bestScore = bestMatch.score;
+
+  // Decide which template to use based on the score
+  if (bestScore >= SIMILARITY_THRESHOLD) {
+    selectedTemplate = bestMatch.template;
+    console.log(`Using specific template (Score: ${bestScore.toFixed(2)})`);
+  } else {
+    selectedTemplate = genericTemplate;
+    console.log(`Using generic template (Best Score: ${bestScore.toFixed(2)})`);
+  }
 
   // Process and format the data
   const processedData = {
@@ -66,19 +97,21 @@ function preparePrompt(
     budgetUtilization: calculateBudgetUtilization(data.budgets, data.expenses),
   };
 
-  return `${template.template}
+  // Construct the final prompt
+  return `${selectedTemplate}
 
 Financial Data Summary:
 Total Budget: $${processedData.totalBudget}
 Total Expenses: $${processedData.totalExpenses}
 Budget Utilization: ${(
-    (processedData.totalExpenses / processedData.totalBudget) *
-    100
-  ).toFixed(1)}%
+      (processedData.totalExpenses / processedData.totalBudget) *
+      100
+    ).toFixed(1)}%
 
 Detailed Data:
 ${JSON.stringify(processedData, null, 2)}
 
+User Request:
 ${userPrompt}`;
 }
 
@@ -136,11 +169,13 @@ export async function generateFinancialAnalysis(
 
 // Helper functions
 function calculateSimilarity(str1: string, str2: string): number {
-  // Simple Jaccard similarity implementation
-  const set1 = new Set(str1.split(" "));
-  const set2 = new Set(str2.split(" "));
-  const intersection = new Set([...set1].filter((x) => set2.has(x)));
-  const union = new Set([...set1, ...set2]);
+  const words1 = new Set(str1.toLowerCase().match(/\w+/g) || []);
+  const words2 = new Set(str2.toLowerCase().match(/\w+/g) || []);
+  if (words1.size === 0 || words2.size === 0) {
+    return 0;
+  }
+  const intersection = new Set([...words1].filter((x) => words2.has(x)));
+  const union = new Set([...words1, ...words2]);
   return intersection.size / union.size;
 }
 

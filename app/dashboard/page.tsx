@@ -472,18 +472,18 @@ export default function Dashboard() {
         activeView={dashboardState.activeView}
         onViewChange={handleTabChange}
         isSidebarOpen={dashboardState.isSidebarOpen}
-        onToggleSidebar={handleToggleSidebar}
         userName={dashboardState.userName}
         userEmail={dashboardState.userEmail}
         onLogout={handleLogout}
       />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden ">
         <Header
           userName={dashboardState.userName}
           userEmail={dashboardState.userEmail}
           onLogout={handleLogout}
           handleAddExpense={handleAddExpense}
           handleAddBudget={handleAddBudget}
+          onToggleSidebar={handleToggleSidebar}
         />
         <main className="flex-1 overflow-y-auto">
           <div className="container mx-auto py-4 sm:py-6 px-4 md:px-6 lg:px-8">
@@ -498,6 +498,12 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+      {dashboardState.isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={handleToggleSidebar}
+        ></div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, PieChart } from "lucide-react";
+import { Plus, PieChart, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import {
@@ -20,6 +20,7 @@ interface HeaderProps {
   onLogout: () => void;
   handleAddExpense: (data: any) => void;
   handleAddBudget: (data: any) => void;
+  onToggleSidebar: () => void;
   children?: React.ReactNode;
 }
 
@@ -29,6 +30,7 @@ export function Header({
   onLogout,
   handleAddExpense,
   handleAddBudget,
+  onToggleSidebar,
   children,
 }: HeaderProps) {
   // Modal state management
@@ -39,8 +41,21 @@ export function Header({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
+        {/* Left side - Mobile Menu Toggle */}
+        <div className="flex items-center md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleSidebar}
+            className="mr-2"
+          >
+            <Menu className="h-6 w-6" />
+            <span className="sr-only">Toggle sidebar</span>
+          </Button>
+        </div>
+
         {/* Right side - Actions and user menu */}
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
           {/* Add Expense Modal */}
           <Dialog open={showExpenseModal} onOpenChange={setShowExpenseModal}>
             <DialogTrigger asChild>
@@ -72,7 +87,7 @@ export function Header({
           <Dialog open={showBudgetModal} onOpenChange={setShowBudgetModal}>
             <DialogTrigger asChild>
               <Button
-                id="add-budget-trigger" // Add this ID
+                id="add-budget-trigger"
                 variant="outline"
                 className="border-primary/20 hover:bg-primary/10"
               >
