@@ -133,7 +133,7 @@ export default function FeaturesPage() {
             animate="visible"
             variants={containerVariants}
           >
-            <motion.div variants={itemVariants} className="space-y-2 max-w-3xl">
+            <motion.div variants={itemVariants} className="space-y-2 max-w-3xl lg:max-w-4xl xl:max-w-5xl">
               <div className="flex items-center justify-center mb-8">
                 <span className="relative px-6 py-3 text-sm font-medium text-primary bg-primary/10 rounded-full backdrop-blur-sm">
                   <Zap className="w-4 h-4 inline-block mr-2" />
@@ -143,7 +143,7 @@ export default function FeaturesPage() {
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
                 Everything you need to manage your money
               </h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground text-xl mt-4">
+              <p className="mx-auto max-w-[700px] text-muted-foreground text-xl mt-4 lg:max-w-3xl xl:max-w-4xl">
                 Discover how MoneyWise makes financial management simple, smart,
                 and secure
               </p>
@@ -187,7 +187,7 @@ export default function FeaturesPage() {
             </motion.div>
 
             <motion.div variants={itemVariants} className="mt-20 text-center">
-              <Card className="max-w-2xl mx-auto bg-primary/5 border-primary/20">
+              <Card className="max-w-2xl mx-auto bg-primary/5 border-primary/20 lg:max-w-3xl xl:max-w-4xl">
                 <CardContent className="pt-6">
                   <h3 className="text-2xl font-semibold mb-4">
                     Ready to experience these features?

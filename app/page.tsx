@@ -153,7 +153,7 @@ export default function Home() {
                   🚀 Welcome to the Future of Finance
                 </span>
               </div>
-              <h1 className="text-7xl font-black tracking-tighter sm:text-8xl lg:text-9xl mb-12 bg-gradient-to-r from-orange-500 via-orange-400 to-secondary bg-clip-text text-transparent">
+              <h1 className="text-6xl font-black tracking-tighter sm:text-8xl lg:text-9xl mb-12 bg-gradient-to-r from-orange-500 via-orange-400 to-secondary bg-clip-text text-transparent">
                 Smart
                 <span className="relative mx-3 text-primary">
                   Money
@@ -170,7 +170,7 @@ export default function Home() {
                 </span>
                 Moves
               </h1>
-              <p className="text-2xl text-muted-foreground max-w-4xl mb-12 leading-relaxed font-medium">
+              <p className="text-xl text-muted-foreground max-w-4xl mb-12 leading-relaxed font-medium sm:text-2xl">
                 Experience the next generation of financial management with our
                 AI-powered budgeting tools and intelligent insights.
               </p>
@@ -330,7 +330,7 @@ export default function Home() {
                 community-driven development. Join us in building the future of
                 personal finance management.
               </motion.p>
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="md:block">
                 <Button
                   asChild
                   size="lg"
