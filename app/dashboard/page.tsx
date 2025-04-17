@@ -12,6 +12,7 @@ import { LatestExpenses } from "@/components/dashboard/LatestExpense";
 import { TopSpendingCategories } from "@/components/dashboard/TopSpendingCategories";
 import { Budget, Expense } from "@/lib/types";
 import { Analysis } from "@/components/dashboard/Analysis";
+import { SpendingTrendChart } from "@/components/dashboard/SpendingTrendChart";
 import { Category, Reminder } from "@prisma/client";
 import { PaymentReminder } from "@/components/dashboard/PaymentReminder";
 import { verifyToken } from "@/lib/auth";
@@ -371,6 +372,10 @@ export default function Dashboard() {
             <OverviewCards
               expenses={expenses}
               budgets={budgets}
+              isLoading={isLoading}
+            />
+            <SpendingTrendChart
+              expenses={expenses}
               isLoading={isLoading}
             />
             <div className="grid gap-4 sm:gap-6">

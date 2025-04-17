@@ -99,3 +99,96 @@ export async function PATCH(request: Request) {
     );
   }
 }
+
+export async function PUT(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const { userId } = await verifyToken(token);
+    const data = await request.json();
+    const { id, ...updateData } = data;
+
+    if (!id) {
+      return NextResponse.json({ error: "Reminder ID is required" }, { status: 400 });
+    }
+
+    // Ensure amount is a float and dueDate is a Date object if present
+    if (updateData.amount) {
+      updateData.amount = parseFloat(updateData.amount);
+    }
+    if (updateData.dueDate) {
+      updateData.dueDate = new Date(updateData.dueDate);
+    }
+    updateData.updatedAt = new Date();
+
+
+    const reminder = await prisma.reminder.updateMany({
+      where: {
+        id,
+        userId, // Ensure user can only update their own reminders
+      },
+      data: updateData,
+    });
+
+    if (reminder.count === 0) {
+      return NextResponse.json({ error: "Reminder not found or unauthorized" }, { status: 404 });
+    }
+
+    // Fetch the updated reminder to return it
+    const updatedReminder = await prisma.reminder.findUnique({
+      where: { id }
+    });
+
+
+    return NextResponse.json(updatedReminder);
+  } catch (error) {
+    console.error("Error updating reminder:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const { userId } = await verifyToken(token);
+    const { id } = await request.json(); // Assume ID is sent in the body for DELETE
+
+    if (!id) {
+      return NextResponse.json({ error: "Reminder ID is required" }, { status: 400 });
+    }
+
+    const deleteResult = await prisma.reminder.deleteMany({
+      where: {
+        id,
+        userId, // Ensure user can only delete their own reminders
+      },
+    });
+
+    if (deleteResult.count === 0) {
+      return NextResponse.json({ error: "Reminder not found or unauthorized" }, { status: 404 });
+    }
+
+
+    return NextResponse.json({ message: "Reminder deleted successfully" }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting reminder:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
