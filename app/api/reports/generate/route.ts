@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { ReportConfig, ReportData } from "@/lib/types";
+import { ReportConfig, ReportData, Budget, Expense } from "@/lib/types";
 import { generateCSVReport } from "@/lib/reports/csv";
 import { generateExcelReport } from "@/lib/reports/excel";
 import { verifyToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { Expense, Budget } from "@prisma/client";
 import { emailService } from "@/utils/emailService";
 import { emailTemplates } from "@/utils/emailTemplates";
 
