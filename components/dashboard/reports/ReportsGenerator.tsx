@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, CSSProperties } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Select,
@@ -21,22 +22,20 @@ import {
   FileDown,
   FileSpreadsheet,
   Calendar as CalendarIcon,
+  Settings,
+  Download,
 } from "lucide-react";
-import { ReportConfig, Expense, Budget } from "@/lib/types";
+import { ReportConfig /*, Expense, Budget */ } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { Label } from "@/components/ui/label";
 
-interface ReportsGeneratorProps {
-  expenses: Expense[];
-  budgets: Budget[];
-}
-
-export function ReportsGenerator({ expenses, budgets }: ReportsGeneratorProps) {
+export function ReportsGenerator(/* { expenses, budgets }: ReportsGeneratorProps */) {
   const [reportConfig, setReportConfig] = useState<ReportConfig>({
     startDate: new Date(),
     endDate: new Date(),
-    format: "CSV", // Changed default from PDF to CSV since PDF isn't in formatOptions
+    format: "CSV",
     type: "COMPLETE",
   });
 
@@ -48,12 +47,22 @@ export function ReportsGenerator({ expenses, budgets }: ReportsGeneratorProps) {
 
       // Validate date range
       if (reportConfig.startDate > reportConfig.endDate) {
-        throw new Error("Start date must be before end date");
+        toast({
+          title: "Invalid Date Range",
+          description: "Start date must be before end date.",
+          variant: "destructive",
+        });
+        return; // Stop execution
       }
 
       const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error("No authentication token found");
+        toast({
+          title: "Authentication Error",
+          description: "No authentication token found. Please log in again.",
+          variant: "destructive",
+        });
+        return; // Stop execution
       }
 
       const response = await fetch("/api/reports/generate", {
@@ -62,43 +71,45 @@ export function ReportsGenerator({ expenses, budgets }: ReportsGeneratorProps) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...reportConfig,
-          expenses,
-          budgets,
-        }),
+        // Only send necessary config, not all expenses/budgets again
+        body: JSON.stringify(reportConfig),
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Failed to generate report");
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Failed to parse error response" }));
+        throw new Error(errorData.error || "Failed to generate report");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `financial-report-${reportConfig.type.toLowerCase()}-${
-        new Date().toISOString().split("T")[0]
-      }.${reportConfig.format.toLowerCase()}`;
+      // Cleaner filename
+      const formattedStartDate = reportConfig.startDate
+        .toISOString()
+        .split("T")[0];
+      const formattedEndDate = reportConfig.endDate.toISOString().split("T")[0];
+      a.download = `financial-report_${reportConfig.type.toLowerCase()}_${formattedStartDate}_to_${formattedEndDate}.${reportConfig.format.toLowerCase()}`;
       document.body.appendChild(a);
       a.click();
-      a.remove(); // Clean up DOM
+      a.remove();
       window.URL.revokeObjectURL(url);
 
       toast({
-        title: "Success",
-        description: "Report generated successfully!",
-        variant: "default",
+        title: "Success!",
+        description: "Your report has been generated and downloaded.",
+        variant: "default", // Use default variant for success
       });
     } catch (error) {
       console.error("Report generation error:", error);
       toast({
-        title: "Error",
+        title: "Generation Failed",
         description:
           error instanceof Error
             ? error.message
-            : "Failed to generate report. Please try again.",
+            : "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -115,183 +126,228 @@ export function ReportsGenerator({ expenses, budgets }: ReportsGeneratorProps) {
     {
       value: "COMPLETE",
       label: "Complete Report",
-      description: "Full financial overview with all details",
+      description: "Full financial overview (expenses & budgets)",
     },
     {
       value: "EXPENSE",
       label: "Expense Report",
-      description: "Detailed breakdown of all expenses",
+      description: "Detailed breakdown of expenses only",
+    },
+    // Added Budget Report Type
+    {
+      value: "BUDGET",
+      label: "Budget Report",
+      description: "Overview of budgets vs. actual spending",
     },
   ];
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 100 },
+    },
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Card className="bg-gradient-to-br from-background via-background/90 to-background backdrop-blur-xl shadow-2xl border-border/50">
-        <CardHeader className="pb-8 relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
-          <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <CardTitle className="text-4xl font-bold flex items-center gap-4">
-              <CalendarIcon className="h-10 w-10 text-primary" />
-              <span className="bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
-                Financial Reports
-              </span>
+    <motion.div variants={containerVariants} initial="hidden" animate="visible">
+      <Card className="w-full max-w-4xl mx-auto shadow-md border border-border/20 rounded-lg overflow-hidden">
+        <CardHeader className="bg-muted/40 p-5 border-b border-border/20">
+          <motion.div variants={itemVariants}>
+            <CardTitle className="text-xl font-semibold flex items-center gap-2.5 text-foreground">
+              <Download className="h-5 w-5 text-primary" />
+              Generate & Download Report
             </CardTitle>
-            <CardDescription className="text-lg mt-2 text-muted-foreground">
-              Generate comprehensive financial reports with customizable
-              parameters
+            <CardDescription className="text-sm mt-1 text-muted-foreground">
+              Configure and generate your financial report.
             </CardDescription>
           </motion.div>
         </CardHeader>
-        <CardContent className="space-y-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <motion.div
-              className="space-y-4"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
-                <CalendarIcon className="h-4 w-4 text-primary" />
+
+        <motion.div variants={itemVariants}>
+          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-5 gap-6">
+            {/* Calendar Section (Takes more space) */}
+            <div className="md:col-span-3 space-y-3">
+              <Label
+                htmlFor="date-range-calendar"
+                className="text-base font-medium flex items-center gap-2 text-foreground"
+              >
+                <CalendarIcon className="h-5 w-5 text-primary" />
                 Select Date Range
-              </label>
-              <div className="p-6 rounded-2xl bg-card/50 shadow-lg backdrop-blur-lg border-border/50 hover:shadow-xl transition-shadow duration-300">
+              </Label>
+              <div className="p-3 border border-border/30 rounded-md bg-background shadow-sm flex justify-center">
                 <Calendar
+                  id="date-range-calendar"
                   mode="range"
                   selected={{
                     from: reportConfig.startDate,
                     to: reportConfig.endDate,
                   }}
                   onSelect={(range) => {
-                    if (range?.from && range?.to) {
-                      setReportConfig((prev) => {
-                        return {
-                          ...prev,
-                          startDate: range.from as Date,
-                          endDate: range.to as Date,
-                        };
-                      });
+                    if (range?.from) {
+                      setReportConfig((prev) => ({
+                        ...prev,
+                        startDate: range.from as Date,
+                        endDate: range.to ?? (range.from as Date),
+                      }));
+                    } else if (!range?.from && !range?.to) {
+                      setReportConfig((prev) => ({
+                        ...prev,
+                        startDate: new Date(),
+                        endDate: new Date(),
+                      }));
                     }
                   }}
-                  className="rounded-xl border-border/50"
+                  numberOfMonths={1}
+                  className="rounded-md p-0" // Remove internal padding of calendar
                 />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              className="space-y-8"
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="space-y-6">
-                <label className="text-sm font-semibold text-foreground">
-                  Report Settings
-                </label>
-                <div className="space-y-6">
-                  <Select
-                    value={reportConfig.type}
-                    onValueChange={(value: ReportConfig["type"]) =>
-                      setReportConfig((prev) => ({ ...prev, type: value }))
-                    }
+            {/* Settings Section (Takes less space) */}
+            <div className="md:col-span-2 space-y-5">
+              <div className="space-y-3">
+                <Label
+                  htmlFor="report-type"
+                  className="text-base font-medium flex items-center gap-2 text-foreground"
+                >
+                  <Settings className="h-5 w-5 text-primary" />
+                  Report Type
+                </Label>
+                <Select
+                  value={reportConfig.type}
+                  onValueChange={(value: ReportConfig["type"]) =>
+                    setReportConfig((prev) => ({ ...prev, type: value }))
+                  }
+                >
+                  <SelectTrigger
+                    id="report-type"
+                    className="h-10 rounded-md border-border/30 bg-background hover:bg-muted/50 transition-colors"
                   >
-                    <SelectTrigger className="w-full h-14 bg-card/50 backdrop-blur-lg border-border/50 rounded-xl hover:shadow-md transition-shadow duration-300">
-                      <SelectValue placeholder="Select report type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {reportTypes.map((type) => (
-                        <SelectItem
-                          key={type.value}
-                          value={type.value}
-                          className="py-3"
-                        >
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-foreground">
-                              {type.label}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {type.description}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select
-                    value={reportConfig.format}
-                    onValueChange={(value: ReportConfig["format"]) =>
-                      setReportConfig((prev) => ({ ...prev, format: value }))
-                    }
-                  >
-                    <SelectTrigger className="w-full h-14 bg-card/50 backdrop-blur-lg border-border/50 rounded-xl hover:shadow-md transition-shadow duration-300">
-                      <SelectValue placeholder="Select format" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {formatOptions.map((format) => (
-                        <SelectItem
-                          key={format.value}
-                          value={format.value}
-                          className="py-2"
-                        >
-                          <div className="flex items-center gap-3">
-                            <format.icon className="h-5 w-5 text-primary" />
-                            <span className="font-medium">{format.label}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {reportTypes.map((type) => (
+                      <SelectItem
+                        key={type.value}
+                        value={type.value}
+                        className="py-2 cursor-pointer" // Ensure cursor changes
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm text-foreground">
+                            {type.label}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {type.description}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </motion.div>
-          </div>
 
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
+              <div className="space-y-3">
+                <Label
+                  htmlFor="report-format"
+                  className="text-base font-medium flex items-center gap-2 text-foreground"
+                >
+                  <FileSpreadsheet className="h-5 w-5 text-primary" />
+                  Format
+                </Label>
+                <Select
+                  value={reportConfig.format}
+                  onValueChange={(value: ReportConfig["format"]) =>
+                    setReportConfig((prev) => ({ ...prev, format: value }))
+                  }
+                >
+                  <SelectTrigger
+                    id="report-format"
+                    className="h-10 rounded-md border-border/30 bg-background hover:bg-muted/50 transition-colors"
+                  >
+                    <SelectValue placeholder="Select format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {formatOptions.map((format) => (
+                      <SelectItem
+                        key={format.value}
+                        value={format.value}
+                        className="py-2 cursor-pointer" // Ensure cursor changes
+                      >
+                        <div className="flex items-center gap-2">
+                          <format.icon className="h-4 w-4 text-primary" />
+                          <span className="font-medium text-sm">
+                            {format.label}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <CardFooter className="bg-muted/40 p-5 border-t border-border/20 flex justify-end">
             <Button
               onClick={generateReport}
               className={cn(
-                "w-full h-16 text-lg font-semibold transition-all duration-300",
-                "bg-gradient-to-r from-primary to-primary",
-                "hover:from-primary/90 hover:to-primary/90",
-                "rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02]",
-                "border border-primary/10",
-                isGenerating && "opacity-80"
+                "h-10 px-5 text-sm font-medium transition-all duration-300",
+                "bg-primary text-primary-foreground hover:bg-primary/90",
+                "rounded-md shadow hover:shadow-md",
+                "flex items-center justify-center gap-2",
+                isGenerating && "opacity-70 cursor-not-allowed"
               )}
               disabled={isGenerating}
             >
-              {formatOptions.find((f) => f.value === reportConfig.format)
-                ?.icon && (
-                <motion.div
-                  className="mr-3"
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {React.createElement(
-                    formatOptions.find((f) => f.value === reportConfig.format)!
-                      .icon,
-                    {
-                      className: "h-6 w-6",
+              {!isGenerating &&
+                formatOptions.find((f) => f.value === reportConfig.format)
+                  ?.icon &&
+                React.createElement(
+                  formatOptions.find((f) => f.value === reportConfig.format)!
+                    .icon,
+                  { className: "h-4 w-4" }
+                )}
+              {isGenerating ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    style={
+                      {
+                        width: 16, // Smaller spinner
+                        height: 16,
+                        border: "2px solid transparent",
+                        borderTopColor: "currentColor",
+                        borderRadius: "50%",
+                        marginRight: "8px", // Add spacing
+                      } as CSSProperties
                     }
-                  )}
-                </motion.div>
+                  />
+                  <span>Generating...</span>
+                </>
+              ) : (
+                "Generate Report"
               )}
-              {isGenerating ? "Generating Report..." : "Generate Report"}
             </Button>
-          </motion.div>
-        </CardContent>
+          </CardFooter>
+        </motion.div>
       </Card>
     </motion.div>
   );

@@ -26,61 +26,117 @@ export async function POST(request: Request) {
 
     const config: ReportConfig = await request.json();
 
-    // Fetch data based on date range
-    const expenses: Expense[] = await prisma.expense.findMany({
-      where: {
-        userId,
-        date: {
-          gte: new Date(config.startDate),
-          lte: new Date(config.endDate),
+    // --- Conditional Data Fetching based on Report Type ---
+    let expenses: Expense[] = [];
+    let budgets: Budget[] = [];
+
+    // Fetch expenses if needed (COMPLETE or EXPENSE type)
+    if (config.type === "COMPLETE" || config.type === "EXPENSE") {
+      expenses = await prisma.expense.findMany({
+        where: {
+          userId,
+          date: {
+            gte: new Date(config.startDate),
+            lte: new Date(config.endDate),
+          },
         },
-      },
-    });
+        orderBy: {
+          // Optional: Sort expenses by date
+          date: "asc",
+        },
+      });
+    }
 
-    const budgets: Budget[] = await prisma.budget.findMany({
-      where: {
-        userId,
-      },
-    });
+    // Fetch budgets if needed (COMPLETE or BUDGET type)
+    if (config.type === "COMPLETE" || config.type === "BUDGET") {
+      budgets = await prisma.budget.findMany({
+        where: {
+          userId,
+        },
+        // Optional: You might want to filter/sort budgets if applicable
+        // orderBy: { category: 'asc' }
+      });
+    }
 
-    // Calculate category breakdown
-    const categoryTotals = expenses.reduce(
-      (acc: Record<string, number>, expense: Expense) => {
+    // --- Calculate Summaries (conditionally) ---
+    let totalExpenses = 0;
+    let categoryTotals: Record<string, number> = {};
+
+    if (expenses.length > 0) {
+      totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+      categoryTotals = expenses.reduce((acc, expense) => {
         acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
         return acc;
-      },
-      {} as Record<string, number>
+      }, {} as Record<string, number>);
+    }
+
+    let totalBudget = 0;
+    if (budgets.length > 0) {
+      totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+    }
+
+    // --- Construct ReportData based on Type ---
+    const reportData: Partial<ReportData> = {}; // Use Partial as structure varies
+
+    const formattedExpenses = expenses.map((exp) => ({
+      ...exp,
+      notes: exp.notes === null ? undefined : exp.notes,
+    }));
+
+    const categoryBreakdown = Object.entries(categoryTotals).map(
+      ([category, amount]): CategoryBreakdown => ({
+        category,
+        amount,
+        // Handle division by zero if totalExpenses is 0
+        percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0,
+      })
     );
 
-    const totalExpenses = expenses.reduce(
-      (sum: number, exp: Expense) => sum + exp.amount,
-      0
-    );
-    const totalBudget = budgets.reduce(
-      (sum: number, budget: Budget) => sum + budget.amount,
-      0
-    );
-
-    // Generate report data
-    const reportData: ReportData = {
-      expenses: expenses.map((exp) => ({
-        ...exp,
-        notes: exp.notes === null ? undefined : exp.notes,
-      })),
-      budgets,
-      summary: {
-        totalExpenses,
-        totalBudget,
-        savings: totalBudget - totalExpenses,
-        categoryBreakdown: Object.entries(categoryTotals).map(
-          ([category, amount]): CategoryBreakdown => ({
-            category,
-            amount,
-            percentage: (amount / totalExpenses) * 100,
-          })
-        ),
-      },
-    };
+    switch (config.type) {
+      case "COMPLETE":
+        reportData.expenses = formattedExpenses;
+        reportData.budgets = budgets;
+        reportData.summary = {
+          totalExpenses,
+          totalBudget,
+          savings: totalBudget - totalExpenses,
+          categoryBreakdown,
+        };
+        break;
+      case "EXPENSE":
+        reportData.expenses = formattedExpenses;
+        reportData.summary = {
+          totalExpenses,
+          totalBudget: 0, // Or undefined, depending on ReportData definition
+          savings: 0 - totalExpenses,
+          categoryBreakdown,
+        };
+        break;
+      case "BUDGET":
+        reportData.budgets = budgets;
+        reportData.summary = {
+          totalExpenses: 0, // Or undefined
+          totalBudget,
+          savings: totalBudget - 0,
+          categoryBreakdown: [], // No expenses, no breakdown
+        };
+        break;
+      default:
+        // Handle unknown type or default to COMPLETE?
+        // For now, let's assume COMPLETE if type is missing/invalid
+        console.warn(
+          `Unknown report type: ${config.type}, defaulting to COMPLETE.`
+        );
+        reportData.expenses = formattedExpenses;
+        reportData.budgets = budgets;
+        reportData.summary = {
+          totalExpenses,
+          totalBudget,
+          savings: totalBudget - totalExpenses,
+          categoryBreakdown,
+        };
+        break;
+    }
 
     // Fetch user email and name
     const user = await prisma.user.findUnique({
@@ -101,12 +157,20 @@ export async function POST(request: Request) {
 
     switch (format) {
       case "CSV":
-        reportBuffer = await generateCSVReport(reportData, config);
+        // Pass the potentially partial reportData
+        reportBuffer = await generateCSVReport(
+          reportData as ReportData,
+          config
+        );
         contentType = "text/csv";
         fileExtension = "csv";
         break;
       case "EXCEL":
-        reportBuffer = await generateExcelReport(reportData, config);
+        // Pass the potentially partial reportData
+        reportBuffer = await generateExcelReport(
+          reportData as ReportData,
+          config
+        );
         contentType =
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         fileExtension = "xlsx";
