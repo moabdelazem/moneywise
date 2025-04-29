@@ -107,20 +107,6 @@ const creators = [
 ];
 
 export default function Home() {
-  const expenses = [
-    // Example expenses data
-    { date: "2023-10-01", amount: 50, category: "Food" },
-    { date: "2023-10-02", amount: 20, category: "Transport" },
-    // Add more expenses as needed
-  ];
-
-  const budgets = [
-    // Example budgets data
-    { category: "Food", amount: 300 },
-    { category: "Transport", amount: 100 },
-    // Add more budgets as needed
-  ];
-
   return (
     <PageTransition>
       <Navbar />
