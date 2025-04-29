@@ -28,4 +28,16 @@ export const emailTemplates = {
       </div>
     `,
   }),
+
+  reportExport: (name: string) => ({
+    subject: "Your MoneyWise Report is Ready!",
+    html: `
+      <div style=\"font-family: Arial, sans-serif; padding: 20px;\">
+        <h2>Hi ${name},</h2>
+        <p>Your requested financial report has been generated and is attached to this email.</p>
+        <p>If you did not request this report, please contact our support team.</p>
+        <p>Thank you for using MoneyWise!</p>
+      </div>
+    `,
+  }),
 };

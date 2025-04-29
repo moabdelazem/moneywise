@@ -5,18 +5,13 @@ import { generateExcelReport } from "@/lib/reports/excel";
 import { verifyToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { Expense, Budget } from "@prisma/client";
+import { emailService } from "@/utils/emailService";
+import { emailTemplates } from "@/utils/emailTemplates";
 
 interface CategoryBreakdown {
   category: string;
   amount: number;
   percentage: number;
-}
-
-interface ReportSummary {
-  totalExpenses: number;
-  totalBudget: number;
-  savings: number;
-  categoryBreakdown: CategoryBreakdown[];
 }
 
 export async function POST(request: Request) {
@@ -69,7 +64,10 @@ export async function POST(request: Request) {
 
     // Generate report data
     const reportData: ReportData = {
-      expenses,
+      expenses: expenses.map((exp) => ({
+        ...exp,
+        notes: exp.notes === null ? undefined : exp.notes,
+      })),
       budgets,
       summary: {
         totalExpenses,
@@ -84,6 +82,15 @@ export async function POST(request: Request) {
         ),
       },
     };
+
+    // Fetch user email and name
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true },
+    });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     // Generate report in requested format
     let reportBuffer: Buffer;
@@ -108,6 +115,19 @@ export async function POST(request: Request) {
       default:
         throw new Error("Unsupported format");
     }
+
+    // Send email with report attached
+    await emailService.sendMail(
+      user.email,
+      emailTemplates.reportExport(user.name).subject,
+      emailTemplates.reportExport(user.name).html,
+      [
+        {
+          filename: `financial-report.${fileExtension}`,
+          content: reportBuffer,
+        },
+      ]
+    );
 
     return new NextResponse(reportBuffer, {
       headers: {

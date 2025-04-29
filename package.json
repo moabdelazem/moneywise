@@ -16,9 +16,10 @@
     "react-is": "^19.0.0-rc-69d4b800-20241021"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.7.0",
     "@hookform/resolvers": "^3.9.1",
     "@next/env": "^15.0.2",
-    "@prisma/client": "^6.0.1",
+    "@prisma/client": "^6.6.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.2",
@@ -44,6 +45,7 @@
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "exceljs": "^4.4.0",
+    "faker": "^6.6.6",
     "framer-motion": "^11.11.10",
     "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2",

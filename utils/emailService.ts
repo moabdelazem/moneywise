@@ -16,13 +16,19 @@ class EmailService {
     });
   }
 
-  async sendMail(to: string, subject: string, html: string) {
+  async sendMail(
+    to: string,
+    subject: string,
+    html: string,
+    attachments?: any[]
+  ) {
     try {
       await this.transporter.sendMail({
         from: config.email.from,
         to,
         subject,
         html,
+        attachments,
       });
       return true;
     } catch (error) {

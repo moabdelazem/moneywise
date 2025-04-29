@@ -36,17 +36,25 @@ export async function signUp(name: string, email: string, password: string) {
 }
 
 export async function login(email: string, password: string) {
+  console.log(`Login attempt for email: ${email}`); // Log input email
   // check if the user exists
   const user = await prisma.user.findUnique({ where: { email } });
   // if the user does not exist, throw an error
   if (!user) {
+    console.error(`Login failed: User not found for email: ${email}`); // Log failure
     throw new Error("Invalid credentials");
   }
 
+  console.log(`User found: ${user.id}. Comparing password.`); // Log user found
+  console.log(`Stored hash: ${user.password}`); // Log the stored hash
+
   // check if the password is valid
   const isPasswordValid = await bcrypt.compare(password, user.password);
+  console.log(`Password comparison result: ${isPasswordValid}`); // Log comparison result
+
   // if the password is not valid, throw an error
   if (!isPasswordValid) {
+    console.error(`Login failed: Password mismatch for user: ${user.email}`); // Log failure
     throw new Error("Invalid credentials");
   }
 
@@ -54,6 +62,8 @@ export async function login(email: string, password: string) {
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
     expiresIn: "1d",
   });
+
+  console.log(`Login successful for user: ${user.email}`); // Log success
 
   // return the user and the token
   return { user, token };

@@ -30,18 +30,42 @@ export function OverviewCards({
   budgets,
   isLoading,
 }: OverviewCardsProps) {
-  // Calculate the total expenses
-  const totalExpenses = expenses.reduce(
+  // Get current month and year
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1; // JS months are 0-indexed
+  const currentYear = currentDate.getFullYear();
+
+  // Filter expenses for the current month and year
+  const currentMonthExpenses = expenses.filter((expense) => {
+    const expenseDate = new Date(expense.date);
+    return (
+      expenseDate.getMonth() + 1 === currentMonth &&
+      expenseDate.getFullYear() === currentYear
+    );
+  });
+
+  // Filter budgets for the current month and year
+  const currentMonthBudgets = budgets.filter((budget) => {
+    return budget.month === currentMonth && budget.year === currentYear;
+  });
+
+  // Calculate total expenses for the CURRENT month
+  const totalCurrentMonthExpenses = currentMonthExpenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
 
-  // Calculate the total budget
-  const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+  // Calculate total budget for the CURRENT month
+  const totalCurrentMonthBudget = currentMonthBudgets.reduce(
+    (sum, budget) => sum + budget.amount,
+    0
+  );
 
-  // Calculate the budget status
+  // Calculate the budget status based on CURRENT month data
   const budgetStatus =
-    totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
+    totalCurrentMonthBudget > 0
+      ? (totalCurrentMonthExpenses / totalCurrentMonthBudget) * 100
+      : 0;
 
   // Calculate the chart data
   const chartData = expenses.reduce((acc, expense) => {
@@ -72,23 +96,26 @@ export function OverviewCards({
   The monthly trend is calculated by finding the total expenses for the current month and the previous month.
   ? If the current month is January, the previous month is December.
   */
-  const currentMonth = new Date().getMonth();
-  // Find the expenses for the current month
-  const currentMonthExpenses = expenses.filter(
-    (expense) => new Date(expense.date).getMonth() === currentMonth
+  const currentMonthForTrend = new Date().getMonth(); // Use JS 0-indexed month here
+  const currentMonthExpensesForTrend = expenses.filter(
+    (expense) =>
+      new Date(expense.date).getMonth() === currentMonthForTrend &&
+      new Date(expense.date).getFullYear() === currentYear
   );
-  // Calculate the total expenses for the current month
-  const currentMonthTotal = currentMonthExpenses.reduce(
+  const currentMonthTotal = currentMonthExpensesForTrend.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
 
-  // Find the expenses for the previous month
-  const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const previousMonthForTrend =
+    currentMonthForTrend === 0 ? 11 : currentMonthForTrend - 1;
+  const previousYearForTrend =
+    currentMonthForTrend === 0 ? currentYear - 1 : currentYear;
   const previousMonthExpenses = expenses.filter(
-    (expense) => new Date(expense.date).getMonth() === previousMonth
+    (expense) =>
+      new Date(expense.date).getMonth() === previousMonthForTrend &&
+      new Date(expense.date).getFullYear() === previousYearForTrend
   );
-  // Calculate the total expenses for the previous month
   const previousMonthTotal = previousMonthExpenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
@@ -133,7 +160,7 @@ export function OverviewCards({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              ${totalExpenses.toFixed(2)}
+              ${totalCurrentMonthExpenses.toFixed(2)}
             </motion.div>
           )}
           <p className="text-sm text-gray-600 dark:text-neutral-400 mt-2 font-medium">
