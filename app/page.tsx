@@ -110,8 +110,20 @@ export default function Home() {
   return (
     <PageTransition>
       <Navbar />
-      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10 px-4 sm:px-8">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none backdrop-blur-3xl" />
+      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10 px-4 sm:px-8 relative overflow-hidden">
+        {/* Animated background blobs */}
+        <div className="absolute inset-0 pointer-events-none -z-10">
+          <motion.div
+            className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] rounded-full bg-primary/30 blur-3xl"
+            animate={{ x: [0, 50, 0], y: [0, 50, 0] }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] rounded-full bg-secondary/30 blur-3xl"
+            animate={{ x: [0, -50, 0], y: [0, -50, 0] }}
+            transition={{ duration: 12, repeat: Infinity }}
+          />
+        </div>
         <motion.div
           className="container px-4 sm:px-8 py-24 mx-auto lg:px-12 mt-16"
           initial="hidden"
@@ -167,7 +179,7 @@ export default function Home() {
                 <Button
                   asChild
                   size="lg"
-                  className="w-full sm:w-auto group px-10 py-7 text-lg hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-primary/30 rounded-2xl"
+                  className="w-full sm:w-auto group px-10 py-7 text-lg hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-primary/40 hover:ring-4 hover:ring-primary/30 rounded-2xl"
                 >
                   <Link href="/signup" className="flex items-center">
                     Join Us Now
@@ -191,7 +203,7 @@ export default function Home() {
             >
               {features.map((feature, index) => (
                 <motion.div key={index} variants={itemVariants}>
-                  <Card className="h-full transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 bg-gradient-to-br from-background via-secondary/5 to-primary/5 border border-secondary/20 group rounded-3xl backdrop-blur-sm">
+                  <Card className="h-full transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 bg-gradient-to-br from-primary/10 via-background to-secondary/20 border border-secondary/20 group rounded-3xl backdrop-blur-md shadow-lg">
                     <CardHeader>
                       <motion.div
                         whileHover={{ scale: 1.2, rotate: 10 }}
@@ -243,7 +255,17 @@ export default function Home() {
                     className="text-center"
                   >
                     <Card className="overflow-hidden backdrop-blur-sm hover:shadow-xl transition-all duration-500 border-border">
-                      <CardHeader className="relative pb-0"></CardHeader>
+                      <CardHeader className="relative pb-0">
+                        {/* Avatar with initials */}
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-2xl font-bold text-primary shadow-md">
+                            {creator.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </div>
+                        </div>
+                      </CardHeader>
                       <CardContent className="pt-4">
                         <h3 className="text-xl font-semibold">
                           {creator.name}

@@ -125,15 +125,18 @@ export default function FeaturesPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen py-24 bg-gradient-to-br from-primary/5 via-background to-secondary/10">
-        <div className="container px-4 md:px-6">
+      <main className="min-h-screen py-24 bg-gradient-to-br from-primary/5 via-background to-secondary/10 flex flex-col items-center justify-center">
+        <div className="w-full max-w-7xl px-4 md:px-8 mx-auto flex flex-col items-center">
           <motion.div
-            className="flex flex-col items-center space-y-4 text-center"
+            className="flex flex-col items-center space-y-4 text-center w-full"
             initial="hidden"
             animate="visible"
             variants={containerVariants}
           >
-            <motion.div variants={itemVariants} className="space-y-2 max-w-3xl lg:max-w-4xl xl:max-w-5xl">
+            <motion.div
+              variants={itemVariants}
+              className="space-y-2 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto"
+            >
               <div className="flex items-center justify-center mb-8">
                 <span className="relative px-6 py-3 text-sm font-medium text-primary bg-primary/10 rounded-full backdrop-blur-sm">
                   <Zap className="w-4 h-4 inline-block mr-2" />
@@ -150,17 +153,21 @@ export default function FeaturesPage() {
             </motion.div>
 
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20 w-full"
               variants={containerVariants}
             >
               {features.map((feature, index) => (
-                <motion.div key={index} variants={itemVariants}>
-                  <Card className="relative border-border overflow-hidden group hover:shadow-xl transition-all duration-500 h-full">
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  className="h-full"
+                >
+                  <Card className="relative overflow-hidden group hover:shadow-2xl transition-all duration-500 h-full rounded-3xl bg-gradient-to-br from-background via-secondary/10 to-primary/5 border border-secondary/20">
                     <CardHeader>
                       <div
-                        className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}
+                        className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-3xl pointer-events-none`}
                       />
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-4 relative z-10">
                         <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-500">
                           <feature.icon className="w-6 h-6 text-primary" />
                         </div>
@@ -169,30 +176,35 @@ export default function FeaturesPage() {
                         </CardTitle>
                       </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="relative z-10 flex flex-col h-full">
                       <p className="text-muted-foreground leading-relaxed mb-4">
                         {feature.description}
                       </p>
-                      <Button
-                        variant="ghost"
-                        className="group/button hover:bg-primary/10"
-                      >
-                        {feature.demo}
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/button:translate-x-1" />
-                      </Button>
+                      <div className="mt-auto">
+                        <Button
+                          variant="ghost"
+                          className="group/button hover:bg-primary/10"
+                        >
+                          {feature.demo}
+                          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/button:translate-x-1" />
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
               ))}
             </motion.div>
 
-            <motion.div variants={itemVariants} className="mt-20 text-center">
-              <Card className="max-w-2xl mx-auto bg-primary/5 border-primary/20 lg:max-w-3xl xl:max-w-4xl">
-                <CardContent className="pt-6">
+            <motion.div
+              variants={itemVariants}
+              className="mt-28 w-full flex justify-center"
+            >
+              <Card className="w-full max-w-2xl mx-auto bg-primary/5 border-primary/20 lg:max-w-3xl xl:max-w-4xl shadow-xl rounded-3xl">
+                <CardContent className="pt-8 pb-10 flex flex-col items-center">
                   <h3 className="text-2xl font-semibold mb-4">
                     Ready to experience these features?
                   </h3>
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-muted-foreground mb-6 text-center">
                     Join thousands of users who are already managing their
                     finances smarter with MoneyWise.
                   </p>
