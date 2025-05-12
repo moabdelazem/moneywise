@@ -120,6 +120,7 @@ export function ReportsGenerator(/* { expenses, budgets }: ReportsGeneratorProps
   const formatOptions = [
     { value: "CSV", label: "CSV Spreadsheet", icon: FileDown },
     { value: "EXCEL", label: "Excel Workbook", icon: FileSpreadsheet },
+    { value: "PDF", label: "PDF Document", icon: FileDown },
   ];
 
   const reportTypes = [

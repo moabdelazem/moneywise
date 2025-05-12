@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ReportConfig, ReportData, Budget, Expense } from "@/lib/types";
 import { generateCSVReport } from "@/lib/reports/csv";
 import { generateExcelReport } from "@/lib/reports/excel";
+import { generatePDFReport } from "@/lib/reports/pdf";
 import { verifyToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { emailService } from "@/utils/emailService";
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
 
     // Fetch expenses if needed (COMPLETE or EXPENSE type)
     if (config.type === "COMPLETE" || config.type === "EXPENSE") {
-      expenses = await prisma.expense.findMany({
+      const prismaExpenses = await prisma.expense.findMany({
         where: {
           userId,
           date: {
@@ -45,6 +46,17 @@ export async function POST(request: Request) {
           date: "asc",
         },
       });
+
+      // Transform Prisma expenses to match Expense type
+      expenses = prismaExpenses.map((exp) => ({
+        id: exp.id,
+        amount: exp.amount,
+        description: exp.description,
+        category: exp.category as string, // Handle Category enum if needed
+        date: exp.date,
+        status: exp.status,
+        notes: exp.notes || undefined, // Convert null to undefined to match Expense type
+      }));
     }
 
     // Fetch budgets if needed (COMPLETE or BUDGET type)
@@ -152,7 +164,7 @@ export async function POST(request: Request) {
     let contentType: string;
     let fileExtension: string;
 
-    type ReportFormat = "CSV" | "EXCEL";
+    type ReportFormat = "CSV" | "EXCEL" | "PDF";
     const format = config.format as ReportFormat;
 
     switch (format) {
@@ -175,6 +187,15 @@ export async function POST(request: Request) {
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         fileExtension = "xlsx";
         break;
+      case "PDF":
+        // Pass the potentially partial reportData
+        reportBuffer = await generatePDFReport(
+          reportData as ReportData,
+          config
+        );
+        contentType = "application/pdf";
+        fileExtension = "pdf";
+        break;
       default:
         throw new Error("Unsupported format");
     }
@@ -192,7 +213,10 @@ export async function POST(request: Request) {
       ]
     );
 
-    return new NextResponse(reportBuffer, {
+    // Create a Uint8Array from the buffer for compatibility with Response
+    const uint8Array = new Uint8Array(reportBuffer);
+
+    return new Response(uint8Array, {
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": `attachment; filename=financial-report.${fileExtension}`,
