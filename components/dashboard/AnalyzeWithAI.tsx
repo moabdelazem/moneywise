@@ -1,9 +1,19 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Info, RefreshCw, Send, PlusCircle, Copy, Check } from "lucide-react";
+import {
+  Info,
+  RefreshCw,
+  Send,
+  PlusCircle,
+  Copy,
+  Check,
+  Download,
+} from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { Budget, Expense } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -13,9 +23,8 @@ const predefinedPrompts = [
   "How much did I spend this month?",
   "What category am I spending the most on?",
   "Am I over budget on any categories?",
-  "How can I save more money?",
   "Compare my housing vs entertainment expenses",
-  "What&apos;s my biggest unnecessary expense?",
+  "What's my biggest unnecessary expense?",
 ];
 
 // Updated examples of good questions to ask
@@ -152,6 +161,7 @@ export function AnalyzeWithAI({
   const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(
     null
   );
+  const [downloadingIndex, setDownloadingIndex] = useState<number | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -200,6 +210,108 @@ export function AnalyzeWithAI({
         });
       }
     );
+  };
+
+  // Function to download AI response as PDF with markdown rendering
+  const downloadAsPdf = async (text: string, index: number) => {
+    try {
+      setDownloadingIndex(index);
+
+      // Check if running in browser
+      if (typeof window === "undefined" || typeof document === "undefined") {
+        throw new Error("PDF generation is only available in the browser");
+      }
+
+      // Create a temporary container for rendering the markdown
+      const container = document.createElement("div");
+      container.style.padding = "20px";
+      container.style.maxWidth = "800px";
+      container.style.margin = "0 auto";
+      container.style.fontFamily = "Arial, sans-serif";
+      container.style.color = "black";
+      container.style.backgroundColor = "white";
+
+      // Add title and date
+      const header = document.createElement("div");
+      const title = document.createElement("h1");
+      title.textContent = "MoneyWise AI Analysis";
+      title.style.borderBottom = "1px solid #ccc";
+      title.style.paddingBottom = "10px";
+      title.style.marginBottom = "5px";
+
+      const dateElem = document.createElement("p");
+      dateElem.textContent = `Generated: ${new Date().toLocaleDateString()}`;
+      dateElem.style.color = "#666";
+      dateElem.style.fontSize = "0.8rem";
+      dateElem.style.marginTop = "0";
+
+      header.appendChild(title);
+      header.appendChild(dateElem);
+      container.appendChild(header);
+
+      // Create markdown container
+      const markdownContainer = document.createElement("div");
+      markdownContainer.className = "markdown-body";
+      markdownContainer.style.marginTop = "20px";
+
+      // Render markdown to HTML
+      const tempRoot = document.createElement("div");
+      document.body.appendChild(tempRoot);
+
+      // We need to use React to render the markdown
+      const ReactDOM = await import("react-dom/client");
+      const root = ReactDOM.createRoot(tempRoot);
+
+      // Use a promise to wait for rendering to complete
+      await new Promise<void>((resolve) => {
+        root.render(
+          <div className="prose max-w-none dark:prose-invert">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+          </div>
+        );
+
+        // Give it a moment to render
+        setTimeout(() => {
+          markdownContainer.innerHTML = tempRoot.innerHTML;
+          resolve();
+        }, 100);
+      });
+
+      // Clean up the temp element
+      document.body.removeChild(tempRoot);
+      container.appendChild(markdownContainer);
+
+      // Dynamically import html2pdf
+      const html2pdfModule = await import("html2pdf.js");
+      const html2pdf = html2pdfModule.default;
+
+      // Use html2pdf to create PDF
+      const opt = {
+        margin: 10,
+        filename: `moneywise-analysis-${new Date()
+          .toLocaleDateString()
+          .replace(/\//g, "-")}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      } as const;
+
+      await html2pdf().set(opt).from(container).save();
+
+      toast({
+        title: "PDF downloaded",
+        description: "The analysis has been downloaded as a PDF",
+      });
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+      toast({
+        title: "Download failed",
+        description: "Could not generate the PDF file",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadingIndex(null);
+    }
   };
 
   const handleSendMessage = async (message: string) => {
@@ -398,19 +510,35 @@ export function AnalyzeWithAI({
                         </ReactMarkdown>
                       </div>
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 right-2 h-7 w-7 p-0 rounded-full opacity-70 hover:opacity-100 hover:bg-background/50"
-                        onClick={() => copyToClipboard(msg.ai, index)}
-                        title="Copy message"
-                      >
-                        {copiedMessageIndex === index ? (
-                          <Check className="h-3.5 w-3.5 text-green-500" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                      </Button>
+                      <div className="absolute top-2 right-2 flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 rounded-full opacity-70 hover:opacity-100 hover:bg-background/50"
+                          onClick={() => copyToClipboard(msg.ai, index)}
+                          title="Copy message"
+                        >
+                          {copiedMessageIndex === index ? (
+                            <Check className="h-3.5 w-3.5 text-green-500" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 rounded-full opacity-70 hover:opacity-100 hover:bg-background/50"
+                          onClick={() => downloadAsPdf(msg.ai, index)}
+                          title="Download as PDF"
+                          disabled={downloadingIndex === index}
+                        >
+                          {downloadingIndex === index ? (
+                            <div className="h-3.5 w-3.5 border-t-2 border-primary rounded-full animate-spin" />
+                          ) : (
+                            <Download className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+                      </div>
                     </>
                   )}
                   {msg.error && (

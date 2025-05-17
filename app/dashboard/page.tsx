@@ -324,6 +324,46 @@ export default function Dashboard() {
     [router, toast]
   );
 
+  const handleDeleteReminder = useCallback(
+    async (id: string) => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/reminders?id=${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          setDashboardState((prev) => ({
+            ...prev,
+            reminders: prev.reminders.filter((reminder) => reminder.id !== id),
+          }));
+          toast({
+            title: "Success",
+            description: "Reminder deleted successfully",
+          });
+        } else {
+          throw new Error("Failed to delete reminder");
+        }
+      } catch (error) {
+        console.error("Delete reminder error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete reminder. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [router, toast]
+  );
+
   const handleTabChange = useCallback((value: string) => {
     setDashboardState((prev) => ({
       ...prev,
@@ -374,10 +414,7 @@ export default function Dashboard() {
               budgets={budgets}
               isLoading={isLoading}
             />
-            <SpendingTrendChart
-              expenses={expenses}
-              isLoading={isLoading}
-            />
+            <SpendingTrendChart expenses={expenses} isLoading={isLoading} />
             <div className="grid gap-4 sm:gap-6">
               <BudgetOverview
                 expenses={expenses}
@@ -441,6 +478,7 @@ export default function Dashboard() {
               status: r.status,
               isRecurring: r.isRecurring,
               frequency: r.frequency || undefined,
+              lastSent: r.lastSent,
             }))}
             isLoading={isLoading}
             onAddReminder={async (reminder) => {
@@ -459,6 +497,7 @@ export default function Dashboard() {
               });
             }}
             onUpdateReminder={handleUpdateReminder}
+            onDeleteReminder={handleDeleteReminder}
           />
         )}
         {activeView === "analyze-with-ai" && (
@@ -469,7 +508,13 @@ export default function Dashboard() {
         )}
       </div>
     );
-  }, [dashboardState, handleAddReminder, handleUpdateReminder, handleLogout]);
+  }, [
+    dashboardState,
+    handleAddReminder,
+    handleUpdateReminder,
+    handleDeleteReminder,
+    handleLogout,
+  ]);
 
   return (
     <div className="flex h-screen bg-background">

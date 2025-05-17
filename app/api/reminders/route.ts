@@ -114,7 +114,10 @@ export async function PUT(request: Request) {
     const { id, ...updateData } = data;
 
     if (!id) {
-      return NextResponse.json({ error: "Reminder ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Reminder ID is required" },
+        { status: 400 }
+      );
     }
 
     // Ensure amount is a float and dueDate is a Date object if present
@@ -126,7 +129,6 @@ export async function PUT(request: Request) {
     }
     updateData.updatedAt = new Date();
 
-
     const reminder = await prisma.reminder.updateMany({
       where: {
         id,
@@ -136,14 +138,16 @@ export async function PUT(request: Request) {
     });
 
     if (reminder.count === 0) {
-      return NextResponse.json({ error: "Reminder not found or unauthorized" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Reminder not found or unauthorized" },
+        { status: 404 }
+      );
     }
 
     // Fetch the updated reminder to return it
     const updatedReminder = await prisma.reminder.findUnique({
-      where: { id }
+      where: { id },
     });
-
 
     return NextResponse.json(updatedReminder);
   } catch (error) {
@@ -165,10 +169,16 @@ export async function DELETE(request: Request) {
 
   try {
     const { userId } = await verifyToken(token);
-    const { id } = await request.json(); // Assume ID is sent in the body for DELETE
+
+    // Extract the reminderId from the URL
+    const url = new URL(request.url);
+    const id = url.searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: "Reminder ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Reminder ID is required" },
+        { status: 400 }
+      );
     }
 
     const deleteResult = await prisma.reminder.deleteMany({
@@ -179,11 +189,16 @@ export async function DELETE(request: Request) {
     });
 
     if (deleteResult.count === 0) {
-      return NextResponse.json({ error: "Reminder not found or unauthorized" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Reminder not found or unauthorized" },
+        { status: 404 }
+      );
     }
 
-
-    return NextResponse.json({ message: "Reminder deleted successfully" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Reminder deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error deleting reminder:", error);
     return NextResponse.json(
